@@ -575,6 +575,30 @@ h1,h2,h3{font-weight:700;letter-spacing:.01em}
 .rl-cell.landed{animation:landed 1.2s ease-in-out 3;box-shadow:inset 0 0 0 2px var(--gold-hi);background:#e8b64733;z-index:1}
 @keyframes landed{50%{background:#e8b64766}}
 @media (max-width:900px){.side{order:2}}
+/* rewards */
+.cnav button{position:relative}
+.dot-ready{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--money);box-shadow:0 0 0 2px var(--ink),0 0 10px var(--money);animation:pulseDot 1.6s infinite}
+@keyframes pulseDot{50%{transform:scale(1.4)}}
+.tier-badge{--tc:#e8b647;display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--tc) 60%,transparent);background:color-mix(in srgb,var(--tc) 14%,transparent);color:var(--tc);font-weight:800;font-size:13px}
+.tier-badge.big{flex-direction:column;gap:2px;padding:16px 20px;border-radius:20px;font-size:15px}
+.tier-badge.big .ic{font-size:44px;filter:drop-shadow(0 0 14px var(--tc))}
+.vip{background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--tc) 16%,transparent),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel))}
+.vip-top{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.vip-txt{flex:1;min-width:220px}.vip-txt h3{font-size:30px;color:var(--tc)}.vip-txt p{margin:6px 0 0}.hl{color:var(--cream)}
+.vip-bar{height:12px;border-radius:999px;background:#0e0d09;border:1px solid var(--line);margin-top:20px;overflow:hidden}
+.vip-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--gold-lo),var(--tc));box-shadow:0 0 14px var(--tc);animation:grow 1s cubic-bezier(.2,.9,.3,1) both}
+@keyframes grow{from{width:0}}
+.vip-meta{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:12.5px;color:var(--mute);flex-wrap:wrap}
+.rw-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.rw-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 14px;align-items:start;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--panel);animation:rise .5s both}
+.rw-card>.ic{font-size:26px;color:var(--gold);margin-top:4px}
+.rw-main{display:grid;gap:2px}.rw-main small{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.rw-main b{font-size:28px;color:var(--gold-hi)}.rw-main span{font-size:13px;color:var(--mute)}
+.rw-card .btn{grid-column:1/-1;width:100%}
+.btn.pulse{animation:btnPulse 1.8s ease-in-out infinite}@keyframes btnPulse{50%{box-shadow:0 0 0 6px #e8b64733,0 10px 30px -6px #e8b647cc}}
+.sheet.tiers{min-width:460px}.sheet.tiers td:first-child,.sheet.tiers th:first-child{text-align:left}
+@media (max-width:820px){.rw-grid{grid-template-columns:1fr}}
+@media (max-width:640px){.cnav button{padding:9px 10px}}
 </style>
 
 </head>
@@ -1149,7 +1173,7 @@ Object.assign(A,{
 /* ---------- Shared casino chrome ---------- */
 function cHead(){
   return `<header class="top chead"><button class="brand" data-a="go" data-v="home" aria-label="Lobby"><img src="${LOGO}" alt=""><span class="ttl">Big Butla<small>Business League</small></span></button>
-   <nav class="cnav" aria-label="Sections">${[["home","Lobby","home"],["leaderboard","Leaderboard","medal"]].map(([v,l,i])=>`<button class="${APP.view===v?"on":""}" data-a="go" data-v="${v}">${ic(i)}<span>${l}</span></button>`).join("")}</nav>
+   <nav class="cnav" aria-label="Sections">${[["home","Lobby","home"],["rewards","Rewards","gift"],["leaderboard","Leaderboard","medal"]].map(([v,l,i])=>`<button class="${APP.view===v?"on":""}" data-a="go" data-v="${v}">${ic(i)}<span>${l}</span>${v==="rewards"&&typeof rewardsReady==="function"&&rewardsReady()?`<i class="dot-ready" aria-label="Rewards ready"></i>`:""}</button>`).join("")}</nav>
    <button class="btn btn-ghost icon-btn" data-a="sound" aria-label="${SFX.on?"Mute sound":"Turn sound on"}" aria-pressed="${SFX.on}">${ic(SFX.on?"volume":"mute")}</button>
    ${ACC||NET_OK===false?"":`<button class="btn btn-ghost login-btn" data-a="go" data-v="account">${ic("login")}<span>Log in</span></button>`}
    <button class="wallet" data-a="go" data-v="${ACC?"account":"leaderboard"}" aria-label="Balance ${fmtB(me().bucks)} Butla Bucks">${ic("coins")}<span><b class="wallet-amt num" data-v="${me().bucks}">${fmtB(me().bucks)}</b><small>${ACC?esc(me().name):"Guest"}</small></span></button></header>`;
@@ -1160,7 +1184,7 @@ const chipStack=(amt,cls="")=>amt?`<span class="stack ${cls}"><i class="chip-min
 function brokeBanner(){
   if(me().bucks>=10)return"";
   const wait=Math.max(0,REFILL_MS-(Date.now()-me().lastRefill)),mins=Math.ceil(wait/60e3);
-  return `<div class="broke">${ic("coins")}<span>You're out of chips.</span>${canRefill()?`<button class="btn btn-gold" data-a="refill">Claim ${fmtB(REFILL)} free</button>`:`<span class="mute">Free refill in ${mins} min</span>`}${canDaily()?`<button class="btn btn-ghost" data-a="daily">Daily bonus</button>`:""}</div>`;
+  return `<div class="broke">${ic("coins")}<span>You're out of chips.</span>${canRefill()?`<button class="btn btn-gold" data-a="refill">Claim ${fmtB(REFILL)} free</button>`:`<span class="mute">Free refill in ${mins} min</span>`}${canDaily()?`<button class="btn btn-ghost" data-a="daily">Daily bonus</button>`:""}${typeof rakeAvail==="function"&&rakeAvail()>=1?`<button class="btn btn-ghost" data-a="claimRake">Claim ${fmtB(rakeAvail())} rakeback</button>`:""}<button class="btn btn-ghost" data-a="go" data-v="rewards">${ic("gift")} Rewards</button></div>`;
 }
 
 /* ---------- Lobby ---------- */
@@ -1500,7 +1524,7 @@ function accFrom(pr,token){return {token,p:{name:pr.username,bucks:+pr.bucks,bes
 let syncT=null;
 function saveAcc(){lsSet("bbbl-refill-"+ACC.p.name.toLowerCase(),String(ACC.p.lastRefill||0));clearTimeout(syncT);syncT=setTimeout(flushAcc,700)}
 async function flushAcc(){clearTimeout(syncT);if(!ACC)return;const p=ACC.p;
-  try{await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league});if(["home","leaderboard"].includes(APP.view))loadLB(APP.view==="home"?"bucks":APP.lb)}
+  try{const sv=await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league,p_wagered:p.wagered||0});if(sv&&ACC){ACC.p.rake=+sv.rake;ACC.p.claimedTier=+sv.claimedTier}if(["home","leaderboard"].includes(APP.view))loadLB(APP.view==="home"?"bucks":APP.lb)}
   catch(e){if(/session|log in/i.test(e.message)){ACC=null;lsDel(SKEY);toast(e.message,"bad");render()}}}
 if(typeof window!=="undefined"&&window.addEventListener)window.addEventListener("pagehide",()=>{if(ACC&&syncT)flushAcc()});
 async function restoreSession(){
@@ -1731,6 +1755,54 @@ function leadersOnline(){
   </section></div>`;
 }
 CV.leaderboard=leadersOnline;
+
+
+/* ---------- Rewards: rakeback, VIP levels, daily, refill ---------- */
+P.gift=P.gift||'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>';
+P.percent='<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>';
+const TIERS=[{n:"Bronze",min:0,rate:1,bonus:0,c:"#c98b5a"},{n:"Silver",min:10000,rate:1.5,bonus:500,c:"#c9d1d9"},{n:"Gold",min:50000,rate:2,bonus:2000,c:"#e8b647"},{n:"Platinum",min:200000,rate:3,bonus:5000,c:"#8fe3d6"},{n:"Diamond",min:1000000,rate:5,bonus:20000,c:"#a8c6ff"}];
+const tierOf=w=>{let t=0;TIERS.forEach((x,i)=>{if((w||0)>=x.min)t=i});return t};
+const rakeAvail=()=>Math.floor(me().rake||0);
+const levelAvail=()=>{const p=me(),t=tierOf(p.wagered);let s=0;for(let i=(p.claimedTier||0)+1;i<=t;i++)s+=TIERS[i].bonus;return s};
+const rewardsReady=()=>rakeAvail()>=1||levelAvail()>0||canDaily()||canRefill();
+{const f=record;record=function(stake,ret){const p=me();p.wagered=(p.wagered||0)+stake;if(!ACC)p.rake=(p.rake||0)+stake*TIERS[tierOf(p.wagered)].rate/100;f(stake,ret)}}
+{const f=accFrom;accFrom=function(pr,token){const a=f(pr,token);Object.assign(a.p,{wagered:+pr.wagered||0,rake:+pr.rake||0,claimedTier:+pr.claimedTier||0});return a}}
+async function claimOnline(fn){await flushAcc();const j=await rpc(fn,{p_token:ACC.token});const pr=j.profile;ACC.p.bucks=+pr.bucks;ACC.p.rake=+pr.rake;ACC.p.claimedTier=+pr.claimedTier;ACC.p.wagered=Math.max(ACC.p.wagered,+pr.wagered);return +j.amount}
+function claimed(amt,label){bumpWallet(amt);coinBurst(amt>=1000?110:60);SFX.win(3);toast(`${ic("gift")} ${label}: +${fmtB(amt)} Butla Bucks`,"good");render()}
+Object.assign(A,{
+  async claimRake(){const a=rakeAvail();if(a<1)return;
+    if(!ACC){me().rake-=a;bank(a);saveW();claimed(a,"Rakeback");return}
+    try{claimed(await claimOnline("bb_claim_rake"),"Rakeback")}catch(e){toast(e.message,"bad")}},
+  async claimLevel(){const a=levelAvail();if(!a)return;
+    if(!ACC){me().claimedTier=tierOf(me().wagered);bank(a);saveW();claimed(a,"Level-up bonus");return}
+    try{claimed(await claimOnline("bb_claim_level"),"Level-up bonus")}catch(e){toast(e.message,"bad")}}
+});
+function tierBadge(t,big){const x=TIERS[t];return `<span class="tier-badge ${big?"big":""}" style="--tc:${x.c}">${ic("crown")}<b>${x.n}</b></span>`}
+function rewards(){
+  const p=me(),w=p.wagered||0,t=tierOf(w),nx=TIERS[t+1],pct=nx?Math.min(100,(w-TIERS[t].min)/(nx.min-TIERS[t].min)*100):100,lv=levelAvail(),rk=rakeAvail();
+  const dailyWait=Math.max(0,DAILY_MS-(Date.now()-(p.lastDaily||0))),hrs=Math.floor(dailyWait/3600e3),mins=Math.ceil((dailyWait%3600e3)/60e3);
+  const refillWait=Math.max(0,REFILL_MS-(Date.now()-(p.lastRefill||0)));
+  const card=(icon,title,big,sub,btn)=>`<div class="rw-card">${ic(icon)}<div class="rw-main"><small>${title}</small><b class="num">${big}</b><span>${sub}</span></div>${btn}</div>`;
+  return `<div class="screen">${cHead()}
+  <div class="sec-h" style="margin-top:8px"><div><div class="eyebrow">${ic("gift")} Rewards</div><h2 style="font-size:36px">Your rewards</h2></div>
+   ${ACC?"":`<button class="btn btn-ghost" data-a="go" data-v="account">${ic("userplus")} Sign up to save rewards</button>`}</div>
+  <section class="felt vip" style="--tc:${TIERS[t].c}">
+   <div class="vip-top">${tierBadge(t,true)}<div class="vip-txt"><div class="eyebrow">VIP level</div><h3>${TIERS[t].n}</h3><p class="mute">You get <b class="hl">${TIERS[t].rate}% rakeback</b> on every bet. You've wagered <b class="num hl">${fmtB(w)}</b> Bucks in total.</p></div>
+    ${lv?`<button class="btn btn-gold btn-lg pulse" data-a="claimLevel">${ic("gift")} Claim ${fmtB(lv)} level-up bonus</button>`:""}</div>
+   ${nx?`<div class="vip-bar"><i style="width:${pct.toFixed(1)}%"></i></div><div class="vip-meta"><span>${TIERS[t].n}</span><span><b class="num">${fmtB(nx.min-w)}</b> more to ${nx.n} · ${nx.rate}% rakeback + ${fmtB(nx.bonus)} bonus</span><span>${nx.n}</span></div>`
+     :`<p class="mute" style="margin:12px 0 0">You've hit the top level. Biggest boss energy.</p>`}
+  </section>
+  <div class="rw-grid">
+   ${card("percent","Rakeback",fmtB(rk),`${TIERS[t].rate}% of every bet comes back to you. ${rk<1?"Place some bets to build it up.":"Ready to claim."}`,`<button class="btn btn-gold" data-a="claimRake" ${rk>=1?"":"disabled"}>Claim</button>`)}
+   ${card("calendar","Daily bonus",fmtB(DAILY),canDaily()?"Ready now. Comes back every 20 hours.":`Next one in ${hrs} h ${mins} min.`,`<button class="btn btn-gold" data-a="daily" ${canDaily()?"":"disabled"}>Claim</button>`)}
+   ${card("coins","Broke refill",fmtB(REFILL),p.bucks<10?(canRefill()?"You're out of chips. Grab a free top-up.":`Next refill in ${Math.ceil(refillWait/60e3)} min.`):"Unlocks if you drop below 10 Bucks.",`<button class="btn btn-gold" data-a="refill" ${canRefill()?"":"disabled"}>Claim</button>`)}
+  </div>
+  <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>VIP levels</h3><span class="mute">Based on total Bucks wagered</span></div>
+   <div class="table-box"><table class="sheet tiers"><thead><tr><th>Level</th><th>Wagered</th><th>Rakeback</th><th>Level-up bonus</th></tr></thead><tbody>
+   ${TIERS.map((x,i)=>`<tr class="${i===t?"first":""}" style="--i:${i}"><td>${tierBadge(i)}${i===t?` <span class="chip gold">You</span>`:""}</td><td>${fmtB(x.min)}+</td><td>${x.rate}%</td><td>${x.bonus?fmtB(x.bonus):"-"}</td></tr>`).join("")}</tbody></table></div></section>
+  <p class="fine">Rewards are play money too. Butla Bucks have no cash value.</p></div>`;
+}
+ROUTES.push("rewards");CV.rewards=rewards;
 
 /* ---------- Render ---------- */
 const VIEWS={home,setup,pass,turn,market,event:eventScreen,end};
