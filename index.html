@@ -918,6 +918,59 @@ body{overflow-x:clip}
 .papers{width:46px;height:30px;background:#f4f1e8;border-radius:2px;box-shadow:3px -3px 0 #e6e2d5,6px -6px 0 #d8d3c3;transform:rotate(-8deg)}
 @media (max-width:900px){.deskkb,.mouse{display:none}.desk-row{display:none}}
 @media (max-width:640px){.monitor{aspect-ratio:auto;padding:8px 8px 16px}.screen-body{min-height:170px}.stand{height:24px;width:54px}.stand::before{width:110px}}
+/* ===== Coinflip ===== */
+.art-cf .tile-art{background:radial-gradient(circle at 50% 60%,#4a3a10,#140f03);color:#ffd76a}
+.art-kn .tile-art{background:radial-gradient(circle at 50% 60%,#1a3a4a,#06121a);color:#7fdcff}
+.art-wh .tile-art{background:radial-gradient(circle at 50% 60%,#3a1a4a,#10061a);color:#e0a0ff}
+.art-tw .tile-art{background:radial-gradient(circle at 50% 60%,#3a2a1a,#140c05);color:#ffb070}
+.cface{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;flex:none}
+.cface.gold{background:radial-gradient(circle at 35% 30%,#fff3c4,#e8b647 55%,#a87515);color:#5a3d06;box-shadow:inset 0 0 0 2px #c8902a}
+.cface.black{background:radial-gradient(circle at 35% 30%,#5a5a5a,#1d1b17 60%);color:#e8b647;box-shadow:inset 0 0 0 2px #444}
+.cf-sides{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cf-side{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0e0d09;color:var(--cream);font-weight:800}
+.cf-side.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.cf-stage{min-height:300px}.cf-list{display:grid;gap:8px}
+.cf-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#0b0a07cc;border:1px solid #ffffff14;flex-wrap:wrap;animation:rise .35s both}
+.cf-row.mine{border-color:var(--gold-lo)}.cf-who{display:grid;flex:1;min-width:100px}.cf-who small{color:var(--mute);font-size:12px}
+.cf-amt{font-size:18px;color:var(--gold-hi)}
+.cf-recent{display:grid;gap:6px}
+.cf-hist{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 10px;border-radius:10px;background:#0e0d09;border:1px solid var(--line);font-size:13.5px}
+.cf-hist.me{border-color:var(--gold-lo)}.cf-hist small{grid-column:2/-1;color:var(--mute);font-size:11px}.cf-hist .cface{grid-row:span 2}
+.cf-big{display:grid;justify-items:center;gap:18px;padding:20px 0}
+.coin3d{width:150px;height:150px;position:relative;transform-style:preserve-3d}
+.cfa{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;font-size:64px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cfa.gold{background:radial-gradient(circle at 35% 30%,#fff3c4,#e8b647 55%,#a87515);color:#5a3d06;box-shadow:inset 0 0 0 6px #c8902a,0 20px 40px -10px #000}
+.cfa.black{background:radial-gradient(circle at 35% 30%,#5a5a5a,#1d1b17 60%);color:#e8b647;transform:rotateY(180deg);box-shadow:inset 0 0 0 6px #444,0 20px 40px -10px #000}
+.cf-vs{display:flex;align-items:center;gap:12px;font-weight:800;font-size:17px}.cf-vs i{font-style:normal;color:var(--mute)}
+.cf-vs .gold{color:var(--gold-hi)}.cf-vs .black{color:#cfcfcf}
+.cf-res{min-height:30px;font-size:22px;opacity:0;transition:opacity .3s}.cf-res.show{opacity:1;animation:pop .4s both}.cf-res .pos{color:var(--money)}.cf-res .neg{color:var(--loss)}
+/* ===== Keno ===== */
+.kn-felt{display:grid;gap:14px;justify-items:center}
+.kn-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;width:min(560px,100%)}
+.kn-cell{aspect-ratio:1;border:0;border-radius:10px;background:#ffffff10;box-shadow:inset 0 0 0 1px #ffffff22;color:var(--cream);font:700 16px var(--f-num);transition:transform .15s,background .2s}
+.kn-cell:not(:disabled):hover{background:#ffffff22}.kn-cell.pick{background:#e8b64744;box-shadow:inset 0 0 0 2px var(--gold)}
+.kn-cell.drawn{background:#2a3a55;animation:pop .25s both}.kn-cell.hit{background:linear-gradient(180deg,#8ff0b4,#3fbf74);color:#06210f;box-shadow:0 0 14px #58c98a99}
+.kn-res{min-height:26px;font-weight:700}.kn-res .pos{color:var(--money)}.kn-res .neg{color:var(--loss)}
+.kn-pay{display:grid;gap:4px}.kn-pay div{display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px;background:#0e0d09;font-size:13px}.kn-pay div.on{background:#58c98a22;color:var(--money)}.kn-pay b{color:var(--gold-hi)}
+/* ===== Wheel ===== */
+.wh-felt{display:grid;gap:14px;justify-items:center}
+.lw-wrap{width:min(360px,100%)}
+#lwWheel{transform-box:view-box;transform-origin:0 0}
+.wh-legend{display:flex;flex-wrap:wrap;gap:8px}.wh-legend span{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700}.wh-legend i{width:12px;height:12px;border-radius:3px}.wh-legend small{color:var(--mute);font-weight:500}
+/* ===== Tower ===== */
+.tw-felt{display:grid;gap:12px;justify-items:center}
+.tw-grid{display:grid;gap:6px;width:min(460px,100%)}
+.tw-row{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:center;opacity:.55;transition:opacity .2s}
+.tw-row.cur,.tw-row.passed{opacity:1}.tw-row.cur .tw-m{color:var(--gold-hi)}
+.tw-m{font-size:13px;font-weight:700;text-align:right;color:var(--mute)}
+.tw-cells{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px}
+.tw-cell{height:42px;border:0;border-radius:9px;background:#ffffff10;box-shadow:inset 0 0 0 1px #ffffff22;color:var(--cream);display:grid;place-items:center;font-size:18px}
+.tw-row.cur .tw-cell{background:#e8b64722;box-shadow:inset 0 0 0 1px var(--gold-lo);animation:btnPulse 1.6s infinite}
+.tw-row.cur .tw-cell:hover{background:#e8b64744}
+.tw-cell.safe{background:radial-gradient(circle,#11564c,#0a2a26);color:#6ee7d8}.tw-cell.bomb{background:radial-gradient(circle,#5c1712,#2a0907);color:#ff8a7a}
+.tw-cell.picked{box-shadow:inset 0 0 0 2px #fff}
+@media (max-width:640px){.kn-grid{grid-template-columns:repeat(8,1fr);gap:4px}.kn-cell{font-size:13px;border-radius:7px}.coin3d{width:120px;height:120px}}
+.cf-col{display:grid;gap:16px;min-width:0}
 </style>
 
 </head>
@@ -1849,11 +1902,11 @@ async function rpc(fn,args){
   catch(e){NET_OK=false;throw new Error("Can't reach the Big Butla server right now.")}
   NET_OK=true;const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||"Something went wrong. Try again.");return j;
 }
-function accFrom(pr,token){return {token,p:{name:pr.username,bucks:+pr.bucks,best:+pr.best,profit:+pr.profit,hands:+pr.hands,league:+pr.league,lastDaily:+pr.lastDaily||0,lastRefill:+(lsGet("bbbl-refill-"+pr.username.toLowerCase())||0)}}}
+function accFrom(pr,token){return {token,p:{srv:+pr.srv||0,officeDone:+pr.officeDone||0,officeEarned:+pr.officeEarned||0,name:pr.username,bucks:+pr.bucks,best:+pr.best,profit:+pr.profit,hands:+pr.hands,league:+pr.league,lastDaily:+pr.lastDaily||0,lastRefill:+(lsGet("bbbl-refill-"+pr.username.toLowerCase())||0)}}}
 let syncT=null;
 function saveAcc(){lsSet("bbbl-refill-"+ACC.p.name.toLowerCase(),String(ACC.p.lastRefill||0));clearTimeout(syncT);syncT=setTimeout(flushAcc,700)}
 async function flushAcc(){clearTimeout(syncT);if(!ACC)return;const p=ACC.p;
-  try{const sv=await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league,p_wagered:p.wagered||0,p_build:+BUILD});if(sv&&ACC){ACC.p.rake=+sv.rake;ACC.p.claimedTier=+sv.claimedTier}if(["home","leaderboard"].includes(APP.view))loadLB(APP.view==="home"?"bucks":APP.lb)}
+  try{const sent=p.bucks;const sv=await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league,p_wagered:p.wagered||0,p_build:+BUILD,p_srv:p.srv||0,p_office_done:p.officeDone||0,p_office_earned:p.officeEarned||0});if(sv&&ACC){const adj=+sv.bucks-sent;ACC.p.srv=+sv.srv||0;if(adj){ACC.p.bucks+=adj;bumpWallet(adj)}ACC.p.rake=+sv.rake;ACC.p.claimedTier=+sv.claimedTier}if(["home","leaderboard"].includes(APP.view))loadLB(APP.view==="home"?"bucks":APP.lb)}
   catch(e){if(/out of date/i.test(e.message)){forceUpdate();return}if(/session|log in/i.test(e.message)){ACC=null;lsDel(SKEY);toast(e.message,"bad");render()}}}
 function forceUpdate(){if(document.getElementById("forceUpd"))return;const d=document.createElement("div");d.id="forceUpd";d.className="bigwin";
   d.innerHTML=`<div class="bw-card"><div class="bw-crown">${ic("rotate")}</div><div class="bw-label" style="font-size:clamp(32px,7vw,56px)">Update needed</div><div class="bw-sub">This page is out of date, so your progress can't be saved.</div><button class="btn btn-gold btn-lg" style="margin-top:10px">Refresh now</button></div>`;
@@ -1883,7 +1936,7 @@ Object.assign(A,{
   async daily(){
     if(!canDaily())return;
     if(!ACC){me().lastDaily=Date.now();bank(DAILY);coinBurst(70);SFX.win(3);toast(`${ic("calendar")} Daily bonus: +${fmtB(DAILY)} Butla Bucks`,"good");render();return}
-    try{await flushAcc();const pr=await rpc("bb_claim_daily",{p_token:ACC.token});ACC.p.bucks=+pr.bucks;ACC.p.lastDaily=+pr.lastDaily;bumpWallet(DAILY);coinBurst(70);SFX.win(3);
+    try{await flushAcc();const pr=await rpc("bb_claim_daily",{p_token:ACC.token});ACC.p.bucks=+pr.bucks;ACC.p.srv=+pr.srv||0;ACC.p.lastDaily=+pr.lastDaily;bumpWallet(DAILY);coinBurst(70);SFX.win(3);
       toast(`${ic("calendar")} Daily bonus: +${fmtB(DAILY)} Butla Bucks`,"good");render()}catch(e){toast(e.message,"bad")}
   },
   lbSort(k){APP.lb=k;if(!APP.glb[k])loadLB(k);render()}
@@ -2101,7 +2154,7 @@ const levelAvail=()=>{const p=me(),t=tierOf(p.wagered);let s=0;for(let i=(p.clai
 const rewardsReady=()=>rakeAvail()>=1||levelAvail()>0||canDaily()||canRefill();
 {const f=record;record=function(stake,ret){const p=me();p.wagered=(p.wagered||0)+stake;if(!ACC)p.rake=(p.rake||0)+stake*TIERS[tierOf(p.wagered)].rate/100;f(stake,ret)}}
 {const f=accFrom;accFrom=function(pr,token){const a=f(pr,token);Object.assign(a.p,{wagered:+pr.wagered||0,rake:+pr.rake||0,claimedTier:+pr.claimedTier||0});return a}}
-async function claimOnline(fn){await flushAcc();const j=await rpc(fn,{p_token:ACC.token});const pr=j.profile;ACC.p.bucks=+pr.bucks;ACC.p.rake=+pr.rake;ACC.p.claimedTier=+pr.claimedTier;ACC.p.wagered=Math.max(ACC.p.wagered,+pr.wagered);return +j.amount}
+async function claimOnline(fn){await flushAcc();const j=await rpc(fn,{p_token:ACC.token});const pr=j.profile;ACC.p.bucks=+pr.bucks;ACC.p.srv=+pr.srv||0;ACC.p.rake=+pr.rake;ACC.p.claimedTier=+pr.claimedTier;ACC.p.wagered=Math.max(ACC.p.wagered,+pr.wagered);return +j.amount}
 function claimed(amt,label){bumpWallet(amt);coinBurst(amt>=1000?110:60);SFX.win(3);toast(`${ic("gift")} ${label}: +${fmtB(amt)} Butla Bucks`,"good");render()}
 Object.assign(A,{
   async claimRake(){const a=rakeAvail();if(a<1)return;
@@ -2149,7 +2202,7 @@ async function lcFetch(){if(LC.busy)return;try{lcAdopt(await rpc("cr_state",{p_t
   if(LC.fails>=4&&APP.view==="crash"){lcStop();LC.solo=true;toast("Live Crash isn't reachable right now. Playing solo.","bad");render()}}}
 function lcAdopt(s){
   LC.off=s.now-Date.now();const prev=LC.st,newRound=!prev||prev.round.id!==s.round.id;LC.st=s;
-  if(s.me&&ACC){const b=ACC.p.bucks;Object.assign(ACC.p,{bucks:+s.me.bucks,best:+s.me.best,profit:+s.me.profit,hands:+s.me.hands,wagered:+s.me.wagered,rake:+s.me.rake,claimedTier:+s.me.claimedTier});if(b!==ACC.p.bucks)bumpWallet(ACC.p.bucks-b)}
+  if(s.me&&ACC){const b=ACC.p.bucks;Object.assign(ACC.p,{srv:+s.me.srv||0,bucks:+s.me.bucks,best:+s.me.best,profit:+s.me.profit,hands:+s.me.hands,wagered:+s.me.wagered,rake:+s.me.rake,claimedTier:+s.me.claimedTier});if(b!==ACC.p.bucks)bumpWallet(ACC.p.bucks-b)}
   if(s.round.crashed&&LC.boomed!==s.round.id){LC.boomed=s.round.id;const mb=s.myBet;if(mb&&!mb.cashedAt)SFX.boom();else if(mb&&mb.cashedAt)SFX.thunk();else SFX.thunk()}
   if(newRound){if(prev)SFX.whoosh();if(APP.view==="crash")render()}else lcPanel();
 }
@@ -2571,7 +2624,7 @@ const ADM={data:null,err:"",busy:false,q:"",confirm:null,sel:null};
 const isAdmin=()=>!!(ACC&&ACC.p.isAdmin);
 async function admLoad(){if(!isAdmin())return;try{ADM.data=await rpc("adm_overview",{p_token:ACC.token});ADM.err=""}catch(e){ADM.err=e.message}if(APP.view==="admin")render()}
 async function admDo(fn,args,okMsg){ADM.busy=true;render();try{ADM.data=await rpc(fn,Object.assign({p_token:ACC.token},args));ADM.err="";toast(`${ic("check")} ${okMsg}`,"good");SFX.click();
-  const pr=await rpc("bb_me",{p_token:ACC.token});Object.assign(ACC.p,{bucks:+pr.bucks,best:+pr.best,profit:+pr.profit,hands:+pr.hands,league:+pr.league,wagered:+pr.wagered,rake:+pr.rake,claimedTier:+pr.claimedTier});bumpWallet(0);APP.glb={}}
+  const pr=await rpc("bb_me",{p_token:ACC.token});Object.assign(ACC.p,{srv:+pr.srv||0,bucks:+pr.bucks,best:+pr.best,profit:+pr.profit,hands:+pr.hands,league:+pr.league,wagered:+pr.wagered,rake:+pr.rake,claimedTier:+pr.claimedTier});bumpWallet(0);APP.glb={}}
   catch(e){toast(e.message,"bad")}ADM.busy=false;ADM.confirm=null;render()}
 const ADM_GLOBAL={reset_all_stats:["Reset ALL stats","Every player goes back to 1,000 Bucks and all stats, ranks, rakeback, the wins feed and Crash history are wiped.",true],
   reset_leaderboards:["Reset leaderboards only","Clears biggest win, total earned, total wagered, hands and League scores. Balances stay.",true],
@@ -2683,8 +2736,8 @@ const OFF_EVENTS=[["The printer jammed. You fixed it with a gentle kick.","print
  ["The air con is set to Antarctica again.","cold"],["You've been in this meeting for three hours.","meeting"]];
 const OFF={line:"",urgent:false,typed:"",errs:0,t0:0,done:0,earned:0,streak:0,last:null,shift:false,msg:"",bag:[]};
 const offKey=()=>"bbbl-office-"+(ACC?ACC.p.name.toLowerCase():"guest");
-function offLoad(){try{const s=JSON.parse(lsGet(offKey())||"null");OFF.done=s?.done||0;OFF.earned=s?.earned||0}catch(e){OFF.done=0;OFF.earned=0}}
-function offSave(){lsSet(offKey(),JSON.stringify({done:OFF.done,earned:OFF.earned}))}
+function offLoad(){if(ACC){const loc=(()=>{try{return JSON.parse(lsGet(offKey())||"null")}catch(e){return null}})();OFF.done=Math.max(ACC.p.officeDone||0,loc?.done||0);OFF.earned=Math.max(ACC.p.officeEarned||0,loc?.earned||0);return}try{const s=JSON.parse(lsGet(offKey())||"null");OFF.done=s?.done||0;OFF.earned=s?.earned||0}catch(e){OFF.done=0;OFF.earned=0}}
+function offSave(){lsSet(offKey(),JSON.stringify({done:OFF.done,earned:OFF.earned}));if(ACC){ACC.p.officeDone=OFF.done;ACC.p.officeEarned=OFF.earned;saveAcc()}}
 const offRank=()=>{let r=0;OFF_RANKS.forEach((x,i)=>{if(OFF.done>=x.at)r=i});return r};
 function offNext(){
   if(Math.random()<.08){OFF.line=OFF_URGENT[Math.floor(Math.random()*OFF_URGENT.length)];OFF.urgent=true}
@@ -2695,8 +2748,8 @@ function offType(ch){
   if(APP.view!=="office")return;if(!OFF.line)offNext();
   if(!OFF.t0)OFF.t0=performance.now();
   const want=OFF.line[OFF.typed.length];
-  if(want!==undefined&&ch.toLowerCase()===want.toLowerCase()){OFF.typed+=want;SFX.keyClick(ch===" ")}
-  else{OFF.errs++;SFX.keyClick(false);SFX.v(180,.08,{type:"square",v:.03,at:.01});const el=document.getElementById("offLine");if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}}
+  if(want!==undefined&&ch.toLowerCase()===want.toLowerCase()){OFF.typed+=want;SFX.v(1400+Math.random()*300,.025,{type:"square",v:.015})}
+  else{OFF.errs++;SFX.v(180,.08,{type:"square",v:.03});const el=document.getElementById("offLine");if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}}
   if(OFF.typed.length>=OFF.line.length)offSubmit();else offPaint();
 }
 function offBack(){if(OFF.typed.length){OFF.typed=OFF.typed.slice(0,-1);offPaint()}}
@@ -2769,6 +2822,7 @@ function office(){
 ROUTES.push("office");CV.office=office;
 GAMES.splice(2,0,{v:"office",name:"Butla Office",icon:"monitor",art:"of",line:"Need Bucks? Get a job. Type the office paperwork, get promoted, get paid.",tag:"Earn · No bet"});
 {const f=route;route=function(){f();if(APP.view==="office"){offLoad()}}}
+{const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="office"){offLoad();render()}}}
 
 /* ---------- "Just get a job" when you go broke ---------- */
 let jobNagAt=0;
@@ -2781,8 +2835,194 @@ function jobNag(){if(APP.view==="office"||document.getElementById("jobNag")||Dat
 }
 {const f=bank;bank=function(d){const was=me().bucks;f(d);if(d<0&&me().bucks<100&&was>=me().bucks)setTimeout(()=>{if(me().bucks<100)jobNag()},2500)}}
 
+
+/* =====================================================================
+   COINFLIP PvP (server-side) + KENO + LUCKY WHEEL + TOWER
+   ===================================================================== */
+P.coin2='<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/>';
+P.grid='<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>';
+P.target='<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>';
+P.tower='<path d="M6 21V8l6-5 6 5v13"/><path d="M6 13h12M6 17h12M10 21v-4h4v4"/>';
+
+/* ---------- Coinflip ---------- */
+const CF={st:null,poll:0,side:"gold",busy:false,anim:null,seen:new Set(),first:true};
+BETS.cf=100;
+async function cfFetch(){try{cfAdopt(await rpc("cf_state",{p_token:ACC?ACC.token:null}))}catch(e){}}
+function cfAdopt(st){
+  CF.st=st;
+  if(st.me&&ACC){const b=ACC.p.bucks;Object.assign(ACC.p,{srv:+st.me.srv||0,bucks:+st.me.bucks,profit:+st.me.profit,best:+st.me.best,hands:+st.me.hands,wagered:+st.me.wagered,rake:+st.me.rake});if(b!==ACC.p.bucks)bumpWallet(ACC.p.bucks-b)}
+  // a flip of mine got resolved by someone else: show it
+  (st.mine||[]).forEach(f=>{if(f.status==="done"&&!CF.seen.has(f.id)){CF.seen.add(f.id);if(!CF.first&&!CF.anim)cfShow(f)}});
+  CF.first=false;
+  if(APP.view==="coinflip"&&!CF.anim)cfPaint();
+}
+function cfShow(f){
+  CF.anim=f;render();SFX.whoosh();
+  const coin=document.getElementById("cfCoin");if(coin){const turns=6+(f.result==="black"?.5:0);coin.animate([{transform:"rotateY(0deg)"},{transform:`rotateY(${turns*360}deg)`}],{duration:2400,easing:"cubic-bezier(.2,.7,.2,1)",fill:"forwards"})}
+  let n=0;const iv=setInterval(()=>{SFX.tick();if(++n>18)clearInterval(iv)},110);
+  setTimeout(()=>{const won=f.winner&&ACC&&f.winner===ACC.p.name;
+    const el=document.getElementById("cfResult");if(el){el.innerHTML=won?`<b class="pos">You won ${fmtC(Math.floor(f.amount*2*.98))}!</b>`:`<b class="neg">${esc(f.winner)} won it</b>`;el.classList.add("show")}
+    if(won){SFX.win(2);coinBurst(70)}else SFX.lose();
+    setTimeout(()=>{CF.anim=null;render()},2600)},2500);
+}
+Object.assign(A,{
+  cfSide(s){CF.side=s;SFX.click();render()},
+  async cfCreate(){if(CF.busy)return;const amt=BETS.cf;if(!(amt>=10)){toast("Minimum flip is 10 Bucks","bad");return}if(amt>me().bucks){toast("Not enough Bucks for that flip","bad");return}
+    CF.busy=true;render();try{await flushAcc();cfAdopt(await rpc("cf_create",{p_token:ACC.token,p_amount:amt,p_side:CF.side}));SFX.chip();toast(`${ic("coin2")} Flip posted. Waiting for someone to take it.`,"good")}catch(e){toast(e.message,"bad")}CF.busy=false;render()},
+  async cfJoin(id){if(CF.busy)return;CF.busy=true;try{await flushAcc();const j=await rpc("cf_join",{p_token:ACC.token,p_id:+id});CF.seen.add(j.flip.id);cfAdopt(j.state);cfShow(j.flip)}catch(e){toast(e.message,"bad");cfFetch()}CF.busy=false},
+  async cfHouse(id){if(CF.busy)return;CF.busy=true;try{await flushAcc();const j=await rpc("cf_house",{p_token:ACC.token,p_id:+id});CF.seen.add(j.flip.id);cfAdopt(j.state);cfShow(j.flip)}catch(e){toast(e.message,"bad");cfFetch()}CF.busy=false},
+  async cfCancel(id){if(CF.busy)return;CF.busy=true;try{cfAdopt(await rpc("cf_cancel",{p_token:ACC.token,p_id:+id}));toast("Flip cancelled. Bucks refunded.")}catch(e){toast(e.message,"bad")}CF.busy=false;render()}
+});
+const coinFace=s=>`<span class="cface ${s}">${ic("crown")}</span>`;
+function cfListHtml(){const st=CF.st;if(!st)return `<p class="mute">Loading flips...</p>`;
+  const open=st.open;if(!open.length)return `<p class="mute" style="text-align:center;padding:18px 0">No open flips. Make one and wait for a challenger.</p>`;
+  return open.map(f=>`<div class="cf-row ${f.iCreated?"mine":""}">${coinFace(f.side)}<div class="cf-who"><b>${esc(f.creator)}</b><small>picked ${f.side}</small></div><b class="num cf-amt">${fmtC(f.amount)}</b>
+    ${f.iCreated?`<button class="btn btn-ghost sm" data-a="cfHouse" data-v="${f.id}">${ic("bot")} Flip vs house</button><button class="btn btn-ghost sm danger" data-a="cfCancel" data-v="${f.id}">Cancel</button>`
+     :`<button class="btn btn-gold sm" data-a="cfJoin" data-v="${f.id}" ${f.amount>me().bucks?"disabled":""}>${ic("coin2")} Join as ${f.side==="gold"?"black":"gold"}</button>`}</div>`).join("")}
+function cfRecentHtml(){const st=CF.st;if(!st||!st.recent.length)return `<p class="mute" style="font-size:13px">No flips yet.</p>`;
+  return st.recent.map(f=>`<div class="cf-hist ${f.mine?"me":""}">${coinFace(f.result)}<span><b>${esc(f.winner)}</b> beat ${esc(f.winner===f.creator?f.joiner:f.creator)}</span><b class="num">${fmtC(f.amount*2)}</b><small>${ago(f.at)}</small></div>`).join("")}
+function cfPaint(){const a=document.getElementById("cfList");if(a)a.innerHTML=cfListHtml();const b=document.getElementById("cfRecent");if(b)b.innerHTML=cfRecentHtml()}
+function coinflip(){
+  if(!ACC||NET_OK===false)return `<div class="screen">${cHead()}<section class="felt auth"><div class="av">${ic("coin2")}</div><h2>Coinflip</h2><p class="mute" style="margin:0">Flip against other players for their Bucks. Log in to play.</p><button class="btn btn-gold btn-lg" data-a="go" data-v="account">${ic("login")} Log in or sign up</button></section></div>`;
+  const a=CF.anim;
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Coinflip</h2><span class="live-pill"><i></i>PvP</span><span class="mute">Winner takes the pot, minus a 2% house cut</span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("cf",false)}
+    <div><label class="lbl2">Your side</label><div class="cf-sides">${["gold","black"].map(s=>`<button class="cf-side ${CF.side===s?"on":""}" data-a="cfSide" data-v="${s}">${coinFace(s)}<b>${s[0].toUpperCase()+s.slice(1)}</b></button>`).join("")}</div></div>
+    <button class="btn btn-gold btn-lg" data-a="cfCreate" ${CF.busy?"disabled":""}>${ic("plus")} Create flip</button>
+    <p class="mute" style="font-size:12.5px;margin:0">Your Bucks are held until someone joins. Cancel any time for a full refund, or flip against the house if nobody bites.</p>
+   </aside>
+   <div class="cf-col">
+    <section class="table-felt cf-stage">${a?`<div class="cf-big"><div class="coin3d" id="cfCoin"><div class="cfa gold">${ic("crown")}</div><div class="cfa black">${ic("crown")}</div></div>
+      <div class="cf-vs"><span class="${a.side}">${esc(a.creator)}</span><i>vs</i><span class="${a.side==="gold"?"black":"gold"}">${esc(a.joiner)}</span></div><div class="cf-res" id="cfResult"></div></div>`
+     :`<div class="sec-h"><h3>Open flips</h3><span class="mute">Tap one to take it on</span></div><div id="cfList" class="cf-list">${cfListHtml()}</div>`}</section>
+    <section class="felt"><div class="sec-h"><h3>Recent flips</h3></div><div id="cfRecent" class="cf-recent">${cfRecentHtml()}</div></section>
+   </div>
+  </div></div>`;
+}
+
+/* ---------- Keno ---------- */
+const KENO_PAY={"1":{"1":3.84},"2":{"1":1.71,"2":5.23},"3":{"1":0.99,"2":2.96,"3":9.88},"4":{"2":2.84,"3":7.1,"4":31.25},"5":{"2":1.87,"3":3.74,"4":12.48,"5":62.39},"6":{"2":1.28,"3":2.56,"4":6.4,"5":32,"6":153.61},"7":{"3":3.06,"4":6.11,"5":18.33,"6":91.65,"7":458.25},"8":{"3":2.04,"4":4.07,"5":10.85,"6":40.7,"7":203.51,"8":1085.36},"9":{"3":1.4,"4":2.8,"5":7,"6":28.01,"7":112.05,"8":560.23,"9":2801.15},"10":{"4":3.35,"5":6.7,"6":20.1,"7":67,"8":335.02,"9":1675.08,"10":8375.4}};
+const KN={picks:new Set(),drawn:[],busy:false,hits:0,last:null};
+BETS.keno=10;
+Object.assign(A,{
+  knPick(n){if(KN.busy)return;n=+n;if(KN.drawn.length){KN.drawn=[];KN.last=null}if(KN.picks.has(n))KN.picks.delete(n);else if(KN.picks.size<10)KN.picks.add(n);else{toast("Pick up to 10 numbers","bad");return}SFX.click();render()},
+  knRandom(){if(KN.busy)return;KN.drawn=[];KN.last=null;const k=KN.picks.size||5;KN.picks=new Set(shuffle([...Array(40).keys()].map(i=>i+1)).slice(0,k));SFX.chip();render()},
+  knClear(){if(KN.busy)return;KN.picks=new Set();KN.drawn=[];KN.last=null;render()},
+  async knPlay(){if(KN.busy)return;if(!KN.picks.size){toast("Pick at least one number","bad");return}const s=takeBet("keno");if(!s)return;
+    KN.busy=true;KN.drawn=[];KN.last=null;render();const draw=shuffle([...Array(40).keys()].map(i=>i+1)).slice(0,10);
+    for(const n of draw){KN.drawn.push(n);const el=document.querySelector(`.kn-cell[data-v="${n}"]`);if(el){el.classList.add("drawn");if(KN.picks.has(n)){el.classList.add("hit");SFX.gem(KN.drawn.filter(x=>KN.picks.has(x)).length)}else SFX.tick()}await sleep(160)}
+    const hits=draw.filter(n=>KN.picks.has(n)).length,mult=(KENO_PAY[KN.picks.size]||{})[hits]||0,ret=Math.floor(s*mult);
+    if(ret)bank(ret);record(s,ret);KN.last={hits,mult,ret,s};KN.busy=false;if(ret&&ret<s*5)SFX.win(mult>=3?2:1);else if(!ret)SFX.lose();render()}
+});
+function keno(){
+  const n=KN.picks.size,tbl=KENO_PAY[n]||{};
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Keno</h2><span class="mute">Pick 1 to 10 numbers. We draw 10.</span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("keno",KN.busy)}
+    <div class="kn-pay"><label class="lbl2">Pays for ${n||"?"} pick${n===1?"":"s"}</label>${n?Object.entries(tbl).map(([h,m])=>`<div class="${KN.last&&KN.last.hits==h?"on":""}"><span>${h} hit${h==1?"":"s"}</span><b class="num">${m}x</b></div>`).join(""):`<p class="mute" style="font-size:13px;margin:0">Pick numbers to see the pays.</p>`}</div>
+    <div class="ctl-btns"><button class="btn btn-ghost sm" data-a="knRandom" ${KN.busy?"disabled":""}>${ic("shuffle")} Random</button><button class="btn btn-ghost sm" data-a="knClear" ${KN.busy?"disabled":""}>${ic("trash")} Clear</button></div>
+    <button class="btn btn-gold btn-lg" data-a="knPlay" ${KN.busy||!n?"disabled":""}>${ic("grid")} Draw</button>
+   </aside>
+   <section class="table-felt kn-felt">
+    <div class="kn-grid">${[...Array(40).keys()].map(i=>i+1).map(x=>`<button class="kn-cell ${KN.picks.has(x)?"pick":""} ${KN.drawn.includes(x)?"drawn":""} ${KN.drawn.includes(x)&&KN.picks.has(x)?"hit":""}" data-a="knPick" data-v="${x}" ${KN.busy?"disabled":""}>${x}</button>`).join("")}</div>
+    <div class="kn-res">${KN.last?(KN.last.ret?`<b class="pos">${KN.last.hits} hits · ${KN.last.mult}x · +${fmtC(KN.last.ret-KN.last.s)}</b>`:`<b class="neg">${KN.last.hits} hit${KN.last.hits===1?"":"s"} · no win</b>`):KN.busy?"Drawing...":`${n}/10 picked`}</div>
+   </section></div></div>`;
+}
+
+/* ---------- Lucky Wheel ---------- */
+const WH_SEGS={low:[1.2,1.5,0,1.2,1.2,0,1.5,1.2,1.2,0,1.2,1.5,1.2,0,1.2,1.2,1.5,0,1.2,1.2],
+  med:[0,1.5,0,2,0,1.5,0,3,0,1.5,0,2,0,4.2,0,1.5,0,2,0,0],high:[0,0,0,0,0,0,0,0,0,19.2,0,0,0,0,0,0,0,0,0,0]};
+const WH={risk:"low",rot:0,shown:0,busy:false,last:null,hist:[]};
+BETS.wheel=10;
+const whColor=m=>m===0?"#2a2620":m<1.4?"#3f6fb5":m<2?"#2f8a55":m<3?"#c8902a":m<5?"#b3261e":"#7a3fb0";
+function wheelSvg2(){const segs=WH_SEGS[WH.risk],n=segs.length,a=360/n,R=140,pt=(d,r)=>[Math.sin(d*Math.PI/180)*r,-Math.cos(d*Math.PI/180)*r];
+  return `<svg class="wheel lw" viewBox="-160 -160 320 320" role="img" aria-label="Lucky wheel"><circle r="156" fill="#8a6514"/><circle r="150" fill="#0b0a07"/>
+   <g id="lwWheel" style="transform:rotate(${WH.shown}deg)">${segs.map((m,i)=>{const s=i*a-a/2,e=i*a+a/2,[x1,y1]=pt(s,R),[x2,y2]=pt(e,R),[tx,ty]=pt(i*a,R-26);
+     return `<path d="M0 0L${x1} ${y1}A${R} ${R} 0 0 1 ${x2} ${y2}Z" fill="${whColor(m)}" stroke="#0b0a07" stroke-width="1.5"/><text x="${tx}" y="${ty}" transform="rotate(${i*a} ${tx} ${ty})" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="800" fill="#f4ecd6" font-family="JetBrains Mono,monospace">${m?m+"x":""}</text>`}).join("")}
+   <circle r="34" fill="#c8902a"/><circle r="26" fill="#0b0a07"/></g><g fill="#e8b647">${[...Array(n)].map((_,i)=>{const[x,y]=pt(i*a+a/2,147);return `<circle cx="${x}" cy="${y}" r="3"/>`}).join("")}</g>
+   <path d="M-12 -164 12 -164 0 -138Z" fill="#ffdd85" stroke="#0b0a07" stroke-width="2"/></svg>`}
+Object.assign(A,{
+  whRisk(r){if(WH.busy)return;WH.risk=r;WH.last=null;SFX.click();render()},
+  async whSpin(){if(WH.busy)return;const s=takeBet("wheel");if(!s)return;WH.busy=true;WH.last=null;
+    const segs=WH_SEGS[WH.risk],n=segs.length,k=Math.floor(Math.random()*n),a=360/n,cur=((WH.rot%360)+360)%360,want=((360-k*a)%360+360)%360;
+    const from=WH.rot;WH.rot+=360*5+((want-cur+360)%360)+(Math.random()-.5)*a*.6;render();
+    const el=document.getElementById("lwWheel");if(el&&el.animate)el.animate([{transform:`rotate(${from}deg)`},{transform:`rotate(${WH.rot}deg)`}],{duration:4200,easing:"cubic-bezier(.15,.65,.15,1)",fill:"forwards"});
+    let t=0;const iv=setInterval(()=>{SFX.tick();t++},90);await sleep(4250);clearInterval(iv);WH.shown=WH.rot;
+    const m=segs[k],ret=Math.floor(s*m);if(ret)bank(ret);record(s,ret);WH.last={m,ret,s};WH.hist.unshift(m);WH.hist=WH.hist.slice(0,14);WH.busy=false;
+    SFX.thunk();if(ret>s&&ret<s*5)SFX.win(m>=2?2:1);else if(!ret)SFX.lose();render()}
+});
+function wheel(){
+  const segs=WH_SEGS[WH.risk],uniq=[...new Set(segs)].sort((x,y)=>x-y);
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Lucky Wheel</h2><span class="mute">Spin it and win whatever it lands on</span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("wheel",WH.busy)}
+    <div><label class="lbl2">Risk</label><div class="seg wrap">${[["low","Low"],["med","Medium"],["high","High"]].map(([v,l])=>`<button class="${WH.risk===v?"on":""}" data-a="whRisk" data-v="${v}" ${WH.busy?"disabled":""}>${l}</button>`).join("")}</div></div>
+    <div class="wh-legend">${uniq.map(m=>`<span><i style="background:${whColor(m)}"></i>${m}x <small>${segs.filter(x=>x===m).length}/${segs.length}</small></span>`).join("")}</div>
+    <button class="btn btn-gold btn-lg" data-a="whSpin" ${WH.busy?"disabled":""}>${ic("target")} Spin</button>
+   </aside>
+   <section class="table-felt wh-felt"><div class="wheel-wrap lw-wrap">${wheelSvg2()}</div>
+    <div class="kn-res">${WH.last?(WH.last.ret>WH.last.s?`<b class="pos">${WH.last.m}x · +${fmtC(WH.last.ret-WH.last.s)}</b>`:WH.last.ret?`<b>${WH.last.m}x · ${fmtC(WH.last.ret)} back</b>`:`<b class="neg">0x · no win</b>`):WH.busy?"Spinning...":"Good luck"}</div>
+    <div class="hist">${WH.hist.map(m=>`<span class="h ${m>=1.5?"hi":m>0?"mid":"lo"}">${m}x</span>`).join("")}</div>
+   </section></div></div>`;
+}
+
+/* ---------- Tower ---------- */
+const TW_MODES={easy:{n:4,b:1,l:"Easy"},med:{n:3,b:1,l:"Medium"},hard:{n:2,b:1,l:"Hard"},expert:{n:3,b:2,l:"Expert"}};
+const TW={mode:"med",rows:[],level:0,state:"idle",stake:0,ret:0,picks:[]};
+BETS.tower=10;
+const twP=()=>{const m=TW_MODES[TW.mode];return (m.n-m.b)/m.n};
+const twMult=k=>Math.floor(.97/Math.pow(twP(),k)*100)/100;
+Object.assign(A,{
+  twMode(m){if(TW.state==="live")return;TW.mode=m;SFX.click();render()},
+  twStart(){if(TW.state==="live")return;const s=takeBet("tower");if(!s)return;const m=TW_MODES[TW.mode];TW.stake=s;TW.level=0;TW.state="live";TW.picks=[];
+    TW.rows=[...Array(8)].map(()=>{const r=Array(m.n).fill(false);shuffle([...Array(m.n).keys()]).slice(0,m.b).forEach(i=>r[i]=true);return r});SFX.whoosh();render()},
+  twPick(i){i=+i;if(TW.state!=="live")return;const row=TW.rows[TW.level];TW.picks[TW.level]=i;
+    if(row[i]){TW.state="lost";record(TW.stake,0);SFX.boom();render();return}
+    TW.level++;SFX.gem(TW.level);if(TW.level>=8){A.twCash();return}render()},
+  twCash(){if(TW.state!=="live"||!TW.level)return;TW.ret=Math.floor(TW.stake*twMult(TW.level));bank(TW.ret);record(TW.stake,TW.ret);TW.state="won";if(TW.ret<TW.stake*5)SFX.win(TW.level>=4?2:1);render()}
+});
+function tower(){
+  const m=TW_MODES[TW.mode],live=TW.state==="live",over=TW.state==="won"||TW.state==="lost";
+  const rows=[...Array(8).keys()].reverse().map(r=>{const cur=live&&r===TW.level,row=TW.rows[r],show=over||r<TW.level;
+    return `<div class="tw-row ${cur?"cur":""} ${r<TW.level?"passed":""}"><span class="tw-m num">${twMult(r+1)}x</span><div class="tw-cells" style="--n:${m.n}">${[...Array(m.n).keys()].map(i=>{const bad=row&&row[i],picked=TW.picks[r]===i;
+      return `<button class="tw-cell ${show&&row?(bad?"bomb":"safe"):""} ${picked?"picked":""}" data-a="twPick" data-v="${i}" ${cur?"":"disabled"}>${show&&row?ic(bad?"bomb":"gem"):cur?ic("arrowUp"):""}</button>`}).join("")}</div></div>`}).join("");
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Tower</h2><span class="mute">Climb 8 floors. Avoid the traps. Cash out any time.</span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("tower",live)}
+    <div><label class="lbl2">Difficulty</label><div class="seg wrap">${Object.entries(TW_MODES).map(([k,v])=>`<button class="${TW.mode===k?"on":""}" data-a="twMode" data-v="${k}" ${live?"disabled":""}>${v.l}</button>`).join("")}</div><p class="mute" style="font-size:12.5px;margin:8px 0 0">${m.n} tiles per floor, ${m.b} trap${m.b>1?"s":""}. Top floor pays ${twMult(8)}x.</p></div>
+    <div class="readout"><div><small>Floor</small><b class="num">${TW.level}/8</b></div><div><small>${live?"Cash out for":"Last result"}</small><b class="num ${TW.state==="won"?"pos":TW.state==="lost"?"neg":""}">${live?(TW.level?fmtC(Math.floor(TW.stake*twMult(TW.level))):"-"):TW.state==="won"?`+${fmtC(TW.ret-TW.stake)}`:TW.state==="lost"?`-${fmtC(TW.stake)}`:"-"}</b></div></div>
+    ${live?`<button class="btn btn-gold btn-lg" data-a="twCash" ${TW.level?"":"disabled"}>${ic("coins")} Cash out</button>`:`<button class="btn btn-gold btn-lg" data-a="twStart">${ic("tower")} ${over?"Climb again":"Start climbing"}</button>`}
+   </aside>
+   <section class="table-felt tw-felt"><div class="tw-grid">${rows}</div>
+    ${TW.state==="lost"?`<div class="over-msg lose">${ic("bomb")} Trap on floor ${TW.level+1}</div>`:TW.state==="won"?`<div class="over-msg win">${ic("coins")} Cashed ${fmtC(TW.ret)} at ${twMult(TW.level)}x</div>`:""}</section>
+  </div></div>`;
+}
+
+/* ---------- Wire up ---------- */
+ROUTES.push("coinflip","keno","wheel","tower");Object.assign(CV,{coinflip,keno,wheel,tower});
+GAMES.splice(3,0,{v:"coinflip",name:"Coinflip",icon:"coin2",art:"cf",line:"Flip against real players for their Bucks. Winner takes the pot.",tag:"New · PvP"});
+GAMES.push({v:"keno",name:"Keno",icon:"grid",art:"kn",line:"Pick up to 10 numbers from 40. Hit all 10 for 8,375x.",tag:"New · Any bet"},
+ {v:"wheel",name:"Lucky Wheel",icon:"target",art:"wh",line:"Spin the wheel. Pick low, medium or high risk.",tag:"New · Any bet"},
+ {v:"tower",name:"Tower",icon:"tower",art:"tw",line:"Climb 8 floors without hitting a trap. Over 6,000x on Expert.",tag:"New · Any bet"});
+Object.assign(GAME_NAMES,{keno:"Keno",wheel:"Lucky Wheel",tower:"Tower"});
+{const f=route;route=function(){const was=APP.view;f();if(APP.view==="coinflip"){if(!CF.poll){cfFetch();CF.poll=setInterval(()=>{if(!document.hidden)cfFetch()},2000)}}else if(was==="coinflip"&&CF.poll){clearInterval(CF.poll);CF.poll=0}}}
+{const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="coinflip"&&!CF.poll){cfFetch();CF.poll=setInterval(()=>{if(!document.hidden)cfFetch()},2000)}}}
+
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793267437";
+const BUILD="1793267808";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
