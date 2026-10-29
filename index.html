@@ -1836,7 +1836,7 @@ const SFX={on:lsGet("bbbl-sound")!=="off",ctx:null,
   coin(){this.tone(1568,.08,{type:"square",v:.04});this.tone(2093,.16,{type:"square",v:.04,at:.06})},
   whoosh(){this.noise(.4,{f:800,q:.5,v:.18})}
 };
-if(typeof document!=="undefined"&&document.addEventListener)document.addEventListener("pointerdown",()=>SFX.init(),{capture:true});
+if(typeof document!=="undefined"&&document.addEventListener){document.addEventListener("pointerdown",()=>SFX.init(),{capture:true});document.addEventListener("keydown",()=>SFX.init(),{capture:true})}
 A.sound=function(){SFX.on=!SFX.on;lsSet("bbbl-sound",SFX.on?"on":"off");SFX.init();if(SFX.on)SFX.click();render()};
 
 /* ---------- Accounts ---------- */
@@ -2648,6 +2648,10 @@ if(typeof window!=="undefined"&&window.setInterval){setTimeout(()=>{if(NET_OK!==
 
 
 /* ---------- Butla Office: type the paperwork, earn slowly ---------- */
+SFX.keyClick=function(space){if(!this.ok())return;const r=Math.random();
+  this.noise(space?.05:.035,{f:space?1400+r*200:2600+r*900,q:space?1.2:2.2,v:space?.22:.18});
+  this.v(space?140:210+r*60,.04,{type:"triangle",v:.05});
+  this.noise(.02,{f:5200+r*1500,q:4,v:.05,at:space?.045:.03})};
 P.monitor='<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>';
 P.briefcase='<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>';
 P.mug='<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/>';
@@ -2691,8 +2695,8 @@ function offType(ch){
   if(APP.view!=="office")return;if(!OFF.line)offNext();
   if(!OFF.t0)OFF.t0=performance.now();
   const want=OFF.line[OFF.typed.length];
-  if(want!==undefined&&ch.toLowerCase()===want.toLowerCase()){OFF.typed+=want;SFX.v(1400+Math.random()*300,.025,{type:"square",v:.015})}
-  else{OFF.errs++;SFX.v(180,.08,{type:"square",v:.03});const el=document.getElementById("offLine");if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}}
+  if(want!==undefined&&ch.toLowerCase()===want.toLowerCase()){OFF.typed+=want;SFX.keyClick(ch===" ")}
+  else{OFF.errs++;SFX.keyClick(false);SFX.v(180,.08,{type:"square",v:.03,at:.01});const el=document.getElementById("offLine");if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}}
   if(OFF.typed.length>=OFF.line.length)offSubmit();else offPaint();
 }
 function offBack(){if(OFF.typed.length){OFF.typed=OFF.typed.slice(0,-1);offPaint()}}
@@ -2778,7 +2782,7 @@ function jobNag(){if(APP.view==="office"||document.getElementById("jobNag")||Dat
 {const f=bank;bank=function(d){const was=me().bucks;f(d);if(d<0&&me().bucks<100&&was>=me().bucks)setTimeout(()=>{if(me().bucks<100)jobNag()},2500)}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793267310";
+const BUILD="1793267437";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
