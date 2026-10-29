@@ -225,7 +225,7 @@ h1,h2,h3{font-family:var(--f-display);font-weight:400;letter-spacing:.02em;text-
   .board{grid-template-columns:1fr 1fr}
   .seat .cash{font-size:18px}
 }
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}}
+@media (prefers-reduced-motion:reduce){.screen,.tile,.step,.fan,.hero-logo,.lobby-logo,.rise,.feed-row,.rw-card,.mp-row,.pod,.sheet td,.tile-art::before,.dot-ready,.live-pill i,.online-dot,.btn.pulse,.pass .av,.wallet.up,.wallet.down{animation:none!important}.tile,.tile-art::before{transition:none!important}}
 /* Category bands echo the printed card colours */
 :root{--c-cust:#e0784c;--c-prod:#58b27a;--c-event:#a983d6;--c-act:#e8b647;--c-biz:#6f9fd0}
 .front{justify-content:flex-start;padding-top:0}
@@ -644,6 +644,55 @@ h1,h2,h3{font-weight:700;letter-spacing:.01em}
 #app.still .rl-result,#app.still .mini-lb li,#app.still .auth,.still .feed-row{animation:none!important}
 img[src^="data:image/webp"]{aspect-ratio:560/537;height:auto}
 .top img{width:54px;height:auto;flex:none}
+/* ===== Mobile polish ===== */
+.lc-hist{top:26px;bottom:auto}
+.rl-board.vertical{grid-template-columns:repeat(3,minmax(0,1fr)) 54px 54px;grid-template-rows:44px repeat(12,40px) 40px;min-width:0;max-width:440px;margin:0 auto}
+.rl-board.vertical .rl-cell.num span{width:30px;height:30px;font-size:14px}
+.rl-cell.vert em{font-style:normal;writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;letter-spacing:.06em;white-space:nowrap}
+.rl-board.vertical .zero span{width:34px;height:34px}
+@media (max-width:640px){
+  .top .ttl{display:none}
+  .chead{flex-wrap:nowrap;gap:6px;padding-block:12px}
+  .chead .brand img{width:44px}
+  .cnav{gap:0;margin-left:auto}.cnav button{padding:9px 8px}
+  .chead .icon-btn{width:36px;height:36px}
+  .wallet{padding:6px 10px 6px 8px;gap:6px}.wallet>.ic{font-size:18px}.wallet b{font-size:14.5px}.wallet small{display:none}
+  .login-btn{padding:8px 10px}
+  .lobby-hero{padding-block:8px 20px;gap:14px}.lobby-hero h1{font-size:40px}.lobby-hero p{font-size:15px;margin:12px auto 18px}
+  .hero-ctas{flex-direction:column;align-items:stretch;width:100%}.hero-ctas .btn{width:100%}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tiles .tile{grid-column:auto!important}
+  .tiles .tile:first-child,.tiles .tile:nth-child(2){grid-column:1/-1!important;flex-direction:row}
+  .tiles .tile:first-child .tile-art,.tiles .tile:nth-child(2) .tile-art{height:auto;width:96px;flex:none}
+  .tile-art{height:84px;font-size:44px}
+  .tile-body{padding:12px;gap:3px}.tile-body b{font-size:18px}.tile-body>span{font-size:12.5px;line-height:1.35}
+  .tile-tag{font-size:10px!important}.tile-go{margin-top:2px;font-size:13px!important}
+  .game-head{gap:10px;margin-bottom:10px}.game-head h2{font-size:28px}.game-head .mute{flex-basis:100%;font-size:13px}
+  .wheel-wrap{width:min(250px,80vw)}
+  .rl-top{gap:12px}.rl-result .num{font-size:38px}.bj-msg{font-size:19px;padding:8px 16px}.bj-msg.idle{font-size:15px}
+  .controls{padding:12px;gap:12px}.controls .rack{width:100%;justify-content:space-between}
+  .controls .ctl-btns{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .controls .ctl-btns .btn-lg{grid-column:1/-1}.controls .ctl-btns.play{grid-template-columns:1fr 1fr}.controls .ctl-btns.play .btn-lg{grid-column:auto}
+  .table-felt{padding:12px}
+  .sheet.lb{min-width:0;font-size:13px}.sheet.lb th:nth-child(n+5),.sheet.lb td:nth-child(n+5){display:none}
+  .sheet.lb th,.sheet.lb td{padding:10px 6px}
+  .sheet.tiers{min-width:0;font-size:13px}.sheet.tiers th,.sheet.tiers td{padding:10px 6px}
+  .sheet.tiers td:first-child .chip{display:none}
+  .vip-top{gap:14px}.tier-badge.big{padding:12px 16px}.tier-badge.big .ic{font-size:34px}.vip-txt h3{font-size:26px}
+  .vip-top .btn{width:100%}
+  .vip-meta span:first-child,.vip-meta span:last-child{display:none}
+  .podium3{gap:8px}.pod{padding:12px 6px}
+  .marquee{font-size:24px}
+  .sec-h h2{font-size:30px!important}
+  .side-layout{gap:12px}
+  #crCanvas{height:320px}.crash-felt{min-height:340px}
+  .mines-felt{min-height:0;padding:14px}.mines-grid{gap:7px}
+  .felt{padding:16px}
+  .mp-box{padding:20px}
+  .room-code .code{letter-spacing:.18em}
+}
+.rl-board.vertical .stack.on-cell{font-size:10.5px;padding:1px 6px 1px 2px}.rl-board.vertical .stack.on-cell .chip-mini{width:14px;height:14px}
+.rl-board.vertical .rl-cell.vert .stack.on-cell{top:auto;bottom:4px;transform:translateX(-50%)}
 </style>
 
 </head>
@@ -1170,7 +1219,7 @@ const SUIT={s:'<path d="M12 2C9 6.2 3 9 3 13.6 3 16.6 5.3 18 7.4 18c1.5 0 2.9-.7
  c:'<circle cx="12" cy="6.8" r="4.3"/><circle cx="6.6" cy="13.2" r="4.3"/><circle cx="17.4" cy="13.2" r="4.3"/><path d="M10.8 12h2.4l1.8 10h-6z"/>'};
 const suit=(s,cls="")=>`<svg class="suit ${cls}" viewBox="0 0 24 24" aria-hidden="true">${SUIT[s]}</svg>`;
 const fmtB=n=>Math.round(n).toLocaleString("en-AU");
-const sleep=ms=>new Promise(r=>setTimeout(r,(typeof matchMedia!=="undefined"&&matchMedia("(prefers-reduced-motion: reduce)").matches)?Math.min(ms,60):ms));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ---------- Wallet & profiles (saved on this device) ---------- */
 const WKEY="bbbl-wallet1",START_BUCKS=1000,DAILY=500,REFILL=250,DAILY_MS=20*3600e3,REFILL_MS=10*60e3;
@@ -1205,6 +1254,7 @@ let APP={view:"home",lb:"bucks"};
 function route(){const h=(typeof location!=="undefined"?location.hash:"").slice(1);APP.view=ROUTES.includes(h)?h:"home";render();
   if(typeof ACC!=="undefined"&&NET_OK!==false&&(APP.view==="home"||APP.view==="leaderboard")){(ACC?flushAcc():Promise.resolve()).then(()=>loadLB(APP.view==="home"?"bucks":APP.lb))}}
 if(typeof window!=="undefined"&&window.addEventListener)window.addEventListener("hashchange",()=>route());
+if(typeof window!=="undefined"&&window.addEventListener){let wasNarrow=window.innerWidth<700;window.addEventListener("resize",()=>{const n=window.innerWidth<700;if(n!==wasNarrow){wasNarrow=n;if(APP.view==="roulette"&&!RL.spinning)render()}})}
 Object.assign(A,{
   go(v){if(typeof location!=="undefined"&&location.hash!=="#"+v)location.hash=v;else route()},
   daily(){if(!canDaily())return;me().lastDaily=Date.now();bank(DAILY);coinBurst(70);toast(`${ic("calendar")} Daily bonus: +${fmtB(DAILY)} Butla Bucks`,"good");render()},
@@ -1406,7 +1456,7 @@ Object.assign(A,{
     const cur=((RL.rot%360)+360)%360,want=((360-k*a)%360+360)%360;RL.rot+=360*5+((want-cur+360)%360);
     RL.ball=Math.floor(RL.ball/360)*360-360*8;
     render();
-    const w=document.getElementById("rlWheel"),b=document.getElementById("rlBall"),reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const w=document.getElementById("rlWheel"),b=document.getElementById("rlBall"),reduce=false;
     const spinTo=(el,from,to,ms,ease)=>{if(!el)return;if(el.animate&&!reduce){const an=el.animate([{transform:`rotate(${from}deg)`},{transform:`rotate(${to}deg)`}],{duration:ms,easing:ease,fill:"forwards"});an.onfinish=()=>{el.style.transform=`rotate(${to}deg)`}}else el.style.transform=`rotate(${to}deg)`};
     spinTo(w,RL.shownRot,RL.rot,5200,"cubic-bezier(.12,.6,.12,1)");spinTo(b,RL.shownBall,RL.ball,5500,"cubic-bezier(.2,.7,.15,1)");
     await sleep(5600);RL.shownRot=RL.rot;RL.shownBall=RL.ball;
@@ -1432,6 +1482,12 @@ function wheelSvg(){
 }
 function roulette(){
   const t=rlTotal(),cell=(k,label,cls="",pos="")=>`<button class="rl-cell ${cls} ${RL.result!=null&&RL.wins?.includes(k)?"hit":""}" style="${pos}" data-a="rlBet" data-v="${k}" aria-label="Bet on ${RL_LABEL[k]||label}${RL.bets[k]?`, ${RL.bets[k]} placed`:""}">${label}${RL.bets[k]?chipStack(RL.bets[k],"on-cell"):""}</button>`;
+  if(typeof window!=="undefined"&&window.innerWidth<700){let v="";
+    for(let c=0;c<12;c++)for(let row=1;row<=3;row++){const n=c*3+row;v+=cell("n"+n,`<span>${n}</span>`,`num ${colorOf(n)} ${RL.result===n?"landed":""}`,`grid-row:${c+2};grid-column:${row}`)}
+    for(let row=1;row<=3;row++)v+=cell("c"+row,"2:1","side",`grid-row:14;grid-column:${row}`);
+    const outs=["d1","d2","d3"].map((k,i)=>cell(k,`<em>${RL_LABEL[k]}</em>`,"out vert",`grid-row:${2+i*4}/span 4;grid-column:4`)).join("")+
+      ["low","even","red","black","odd","high"].map((k,i)=>cell(k,k==="red"||k==="black"?`<i class="dia ${k}"></i>`:`<em>${RL_LABEL[k]}</em>`,"out vert",`grid-row:${2+i*2}/span 2;grid-column:5`)).join("");
+    var boardHtml=`<div class="rl-board vertical">${cell("n0",`<span>0</span>`,`num green zero ${RL.result===0?"landed":""}`,"grid-row:1;grid-column:1/4")}${v}${outs}</div>`}
   let nums="";for(let row=3;row>=1;row--){for(let c=0;c<12;c++){const n=c*3+row;nums+=cell("n"+n,`<span>${n}</span>`,`num ${colorOf(n)} ${RL.result===n?"landed":""}`,`grid-row:${4-row};grid-column:${c+2}`)}nums+=cell("c"+row,"2:1","side",`grid-row:${4-row};grid-column:14`)}
   return `<div class="screen">${cHead()}
   <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Roulette</h2><span class="mute">European single zero · Number pays 35:1</span></div>
@@ -1441,11 +1497,11 @@ function roulette(){
     <div class="rl-info">${RL.result!=null&&!RL.spinning?`<div class="rl-result ${colorOf(RL.result)}"><span class="num">${RL.result}</span><small>${colorOf(RL.result)}</small></div><div class="bj-msg ${RL.net>0?"win":RL.net<0?"lose":""}">${RL.msg}</div>`:RL.spinning?`<div class="bj-msg idle">No more bets</div>`:`<div class="bj-msg idle">Place your chips on the table</div>`}
      <div class="hist" aria-label="Recent numbers">${RL.hist.map(n=>`<span class="h ${colorOf(n)}">${n}</span>`).join("")||`<span class="mute" style="font-size:13px">Recent numbers show here</span>`}</div>
      <div class="rl-bet">On the table <b class="num">${fmtB(t)}</b></div></div></div>
-   <div class="board-wrap"><div class="rl-board">
+   <div class="board-wrap">${typeof boardHtml!=="undefined"&&boardHtml?boardHtml:`<div class="rl-board">
      ${cell("n0",`<span>0</span>`,`num green zero ${RL.result===0?"landed":""}`,"grid-row:1/4;grid-column:1")}${nums}
      ${["d1","d2","d3"].map((k,i)=>cell(k,RL_LABEL[k],"out",`grid-row:4;grid-column:${2+i*4}/span 4`)).join("")}
      ${["low","even","red","black","odd","high"].map((k,i)=>cell(k,k==="red"||k==="black"?`<i class="dia ${k}"></i>`:RL_LABEL[k],"out",`grid-row:5;grid-column:${2+i*2}/span 2`)).join("")}
-   </div></div>
+   </div>`}</div>
   </section>
   <div class="controls">${chipRack(RL.chip,"rlChip")}
    <div class="ctl-btns"><button class="btn btn-ghost" data-a="rlUndo" ${RL.order.length&&!RL.spinning?"":"disabled"}>${ic("undo")} Undo</button>
