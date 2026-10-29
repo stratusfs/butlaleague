@@ -971,6 +971,32 @@ body{overflow-x:clip}
 .tw-cell.picked{box-shadow:inset 0 0 0 2px #fff}
 @media (max-width:640px){.kn-grid{grid-template-columns:repeat(8,1fr);gap:4px}.kn-cell{font-size:13px;border-radius:7px}.coin3d{width:120px;height:120px}}
 .cf-col{display:grid;gap:16px;min-width:0}
+/* ===== ButlaChat inside the monitor ===== */
+.monitor{aspect-ratio:16/11}
+.screen-body.chat{padding:0;display:block;min-height:0;overflow:hidden;background:#f4f5f7}
+.oc{display:grid;grid-template-columns:170px minmax(0,1fr);height:100%}
+.oc-side{background:#1d2330;color:#d7dce6;padding:8px 6px;overflow:hidden;display:flex;flex-direction:column;gap:2px}
+.oc-brand{display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;padding:4px 6px 8px;color:#fff}
+.oc-contact{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:7px;align-items:center;padding:5px 6px;border-radius:7px;font-size:12px}
+.oc-contact.on{background:#3a4459}
+.oc-contact b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.oc-contact small{color:#8e97a8;font-size:10.5px}
+.oc-badge{font-style:normal;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e5484d;color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center}
+.oc-av{width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-weight:900;font-size:12px;flex:none}
+.oc-av .ic{font-size:14px;color:#1a1205}
+.oc-main{display:grid;grid-template-rows:auto 1fr auto;min-height:0;color:#1b1d21}
+.oc-main.urgent{background:#fff1ef}
+.oc-head{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #e3e5ea;background:#fff}
+.oc-head .oc-av{width:32px;height:32px;font-size:14px}.oc-head b{display:block;font-size:14px}.oc-head small{font-size:11.5px;color:#6b7080}
+.oc-main.urgent .oc-head small{color:#d8432f;font-weight:800}
+.oc-thread{display:flex;flex-direction:column;justify-content:flex-end;gap:7px;padding:12px 14px;overflow:hidden;min-height:0}
+.oc-msg{max-width:82%;padding:8px 12px;border-radius:14px 14px 14px 4px;background:#fff;box-shadow:0 1px 2px #0002;font-size:13.5px;line-height:1.35;align-self:flex-start}
+.oc-msg.me{align-self:flex-end;background:#2f6fd1;color:#fff;border-radius:14px 14px 4px 14px}
+.oc-msg.new{animation:msgIn .35s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(.95)}}
+.oc-msg.draft{background:#fff;color:#1b1d21;border:2px dashed #2f6fd1;max-width:92%}
+.oc-msg.draft .off-line{font-size:clamp(14px,1.9vw,18px)}
+.oc-compose{padding:8px 14px 10px;background:#fff;border-top:1px solid #e3e5ea;display:grid;gap:6px}
+@media (max-width:640px){.oc{grid-template-columns:1fr}.oc-side{display:none}.monitor{aspect-ratio:auto}.oc-main{min-height:300px}.oc-thread{padding:10px}.oc-msg{font-size:13px}}
 </style>
 
 </head>
@@ -2804,36 +2830,106 @@ function office(){
   if(!OFF.line){offLoad();offNext()}
   const rk=offRank(),r=OFF_RANKS[rk],nx=OFF_RANKS[rk+1],L=OFF.last;
   return `<div class="screen">${cHead()}
-  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Butla Office</h2><span class="mute">Type the paperwork. Get paid. Repeat forever.</span></div>
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Butla Office</h2><span class="mute">Reply to your coworkers. Get paid. Repeat forever.</span></div>
   <div class="off-top">
    <div class="off-badge">${ic("briefcase")}<div><small>Your job</small><b>${r.n}</b><span>${r.rate} Bucks per letter${nx?` · ${nx.at-OFF.done} more to ${nx.n}`:" · top of the ladder"}</span></div></div>
-   <div class="off-stats"><div><small>Sentences typed</small><b class="num">${fmtB(OFF.done)}</b></div><div><small>Earned at work</small><b class="num">${fmtC(OFF.earned)}</b></div><div><small>Streak</small><b class="num">${OFF.streak}</b></div><div><small>This hour</small><b class="num ${offShift()>=OFF_SHIFT?"neg":""}">${offShift()}/${OFF_SHIFT}</b></div></div>
+   <div class="off-stats"><div><small>Replies sent</small><b class="num">${fmtB(OFF.done)}</b></div><div><small>Earned at work</small><b class="num">${fmtC(OFF.earned)}</b></div><div><small>Streak</small><b class="num">${OFF.streak}</b></div><div><small>This hour</small><b class="num ${offShift()>=OFF_SHIFT?"neg":""}">${offShift()}/${OFF_SHIFT}</b></div></div>
   </div>
   <section class="office">
    <div class="desk">
     <div class="monitor">
-     <div class="screen-top"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="app">ButlaDocs · ${OFF.urgent?"URGENT.docx":"paperwork_final_v"+(OFF.done+3)+".docx"}</span></div>
-     <div class="screen-body ${OFF.urgent?"urgent":""}">
-      ${OFF.urgent?`<div class="urg">${ic("alert")} URGENT · double pay</div>`:""}
-      <div id="offLine" class="off-line">${offLineHtml()}</div>
-      <div class="off-bar"><i id="offProg" style="width:${OFF.typed.length/OFF.line.length*100}%"></i></div>
-      <div class="off-meta"><span>Typos: <b id="offErr">${OFF.errs}</b></span><span>${OFF.line.length} letters · about ${fmtB(Math.round(OFF.line.length*r.rate*(OFF.urgent?2:1)))} Bucks</span></div>
-     </div>
+     <div class="screen-top"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="app">ButlaChat · ${OC_PEOPLE.reduce((n,p)=>n+(OC.unread[p.n]||0),0)+1} unread</span></div>
+     <div class="screen-body chat">${ocAppHtml(rk)}</div>
     </div>
     <div class="stand"></div>
     <div class="desk-row"><div class="deskkb" aria-hidden="true">${Array.from({length:4},(_,r)=>`<i style="--n:${[12,11,10,7][r]}">${"<b></b>".repeat([12,11,10,7][r])}</i>`).join("")}</div><div class="mouse" aria-hidden="true"></div></div>
     <div class="desk-items"><span class="mug">${ic("mug")}</span><span class="plant"></span><span class="papers"></span></div>
    </div>
-   ${L?`<div class="payslip ${L.pay?"":"none"}"><b>${L.pay?`+${fmtB(L.pay)} Bucks`:"No pay"}</b><span>${Math.round(L.acc*100)}% accurate · ${L.wpm} WPM</span><small>${esc(L.note)}</small></div>`:`<div class="payslip hint"><span>Start typing the sentence on the screen. ${"ontouchstart" in window?"Use the keyboard below.":"Use your keyboard."}</span></div>`}
+   ${L?`<div class="payslip ${L.pay?"":"none"}"><b>${L.pay?`+${fmtB(L.pay)} Bucks`:"No pay"}</b><span>${Math.round(L.acc*100)}% accurate · ${L.wpm} WPM</span><small>${esc(L.note)}</small></div>`:`<div class="payslip hint"><span>Type your reply to the message on screen. ${"ontouchstart" in window?"Use the keyboard below.":"Use your keyboard."}</span></div>`}
    ${OFF.msg?`<div class="off-event">${ic("mug")} ${esc(OFF.msg)}</div>`:""}
    <div id="offKb" class="kbd">${offKbHtml()}</div>
    <div class="row-c" style="margin-top:6px"><button class="btn btn-ghost sm" data-a="offSkip">${ic("shuffle")} Skip this one (resets streak)</button></div>
   </section>
-  <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Career ladder</h3><span class="mute">Promotions come with sentences typed</span></div>
-   <div class="ladder">${OFF_RANKS.map((x,i)=>`<div class="rung ${i===rk?"on":i<rk?"past":""}"><b>${x.n}</b><span>${x.at} sentences</span><span class="num">${x.rate}/letter</span></div>`).join("")}</div></section></div>`;
+  <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Career ladder</h3><span class="mute">Promotions come with replies sent</span></div>
+   <div class="ladder">${OFF_RANKS.map((x,i)=>`<div class="rung ${i===rk?"on":i<rk?"past":""}"><b>${x.n}</b><span>${x.at} replies</span><span class="num">${x.rate}/letter</span></div>`).join("")}</div></section></div>`;
 }
+
+/* ---------- Butla Office chat: coworkers message you, you type the reply ---------- */
+const OC_PEOPLE=[
+ {n:"Gary",d:"Accounts",c:"#3f6fb5",t:["acct","gen"]},{n:"Linda",d:"HR",c:"#c0398a",t:["hr","gen"]},{n:"Dave",d:"IT",c:"#2f8a55",t:["it","gen"]},
+ {n:"Priya",d:"Marketing",c:"#c8902a",t:["mkt","gen"]},{n:"Mo",d:"Sales",c:"#b3261e",t:["sales","gen"]},{n:"Jen",d:"Reception",c:"#7a3fb0",t:["rec","gen"]},
+ {n:"Tom",d:"Intern",c:"#1f9aa8",t:["intern","gen"]},{n:"Sasha",d:"Legal",c:"#556070",t:["legal","gen"]},{n:"Big Butla",d:"CEO",c:"#e8b647",t:["boss"],boss:true}];
+const OC_FILL={thing:["stapler","laptop charger","lunch","mug","lanyard","good pen","desk fan","headphones","umbrella","keyboard"],
+ place:["kitchen","printer room","car park","meeting room B","lift","break room","front desk","storage cupboard"],
+ day:["Monday","Tuesday","Wednesday","Thursday","Friday"],time:["9am","10:30","11am","noon","2pm","3:15","4pm","4:59pm"],
+ food:["donuts","pizza","sausage rolls","cake","sushi","party pies","lamingtons"],num:["3","5","7","12","20","40","99"],
+ doc:["the budget","the invoice","the report","the slides","the contract","the timesheet","the spreadsheet","the proposal"],
+ client:["Acme Pty Ltd","Sunrise Bakery","Mega Mart","Blue Sky Tours","Top Notch Plumbing","Gold Coast Gyms"]};
+const OC_SCRIPTS=[
+ ["gen","Has anyone seen my {thing}? Pretty sure I left it in the {place}.","Sorry, I have not seen your {thing}. Maybe check the {place} again."],
+ ["gen","Are you coming to the meeting at {time}?","Yes, I will be there at {time}. Save me a seat near the door."],
+ ["gen","There are free {food} in the kitchen. Be quick.","On my way. Please save me some {food}."],
+ ["gen","Can you cover my desk for ten minutes?","No worries, I can cover your desk. Take your time."],
+ ["gen","Did you finish {doc} yet?","Almost done with {doc}. I will send it over by {time}."],
+ ["gen","Who keeps leaving dishes in the sink?","Not me, I promise. I always wash my mug straight away."],
+ ["gen","Happy {day}! Any plans for lunch?","Happy {day}! I am thinking {food} from the place downstairs."],
+ ["acct","I need your receipts from last month by {day}.","I will find my receipts and send them to you by {day}."],
+ ["acct","Why did you claim {num} coffees as a business expense?","Those were client meetings. All {num} of them. Very important."],
+ ["acct","{doc} is {num} dollars over. Can you explain?","I will look at {doc} and explain the extra {num} dollars today."],
+ ["hr","Reminder: please complete your safety training by {day}.","Thanks for the reminder. I will finish the safety training by {day}."],
+ ["hr","We had a complaint about someone microwaving fish.","It was not me this time. I only microwave {food}."],
+ ["hr","Your leave request for {day} has been received.","Thank you. Please let me know if {day} is approved."],
+ ["it","Have you tried turning it off and on again?","Yes, I turned it off and on again. It is still broken."],
+ ["it","Please stop clicking links in emails from princes.","Understood. I will stop clicking links from princes."],
+ ["it","Your password expires today. Pick a new one.","Done. My new password is very strong and very secret."],
+ ["mkt","Can you like and share our new post?","Liked and shared. I even left a nice comment."],
+ ["mkt","We need {num} ideas for the campaign by {time}.","I will have {num} ideas ready for you by {time}."],
+ ["sales","{client} wants a call at {time}. Can you join?","Yes, I can join the call with {client} at {time}."],
+ ["sales","We just closed the deal with {client}!","Great work on the {client} deal. Drinks are on you."],
+ ["rec","A courier is here with a parcel for you.","Thanks, I will come down to the front desk now."],
+ ["rec","Your {time} visitor is waiting in the lobby.","Please tell them I am on my way down."],
+ ["intern","Sorry, I think I broke the printer again.","No problem, I will show you how to fix the printer."],
+ ["intern","Where do we keep the spare paper?","The spare paper is in the {place}, top shelf."],
+ ["intern","Is it normal to work this late?","Only on {day}s. Go home and get some rest."],
+ ["legal","Please do not sign anything from {client} yet.","Got it. I will not sign anything from {client} until you check it."],
+ ["legal","Who wrote a pinky promise into the contract?","That was a joke. I will take the pinky promise out."],
+ ["boss","I need {doc} on my desk by {time}. No excuses.","Yes boss. {doc} will be on your desk by {time}."],
+ ["boss","Why is the coffee machine empty again?","Sorry boss, I will refill the coffee machine right now."],
+ ["boss","Big meeting at {time}. Wear a suit.","Understood, boss. Suit on and ready for {time}."],
+ ["boss","Who parked in my spot?","Not me, boss. I will find out who parked in your spot."]];
+function ocFill(str,v){return str.replace(/\{(\w+)\}/g,(_,k)=>v[k])}
+function ocUpper(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+const OC={threads:{},unread:{},cur:null,typingDots:false};
+function offNext(){
+  const boss=Math.random()<.09,pool=OC_PEOPLE.filter(p=>boss?p.boss:!p.boss),who=pool[Math.floor(Math.random()*pool.length)];
+  const scripts=OC_SCRIPTS.filter(s=>who.t.includes(s[0])),sc=scripts[Math.floor(Math.random()*scripts.length)];
+  const v={};Object.keys(OC_FILL).forEach(k=>{v[k]=OC_FILL[k][Math.floor(Math.random()*OC_FILL[k].length)]});
+  v.place2=OC_FILL.place.filter(x=>x!==v.place)[Math.floor(Math.random()*(OC_FILL.place.length-1))];
+  const msg=ocUpper(ocFill(sc[1],v)),reply=ocUpper(ocFill(sc[2],v));
+  OC.cur=who.n;(OC.threads[who.n]=OC.threads[who.n]||[]).push({me:false,t:msg});OC.threads[who.n]=OC.threads[who.n].slice(-6);
+  OFF.line=reply;OFF.urgent=boss;OFF.typed="";OFF.errs=0;OFF.t0=0;OFF.keys=[];OFF.who=who;
+  OC_PEOPLE.forEach(p=>{if(p.n!==who.n&&Math.random()<.25)OC.unread[p.n]=(OC.unread[p.n]||0)+1});delete OC.unread[who.n];
+  if(OFF.done>0||OFF.last)setTimeout(()=>SFX.v(1318,.12,{type:"sine",v:.05})||SFX.v(1760,.18,{type:"sine",v:.04,at:.1}),250);
+}
+{const f=offSubmit;offSubmit=function(){const who=OC.cur,txt=OFF.line;if(who){(OC.threads[who]=OC.threads[who]||[]).push({me:true,t:txt});OC.threads[who]=OC.threads[who].slice(-6)}SFX.whoosh();f()}}
+const ocAv=p=>`<span class="oc-av" style="--ac:${p.c}">${p.boss?ic("crown"):esc(p.n[0])}</span>`;
+function ocAppHtml(rk){
+  const who=OFF.who||OC_PEOPLE[0],th=(OC.threads[who.n]||[]),r=OFF_RANKS[rk];
+  return `<div class="oc">
+   <aside class="oc-side"><div class="oc-brand">${ic("megaphone")} ButlaChat</div>
+    ${OC_PEOPLE.map(p=>`<div class="oc-contact ${p.n===who.n?"on":""}">${ocAv(p)}<div><b>${esc(p.n)}</b><small>${esc(p.d)}</small></div>${OC.unread[p.n]?`<i class="oc-badge">${OC.unread[p.n]}</i>`:""}</div>`).join("")}</aside>
+   <div class="oc-main ${OFF.urgent?"urgent":""}">
+    <div class="oc-head">${ocAv(who)}<div><b>${esc(who.n)}</b><small>${esc(who.d)}${OFF.urgent?" · URGENT · double pay":" · online"}</small></div></div>
+    <div class="oc-thread">${th.slice(0,-1).map(m=>`<div class="oc-msg ${m.me?"me":""}">${esc(m.t)}</div>`).join("")}
+     ${th.length?`<div class="oc-msg new">${esc(th[th.length-1].t)}</div>`:""}
+     <div class="oc-msg me draft"><div id="offLine" class="off-line">${offLineHtml()}</div></div></div>
+    <div class="oc-compose"><div class="off-bar"><i id="offProg" style="width:${OFF.typed.length/OFF.line.length*100}%"></i></div>
+     <div class="off-meta"><span>Typos: <b id="offErr">${OFF.errs}</b></span><span>${OFF.line.length} letters · about ${fmtB(Math.round(OFF.line.length*r.rate*(OFF.urgent?2:1)))} Bucks</span></div></div>
+   </div></div>`;
+}
+
 ROUTES.push("office");CV.office=office;
-GAMES.splice(2,0,{v:"office",name:"Butla Office",icon:"monitor",art:"of",line:"Need Bucks? Get a job. Type the office paperwork, get promoted, get paid.",tag:"Earn · No bet"});
+GAMES.splice(2,0,{v:"office",name:"Butla Office",icon:"monitor",art:"of",line:"Need Bucks? Get a job. Answer your coworkers' messages, get promoted, get paid.",tag:"Earn · No bet"});
 {const f=route;route=function(){f();if(APP.view==="office"){offLoad()}}}
 {const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="office"){offLoad();render()}}}
 
@@ -3035,7 +3131,7 @@ Object.assign(GAME_NAMES,{keno:"Keno",wheel:"Lucky Wheel",tower:"Tower"});
 {const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="coinflip"&&!CF.poll){cfFetch();CF.poll=setInterval(()=>{if(!document.hidden)cfFetch()},2000)}}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793268262";
+const BUILD="1793268535";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
