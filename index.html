@@ -399,7 +399,7 @@ Object.assign(P,{
 });
 
 /* ---------- Rules config (defaults come from the printed cards) ---------- */
-const DEF={rounds:5,research:1,matchPrice:2,missPrice:1,wage:2,super:1,superFine:5,maxWorkers:3,machineCost:4,machineMult:2,maxMachines:1,improveCost:2,improveBonus:1,
+const DEF={rounds:5,research:1,matchPrice:3,missPrice:2,wage:2,super:1,superFine:5,maxWorkers:3,machineCost:4,machineMult:2,maxMachines:1,improveCost:2,improveBonus:1,
   soleStart:10,soleReg:1,freeProfit:4,flatTax:2,partStart:14,partReg:2,partFee:1,coStart:10,coReg:4,coTaxPct:25,coRescue:5,publicBonus:10,
   starPts:3,machPts:2,workerPts:1};
 const FIELDS=[["Game","rounds","Rounds",""],["Game","research","Market research cost","$"],["Game","matchPrice","Sale price on a match","$"],["Game","missPrice","Sale price, no match","$"],
@@ -410,8 +410,8 @@ const FIELDS=[["Game","rounds","Rounds",""],["Game","research","Market research 
   ["Company","coStart","Starting money","$"],["Company","coReg","Register cost","$"],["Company","coTaxPct","Tax on profit","%"],["Company","coRescue","Run out? Go back to","$"],["Company","publicBonus","Go public bonus","$"],
   ["Score sheet","starPts","Points per star",""],["Score sheet","machPts","Points per machine",""],["Score sheet","workerPts","Points per worker",""]];
 let CFG=Object.assign({},DEF);
-try{const s=JSON.parse(localStorage.getItem("bbbl-cfg2")||"null");if(s)CFG=Object.assign({},DEF,s)}catch(e){}
-const saveCfg=()=>{try{localStorage.setItem("bbbl-cfg2",JSON.stringify(CFG))}catch(e){}};
+try{const s=JSON.parse(localStorage.getItem("bbbl-cfg3")||"null");if(s)CFG=Object.assign({},DEF,s)}catch(e){}
+const saveCfg=()=>{try{localStorage.setItem("bbbl-cfg3",JSON.stringify(CFG))}catch(e){}};
 
 /* ---------- Your cards ---------- */
 const TYPES=()=>[
