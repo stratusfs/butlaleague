@@ -891,6 +891,10 @@ body{overflow-x:clip}
 @media (hover:hover) and (pointer:fine) and (min-width:900px){.kbd{display:none}}
 @media (max-width:640px){.office{padding:12px;border-radius:18px}.screen-body{padding:18px 14px 14px;min-height:150px}.kb{height:42px;font-size:15px}.kbd{padding:6px;gap:5px}.kb-row{gap:4px}
   .ladder{grid-template-columns:repeat(2,minmax(0,1fr))}.desk-items{display:none}.off-stats div{min-width:0;flex:1}}
+.broke.job{border-color:#9ad1ff55;background:#9ad1ff12}.broke.job>.ic{color:#9ad1ff}
+.job-nag .bw-label{background-image:linear-gradient(180deg,#fff,#cfe6ff 40%,#5aa0e0 75%,#e6f2ff);filter:drop-shadow(0 6px 0 #0d2a4b) drop-shadow(0 0 24px #5aa0e099);font-size:clamp(38px,9vw,84px)}
+.job-nag .bw-crown{color:#9ad1ff;filter:drop-shadow(0 0 20px #5aa0e0)}
+.job-nag{background:#000000d9;backdrop-filter:blur(3px)}
 </style>
 
 </head>
@@ -1476,9 +1480,10 @@ const CHIPS=[10,25,100,500];
 function chipRack(sel,act){return `<div class="rack" role="group" aria-label="Chip value">${CHIPS.map(v=>`<button class="chip-btn c${v} ${sel===v?"on":""}" data-a="${act}" data-v="${v}" aria-pressed="${sel===v}"><span>${v}</span></button>`).join("")}</div>`}
 const chipStack=(amt,cls="")=>amt?`<span class="stack ${cls}"><i class="chip-mini c${amt>=500?500:amt>=100?100:amt>=25?25:10}"></i><b>${fmtB(amt)}</b></span>`:"";
 function brokeBanner(){
+  if(me().bucks>=10&&me().bucks<100&&APP.view!=="office")return `<div class="broke job">${ic("briefcase")}<span>Running low? Just get a job.</span><button class="btn btn-gold" data-a="go" data-v="office">${ic("monitor")} Go to work</button></div>`;
   if(me().bucks>=10)return"";
   const wait=Math.max(0,REFILL_MS-(Date.now()-me().lastRefill)),mins=Math.ceil(wait/60e3);
-  return `<div class="broke">${ic("coins")}<span>You're out of chips.</span>${canRefill()?`<button class="btn btn-gold" data-a="refill">Claim ${fmtB(REFILL)} free</button>`:`<span class="mute">Free refill in ${mins} min</span>`}${canDaily()?`<button class="btn btn-ghost" data-a="daily">Daily bonus</button>`:""}${typeof rakeAvail==="function"&&rakeAvail()>=1?`<button class="btn btn-ghost" data-a="claimRake">Claim ${fmtB(rakeAvail())} rakeback</button>`:""}<button class="btn btn-ghost" data-a="go" data-v="rewards">${ic("gift")} Rewards</button></div>`;
+  return `<div class="broke">${ic("coins")}<span>You're out of chips. Just get a job.</span><button class="btn btn-gold" data-a="go" data-v="office">${ic("monitor")} Go to work</button>${canRefill()?`<button class="btn btn-gold" data-a="refill">Claim ${fmtB(REFILL)} free</button>`:`<span class="mute">Free refill in ${mins} min</span>`}${canDaily()?`<button class="btn btn-ghost" data-a="daily">Daily bonus</button>`:""}${typeof rakeAvail==="function"&&rakeAvail()>=1?`<button class="btn btn-ghost" data-a="claimRake">Claim ${fmtB(rakeAvail())} rakeback</button>`:""}<button class="btn btn-ghost" data-a="go" data-v="rewards">${ic("gift")} Rewards</button></div>`;
 }
 
 /* ---------- Lobby ---------- */
@@ -2736,8 +2741,19 @@ ROUTES.push("office");CV.office=office;
 GAMES.splice(2,0,{v:"office",name:"Butla Office",icon:"monitor",art:"of",line:"Need Bucks? Get a job. Type the office paperwork, get promoted, get paid.",tag:"Earn · No bet"});
 {const f=route;route=function(){f();if(APP.view==="office"){offLoad()}}}
 
+/* ---------- "Just get a job" when you go broke ---------- */
+let jobNagAt=0;
+function jobNag(){if(APP.view==="office"||document.getElementById("jobNag")||Date.now()-jobNagAt<120000)return;jobNagAt=Date.now();
+  const d=document.createElement("div");d.id="jobNag";d.className="bigwin job-nag";
+  d.innerHTML=`<div class="bw-card"><div class="bw-crown">${ic("briefcase")}</div><div class="bw-label">JUST GET A JOB</div><div class="bw-sub">You're down to ${fmtB(me().bucks)} Bucks. The office is hiring.</div>
+   <div class="ctl-btns" style="justify-content:center;margin-top:12px"><button class="btn btn-gold btn-lg" id="jobGo">${ic("monitor")} Go to work</button><button class="btn btn-ghost" id="jobNo">Keep gambling</button></div></div>`;
+  d.onclick=e=>{if(e.target.closest("#jobGo")){d.remove();A.go("office")}else if(e.target.closest("#jobNo")||e.target===d){d.classList.add("out");setTimeout(()=>d.remove(),300)}};
+  document.body.appendChild(d);SFX.lose();
+}
+{const f=bank;bank=function(d){const was=me().bucks;f(d);if(d<0&&me().bucks<100&&was>=me().bucks)setTimeout(()=>{if(me().bucks<100)jobNag()},2500)}}
+
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793267057";
+const BUILD="1793267215";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
