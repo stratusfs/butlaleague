@@ -997,6 +997,28 @@ body{overflow-x:clip}
 .oc-msg.draft .off-line{font-size:clamp(14px,1.9vw,18px)}
 .oc-compose{padding:8px 14px 10px;background:#fff;border-top:1px solid #e3e5ea;display:grid;gap:6px}
 @media (max-width:640px){.oc{grid-template-columns:1fr}.oc-side{display:none}.monitor{aspect-ratio:auto}.oc-main{min-height:300px}.oc-thread{padding:10px}.oc-msg{font-size:13px}}
+/* ===== Office: phone in landscape — chat and keyboard side by side, fits one screen ===== */
+@media (orientation:landscape) and (max-height:520px){
+ .office{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);align-items:start;justify-items:stretch;padding:8px;gap:6px 10px;border-radius:14px;background:#1b1d21;scroll-margin-top:4px}
+ .office>.desk{grid-column:1;grid-row:1/span 4;padding:0}
+ .office>:not(.desk){grid-column:2}
+ .stand,.desk-row,.desk-items,.monitor::before{display:none}
+ .monitor{width:100%;aspect-ratio:auto;padding:5px;border-radius:10px}
+ .screen-top{padding:4px 8px}.screen-top .dot{width:8px;height:8px}.screen-top .app{font-size:11px}
+ .oc{grid-template-columns:1fr}.oc-side{display:none}
+ .oc-main{height:calc(100svh - 52px);max-height:330px;min-height:200px}
+ .oc-head{padding:5px 10px;gap:8px}.oc-head .oc-av{width:24px;height:24px;font-size:12px}.oc-head b{font-size:13px}.oc-head small{font-size:10.5px}
+ .oc-thread{padding:6px 8px;gap:5px}.oc-msg{font-size:12.5px;padding:6px 10px;max-width:95%}
+ .oc-msg:not(.new):not(.draft){display:none}
+ .oc-msg.draft .off-line{font-size:14px}
+ .oc-compose{padding:5px 8px 6px;gap:3px}.off-meta{font-size:11px}
+ .payslip,.payslip.hint{margin-top:0;padding:4px 10px;min-width:0;width:100%;grid-auto-flow:column;justify-content:center;gap:10px;align-items:baseline;border-radius:10px}
+ .payslip b{font-size:15px}.payslip span{font-size:12px}.payslip small{display:none}
+ .off-event{padding:4px 10px;font-size:12px}
+ .kbd{max-width:none;padding:5px;gap:4px;border-radius:12px}.kb-row{gap:4px}.kb{height:clamp(30px,calc((100svh - 130px)/4),40px);font-size:14px}
+ .office .row-c{margin-top:0!important}.office .row-c .btn{padding:4px 10px;font-size:12px}
+}
+.oc-side{gap:0;padding:6px 5px}.oc-brand{padding:2px 6px 5px}.oc-contact{padding:3px 6px}.oc-contact .oc-av{width:24px;height:24px;font-size:11px}
 </style>
 
 </head>
@@ -2930,7 +2952,9 @@ function ocAppHtml(rk){
 
 ROUTES.push("office");CV.office=office;
 GAMES.splice(2,0,{v:"office",name:"Butla Office",icon:"monitor",art:"of",line:"Need Bucks? Get a job. Answer your coworkers' messages, get promoted, get paid.",tag:"Earn · No bet"});
-{const f=route;route=function(){f();if(APP.view==="office"){offLoad()}}}
+{const f=route;route=function(){f();if(APP.view==="office"){offLoad();offFit()}}}
+function offFit(){try{if(matchMedia("(orientation:landscape) and (max-height:520px)").matches)setTimeout(()=>{const el=document.querySelector(".office");el&&el.scrollIntoView({block:"start"})},60)}catch(e){}}
+try{matchMedia("(orientation:landscape) and (max-height:520px)").addEventListener("change",e=>{if(APP.view==="office")offFit()})}catch(e){}
 {const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="office"){offLoad();render()}}}
 
 /* ---------- "Just get a job" when you go broke ---------- */
@@ -3131,7 +3155,7 @@ Object.assign(GAME_NAMES,{keno:"Keno",wheel:"Lucky Wheel",tower:"Tower"});
 {const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="coinflip"&&!CF.poll){cfFetch();CF.poll=setInterval(()=>{if(!document.hidden)cfFetch()},2000)}}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793268535";
+const BUILD="1793268898";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
