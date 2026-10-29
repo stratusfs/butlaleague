@@ -2242,12 +2242,12 @@ function pokies(){
 /* ---------- Butla Air: dodge the storm clouds, grab boosts, cash out ---------- */
 const AIR={state:"idle",stake:0,m:1,ret:0,lane:1,y:1,t:0,last:0,speed:0,obs:[],bg:[],dist:0,spawn:0,hist:[],raf:0,boom:null,best:0,sparks:[],shake:0};
 BETS.air=10;
-const AIR_LANES=3,AIR_GROW=.07;
-function airReset(){AIR.m=1;AIR.lane=1;AIR.y=1;AIR.t=0;AIR.dist=0;AIR.spawn=1.2;AIR.obs=[];AIR.sparks=[];AIR.boom=null;AIR.shake=0;AIR.ret=0;
+const AIR_LANES=3,AIR_GROW=.075;
+function airReset(){AIR.struck=0;AIR.why="";AIR.m=1;AIR.lane=1;AIR.y=1;AIR.t=0;AIR.dist=0;AIR.spawn=1.2;AIR.obs=[];AIR.sparks=[];AIR.boom=null;AIR.shake=0;AIR.ret=0;
   AIR.bg=Array.from({length:9},(_,i)=>({x:Math.random(),y:Math.random()*.9,s:.5+Math.random(),k:.15+Math.random()*.35}))}
 airReset();
 Object.assign(A,{
-  airStart(){if(AIR.state==="run")return;const s=takeBet("air");if(!s)return;airReset();AIR.stake=s;AIR.state="run";AIR.last=performance.now();SFX.engine(1.4);SFX.whoosh();render();
+  airStart(){if(AIR.state==="run")return;const s=takeBet("air");if(!s)return;airReset();AIR.stake=s;AIR.cp=crPoint();AIR.state="run";AIR.last=performance.now();SFX.engine(1.4);SFX.whoosh();render();
     cancelAnimationFrame(AIR.raf);AIR.raf=requestAnimationFrame(airLoop);document.getElementById("airCanvas")?.focus()},
   airCash(){if(AIR.state!=="run")return;AIR.ret=Math.floor(AIR.stake*AIR.m);bank(AIR.ret);AIR.state="cashed";AIR.hist.unshift({m:AIR.m,ok:true});AIR.hist=AIR.hist.slice(0,12);
     record(AIR.stake,AIR.ret);if(AIR.ret<AIR.stake*5)SFX.win(AIR.m>=3?2:1);airUI();setTimeout(()=>{if(APP.view==="air")render()},700)},
@@ -2262,18 +2262,19 @@ if(typeof document!=="undefined"&&document.addEventListener){
 }
 function airSpawn(){
   const free=Math.floor(Math.random()*AIR_LANES),hard=Math.min(1,AIR.t/40);
-  for(let l=0;l<AIR_LANES;l++){if(l===free)continue;if(Math.random()<.42+hard*.35)AIR.obs.push({x:1.12+Math.random()*.06,lane:l,kind:"storm",r:.9+Math.random()*.25,ph:Math.random()*6})}
+  for(let l=0;l<AIR_LANES;l++){if(l===free)continue;if(Math.random()<.38+hard*.3)AIR.obs.push({x:1.12+Math.random()*.06,lane:l,kind:"storm",r:.9+Math.random()*.25,ph:Math.random()*6})}
   const r=Math.random();
-  if(r<.32)AIR.obs.push({x:1.12,lane:free,kind:"coin",v:+(.15+Math.random()*.35).toFixed(2)});
-  else if(r<.37)AIR.obs.push({x:1.12,lane:free,kind:"boost"});
-  else if(r<.40+hard*.08)AIR.obs.push({x:1.35,lane:free,kind:"bolt"});
+  if(r<.26)AIR.obs.push({x:1.12,lane:free,kind:"coin",v:+(.05+Math.random()*.15).toFixed(2)});
+  else if(r<.28)AIR.obs.push({x:1.12,lane:free,kind:"boost"});
+  else if(r<.31+hard*.06)AIR.obs.push({x:1.35,lane:free,kind:"bolt"});
 }
 function airLoop(now){
   if(AIR.state!=="run"){AIR.raf=0;return}
   const dt=Math.min(.05,(now-AIR.last)/1000);AIR.last=now;AIR.t+=dt;
-  AIR.speed=.33+Math.min(.42,AIR.t*.012);AIR.dist+=AIR.speed*dt;
+  AIR.speed=.33+Math.min(.3,AIR.t*.009);AIR.dist+=AIR.speed*dt;
   AIR.m=Math.floor((AIR.m+AIR_GROW*dt*(1+AIR.t/30))*10000)/10000;
   AIR.y+=(AIR.lane-AIR.y)*Math.min(1,dt*12);
+  if(AIR.m>=AIR.cp){AIR.m=+AIR.cp.toFixed(2);AIR.struck=performance.now();airCrash({kind:"strike"});return}
   AIR.spawn-=dt;if(AIR.spawn<=0){airSpawn();AIR.spawn=Math.max(.55,1.25-AIR.t*.018)/(AIR.speed/.33)}
   AIR.bg.forEach(c=>{c.x-=AIR.speed*c.k*dt;if(c.x<-.3){c.x=1.2;c.y=Math.random()*.9}});
   const PX=.2;
@@ -2282,14 +2283,14 @@ function airLoop(now){
     if(o.kind==="storm"&&dx<.055*o.r&&dl<.42){airCrash(o);return}
     if(o.kind==="bolt"&&dx<.03&&dl<.35){airCrash(o);return}
     if((o.kind==="coin"||o.kind==="boost")&&dx<.05&&dl<.45){o.hit=true;
-      if(o.kind==="coin"){AIR.m=+(AIR.m+o.v).toFixed(2);SFX.coin();airPop(`+${o.v.toFixed(2)}x`,o)}else{AIR.m=+(AIR.m*1.5).toFixed(2);SFX.win(1);airPop("x1.5",o)}}}
+      if(o.kind==="coin"){AIR.m=+(AIR.m+o.v).toFixed(2);SFX.coin();airPop(`+${o.v.toFixed(2)}x`,o)}else{AIR.m=+(AIR.m*1.2).toFixed(2);SFX.win(1);airPop("x1.2",o)}}}
   AIR.obs=AIR.obs.filter(o=>o.x>-.2&&!(o.hit&&o.kind!=="storm"));
   AIR.sparks=AIR.sparks.filter(s=>(s.life-=dt)>0);
   if(Math.random()<dt*1.2)SFX.engine(.5);
   airPaint();airUI();AIR.raf=requestAnimationFrame(airLoop);
 }
 function airPop(txt,o){AIR.sparks.push({txt,x:o.x,lane:o.lane,life:1})}
-function airCrash(o){AIR.state="crashed";AIR.boom={x:.2,y:AIR.y,t0:performance.now()};AIR.shake=1;AIR.hist.unshift({m:AIR.m,ok:false});AIR.hist=AIR.hist.slice(0,12);
+function airCrash(o){AIR.state="crashed";AIR.why=o&&o.kind==="strike"?"strike":"cloud";AIR.boom={x:.2,y:AIR.y,t0:performance.now()};AIR.shake=1;AIR.hist.unshift({m:AIR.m,ok:false});AIR.hist=AIR.hist.slice(0,12);
   record(AIR.stake,0);SFX.boom();SFX.lose();
   const t0=performance.now();(function f(n){airPaint();if(n-t0<1100&&APP.view==="air")requestAnimationFrame(f);else if(APP.view==="air")render()})(t0)}
 function airUI(){const el=document.getElementById("airMult");if(el){el.textContent=AIR.m.toFixed(2)+"x";el.className="air-hud-m num "+(AIR.state==="crashed"?"crashed":AIR.state==="cashed"?"cashed":"")}
@@ -2313,7 +2314,7 @@ function airPaint(){
     else if(o.kind==="coin"){const bob=Math.sin(now/200+o.x*20)*4,w=Math.abs(Math.cos(now/260+o.x*9));x.save();x.translate(ox,oy+bob);x.shadowColor="#ffd34a";x.shadowBlur=14;x.fillStyle="#e8b647";x.beginPath();x.ellipse(0,0,S*.42*w+2,S*.42,0,0,7);x.fill();x.shadowBlur=0;
       x.fillStyle="#1a1205";x.font=`800 ${Math.round(S*.36)}px Manrope, sans-serif`;x.textAlign="center";x.textBaseline="middle";if(w>.5)x.fillText("+"+o.v.toFixed(1),0,1);x.restore()}
     else if(o.kind==="boost"){x.save();x.translate(ox,oy);x.rotate(now/400);x.shadowColor="#58c98a";x.shadowBlur=18;x.fillStyle="#58c98a";x.beginPath();for(let i=0;i<10;i++){const a=i*Math.PI/5,rr=i%2?S*.25:S*.5;x.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}x.fill();x.restore();
-      x.fillStyle="#06210f";x.font=`900 ${Math.round(S*.3)}px Manrope, sans-serif`;x.textAlign="center";x.textBaseline="middle";x.fillText("x1.5",ox,oy+1)}}
+      x.fillStyle="#06210f";x.font=`900 ${Math.round(S*.3)}px Manrope, sans-serif`;x.textAlign="center";x.textBaseline="middle";x.fillText("x1.2",ox,oy+1)}}
   AIR.sparks.forEach(s=>{x.globalAlpha=Math.max(0,s.life);x.fillStyle="#fff";x.font="900 18px Manrope, sans-serif";x.textAlign="center";x.strokeStyle="#1a1205";x.lineWidth=4;const yy=LY(s.lane)-(1-s.life)*50;x.strokeText(s.txt,s.x*W,yy);x.fillText(s.txt,s.x*W,yy);x.globalAlpha=1});
   const px=W*.2,py=top+laneH*(AIR.y+.5),tilt=(AIR.lane-AIR.y)*.5;
   if(AIR.state==="run"){x.strokeStyle="#ffffffaa";x.lineWidth=3;x.beginPath();for(let i=0;i<14;i++){const tx=px-26-i*9,tyy=py+Math.sin(now/120-i*.6)*2;i?x.lineTo(tx,tyy):x.moveTo(tx,tyy)}x.stroke()}
@@ -2323,7 +2324,9 @@ function airPaint(){
     x.fillStyle="#c8902a";x.beginPath();x.moveTo(4,-2);x.lineTo(-8,-18);x.lineTo(-14,-18);x.lineTo(-6,-2);x.fill();x.beginPath();x.moveTo(4,2);x.lineTo(-6,14);x.lineTo(-11,14);x.lineTo(-5,2);x.fill();
     x.fillStyle="#2a6bb8";x.beginPath();x.ellipse(14,-2,4,2.2,0,0,7);x.fill();
     const prop=(now/20)%2<1?10:3;x.fillStyle="#1a1205aa";x.fillRect(26,-prop/2,2,prop);x.restore()}
-  else{const k=Math.min(1,(now-AIR.boom.t0)/700);for(let i=0;i<16;i++){const a=i/16*6.28,rr=10+k*60;x.fillStyle=i%2?"#ff7a3d":"#ffd34a";x.globalAlpha=1-k;x.beginPath();x.arc(px+Math.cos(a)*rr,py+Math.sin(a)*rr,8*(1-k)+2,0,7);x.fill()}x.globalAlpha=1;
+  else{if(AIR.why==="strike"&&now-AIR.boom.t0<450){x.save();x.strokeStyle="#fff7b0";x.shadowColor="#ffe14a";x.shadowBlur=30;x.lineWidth=5;x.beginPath();let bx=px+30,by=0;x.moveTo(bx,by);
+      while(by<py){by+=H/9;bx+=(Math.random()-.5)*50;x.lineTo(Math.min(by,py)===py?px:bx,Math.min(by,py))}x.stroke();x.restore();x.fillStyle="#ffffff55";x.fillRect(0,0,W,H)}
+    const k=Math.min(1,(now-AIR.boom.t0)/700);for(let i=0;i<16;i++){const a=i/16*6.28,rr=10+k*60;x.fillStyle=i%2?"#ff7a3d":"#ffd34a";x.globalAlpha=1-k;x.beginPath();x.arc(px+Math.cos(a)*rr,py+Math.sin(a)*rr,8*(1-k)+2,0,7);x.fill()}x.globalAlpha=1;
     cloudPath(x,px,py-k*30,18+k*20,`rgba(60,60,60,${.7*(1-k)})`)}
 }
 function air(){
@@ -2337,13 +2340,14 @@ function air(){
     ${run?`<button id="airBtn" class="btn btn-gold btn-lg cashg" data-a="airCash">${ic("coins")} Cash out</button>`:`<button class="btn btn-gold btn-lg" data-a="airStart">${ic("plane")} ${over?"Fly again":"Take off"}</button>`}
     <div class="air-help"><div><span class="ar">${ic("arrowUp")}${ic("arrowDown")}</span><span>Tap the top or bottom of the sky, or use the arrow keys, to change lanes</span></div>
      <div><i class="air-chip storm"></i><span>Storm clouds and lightning end your flight</span></div>
-     <div><i class="air-chip coin"></i><span>Coins add to your multiplier. Green stars give x1.5</span></div>
-     <div>${ic("trend")}<span>The multiplier grows the longer you fly, and so does the speed</span></div></div>
+     <div><i class="air-chip coin"></i><span>Coins add to your multiplier. Green stars give x1.2</span></div>
+     <div>${ic("trend")}<span>The multiplier grows the longer you fly, and so does the speed</span></div>
+     <div>${ic("zap")}<span>Every flight can be struck by lightning out of nowhere. Don't get greedy</span></div></div>
     <div><label class="lbl2">Recent flights</label><div class="hist">${AIR.hist.map(h=>`<span class="h ${h.ok?"hi":"lo"}">${h.m.toFixed(2)}x</span>`).join("")||`<span class="mute" style="font-size:13px">None yet</span>`}</div></div>
    </aside>
    <section class="table-felt air-felt"><canvas id="airCanvas" tabindex="0" aria-label="Butla Air sky. Tap the top or bottom half to change lanes."></canvas>
     <div class="air-hud"><div id="airMult" class="air-hud-m num ${AIR.state==="crashed"?"crashed":AIR.state==="cashed"?"cashed":""}">${AIR.m.toFixed(2)}x</div><div class="air-hud-d num" id="airDist">${Math.floor(AIR.dist*100)} m</div></div>
-    ${over?`<div class="air-over ${AIR.state}"><b>${AIR.state==="crashed"?"Crashed!":"Landed it"}</b><span>${AIR.state==="crashed"?`Lost ${fmtB(AIR.stake)} at ${AIR.m.toFixed(2)}x`:`+${fmtB(AIR.ret-AIR.stake)} at ${AIR.m.toFixed(2)}x`}</span><button class="btn btn-gold" data-a="airStart">${ic("plane")} Fly again</button></div>`:AIR.state==="idle"?`<div class="air-over"><b>Ready for take off</b><span>Set a bet and hit Take off</span><button class="btn btn-gold" data-a="airStart">${ic("plane")} Take off</button></div>`:""}
+    ${over?`<div class="air-over ${AIR.state}"><b>${AIR.state==="crashed"?(AIR.why==="strike"?"Lightning strike!":"Crashed!"):"Landed it"}</b><span>${AIR.state==="crashed"?`Lost ${fmtB(AIR.stake)} at ${AIR.m.toFixed(2)}x`:`+${fmtB(AIR.ret-AIR.stake)} at ${AIR.m.toFixed(2)}x`}</span><button class="btn btn-gold" data-a="airStart">${ic("plane")} Fly again</button></div>`:AIR.state==="idle"?`<div class="air-over"><b>Ready for take off</b><span>Set a bet and hit Take off</span><button class="btn btn-gold" data-a="airStart">${ic("plane")} Take off</button></div>`:""}
     ${run?`<div class="air-pads"><button data-a="airMove" data-v="-1" aria-label="Fly up">${ic("arrowUp")}</button><button data-a="airMove" data-v="1" aria-label="Fly down">${ic("arrowDown")}</button></div>
      <button class="air-cash" data-a="airCash">${ic("coins")} Cash out</button>`:""}
    </section></div></div>`;
@@ -2434,7 +2438,7 @@ Object.assign(GAME_NAMES,{pokies:"Butla Pokies",air:"Butla Air",dice:"Dice",hilo
 {const f=afterRender;afterRender=function(){f();if(APP.view==="air")airPaint(AIR.state==="gone"?1:0)}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793263696";
+const BUILD="1793264213";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
