@@ -846,6 +846,9 @@ img[src^="data:image/webp"]{aspect-ratio:560/537;height:auto}
 .ann-bar{margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px))) 0 calc(-1*max(16px,env(safe-area-inset-left,0px)));width:auto;max-width:none}
 body{overflow-x:clip}
 @media (max-width:640px){.sec-h:has(.seg[role=tablist]){display:grid}.sec-h .seg[role=tablist]{width:100%}.wallet b{max-width:11ch}.ann-bar{font-size:13.5px}}
+/* tile rays: a big centred circle so rotation never exposes corners */
+.tile-art::before{inset:auto;left:50%;top:50%;width:max(260%,700px);aspect-ratio:1;height:auto;border-radius:50%;transform:translate(-50%,-50%) rotate(0deg);transition:transform 6s linear}
+.tile:hover .tile-art::before{transform:translate(-50%,-50%) rotate(60deg)}
 </style>
 
 </head>
@@ -2574,7 +2577,7 @@ if(typeof window!=="undefined"&&window.setInterval){setTimeout(()=>{if(NET_OK!==
 {const f=route;route=function(){f();if(APP.view==="admin"){ADM.data=null;admLoad()}}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793264945";
+const BUILD="1793266787";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
