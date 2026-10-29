@@ -637,6 +637,11 @@ h1,h2,h3{font-weight:700;letter-spacing:.01em}
 .tiles .tile:nth-child(2){grid-column:span 2}
 @media (max-width:900px){.tiles .tile:nth-child(2){grid-column:auto}.tiles .tile:last-child:nth-child(4n+1){grid-column:auto}}
 @media (max-width:520px){.tiles .tile{grid-column:auto!important}}
+/* no replayed entrance animations when the same screen refreshes */
+#app.still .screen,#app.still .tile,#app.still .step,#app.still .mp-row,#app.still .feed-row,#app.still .rw-card,#app.still .pod,#app.still .sheet td,
+#app.still .lc-row,#app.still .vip-bar i,#app.still .lobby-logo,#app.still .hero-logo,#app.still .seat-cfg,#app.still .reward,#app.still .pickable,
+#app.still .fan,#app.still .ledger .ln,#app.still .eff,#app.still .crowd-note,#app.still .rank,#app.still .bj-msg.idle,#app.still .over-msg,
+#app.still .rl-result,#app.still .mini-lb li,#app.still .auth,.still .feed-row{animation:none!important}
 </style>
 
 </head>
@@ -1197,9 +1202,9 @@ const ROUTES=["home","league","blackjack","roulette","slots","leaderboard"];
 let APP={view:"home",lb:"bucks"};
 function route(){const h=(typeof location!=="undefined"?location.hash:"").slice(1);APP.view=ROUTES.includes(h)?h:"home";render();
   if(typeof ACC!=="undefined"&&NET_OK!==false&&(APP.view==="home"||APP.view==="leaderboard")){(ACC?flushAcc():Promise.resolve()).then(()=>loadLB(APP.view==="home"?"bucks":APP.lb))}}
-if(typeof window!=="undefined"&&window.addEventListener)window.addEventListener("hashchange",route);
+if(typeof window!=="undefined"&&window.addEventListener)window.addEventListener("hashchange",()=>route());
 Object.assign(A,{
-  go(v){if(typeof location!=="undefined"&&location.hash!=="#"+v)location.hash=v;else{APP.view=v;render()}},
+  go(v){if(typeof location!=="undefined"&&location.hash!=="#"+v)location.hash=v;else route()},
   daily(){if(!canDaily())return;me().lastDaily=Date.now();bank(DAILY);coinBurst(70);toast(`${ic("calendar")} Daily bonus: +${fmtB(DAILY)} Butla Bucks`,"good");render()},
   refill(){if(!canRefill())return;me().lastRefill=Date.now();bank(REFILL);toast(`${ic("coins")} Free refill: +${fmtB(REFILL)} Butla Bucks`,"good");render()},
   lbTab(k){APP.lb=k;render()},
@@ -1846,10 +1851,11 @@ ROUTES.push("rewards");CV.rewards=rewards;
 
 /* ---------- Live Crash (shared rounds) ---------- */
 const LC={st:null,off:0,poll:0,raf:0,busy:false,auto:0,lastRound:0,boomed:0};
-const liveOn=()=>!!ACC&&NET_OK!==false;
+const liveOn=()=>!!ACC&&NET_OK!==false&&!LC.solo;
 function lcStart(){if(LC.poll)return;lcFetch();LC.poll=setInterval(lcFetch,800);if(!LC.raf)LC.raf=requestAnimationFrame(lcFrame)}
 function lcStop(){clearInterval(LC.poll);LC.poll=0;cancelAnimationFrame(LC.raf);LC.raf=0}
-async function lcFetch(){if(LC.busy)return;try{lcAdopt(await rpc("cr_state",{p_token:ACC?ACC.token:null}))}catch(e){}}
+async function lcFetch(){if(LC.busy)return;try{lcAdopt(await rpc("cr_state",{p_token:ACC?ACC.token:null}));LC.fails=0}catch(e){LC.fails=(LC.fails||0)+1;
+  if(LC.fails>=4&&APP.view==="crash"){lcStop();LC.solo=true;toast("Live Crash isn't reachable right now. Playing solo.","bad");render()}}}
 function lcAdopt(s){
   LC.off=s.now-Date.now();const prev=LC.st,newRound=!prev||prev.round.id!==s.round.id;LC.st=s;
   if(s.me&&ACC){const b=ACC.p.bucks;Object.assign(ACC.p,{bucks:+s.me.bucks,best:+s.me.best,profit:+s.me.profit,hands:+s.me.hands,wagered:+s.me.wagered,rake:+s.me.rake,claimedTier:+s.me.claimedTier});if(b!==ACC.p.bucks)bumpWallet(ACC.p.bucks-b)}
@@ -1916,10 +1922,10 @@ function crashLive(){
 
 /* ---------- Live wins feed + online count ---------- */
 APP.feed=null;
-async function loadFeed(){try{APP.feed=await rpc("bb_feed",{p_token:ACC?ACC.token:null});if(APP.view==="home"){const el=document.getElementById("liveFeed");if(el)el.outerHTML=feedHtml();else render()}
+async function loadFeed(){try{APP.feed=await rpc("bb_feed",{p_token:ACC?ACC.token:null});if(APP.view==="home"){const el=document.getElementById("liveFeed");if(el)el.outerHTML=feedHtml(true)}
   const oc=document.getElementById("onlineCount");if(oc)oc.textContent=APP.feed.online}catch(e){}}
 function ago(ms){const s=Math.max(0,Math.round((Date.now()-ms)/1000));return s<60?`${s}s ago`:s<3600?`${Math.floor(s/60)}m ago`:`${Math.floor(s/3600)}h ago`}
-function feedHtml(){const f=APP.feed;return `<section class="felt" id="liveFeed"><div class="sec-h"><h3>Live wins</h3><span class="live-pill"><i></i><span>${f?f.online:"-"} online</span></span></div>
+function feedHtml(still){const f=APP.feed;return `<section class="felt ${still?"still":""}" id="liveFeed"><div class="sec-h"><h3>Live wins</h3><span class="live-pill"><i></i><span>${f?f.online:"-"} online</span></span></div>
   ${!f?`<p class="mute">Loading...</p>`:!f.feed.length?`<p class="mute" style="font-size:13.5px">No big wins yet. Hit a 2x or better and you'll show up here.</p>`:
   `<div class="feed">${f.feed.slice(0,8).map(x=>`<div class="feed-row"><b>${esc(x.name)}</b><span class="mute">${esc(x.game)}</span><span class="num pos">+${fmtB(x.payout-x.bet)}</span><span class="mult num">${(+x.mult).toFixed(2)}x</span><small>${ago(x.at)}</small></div>`).join("")}</div>`}</section>`}
 {const f=CV.home;CV.home=function(){let h=f();if(NET_OK===false)return h;
@@ -1928,7 +1934,7 @@ function feedHtml(){const f=APP.feed;return `<section class="felt" id="liveFeed"
 const GAME_NAMES={blackjack:"Blackjack",roulette:"Roulette",slots:"Butla Slots",mines:"Mines",plinko:"Plinko"};
 {const f=record;record=function(stake,ret){f(stake,ret);const g=GAME_NAMES[APP.view];if(ACC&&g&&ret>stake&&(ret>=stake*2||ret-stake>=500))rpc("bb_feed_post",{p_token:ACC.token,p_game:g,p_bet:Math.round(stake),p_payout:Math.round(ret)}).catch(()=>{})}}
 if(typeof window!=="undefined"&&window.setInterval)setInterval(()=>{if(NET_OK!==false&&(typeof document==="undefined"||!document.hidden))loadFeed()},10000);
-{const f=route;route=function(){const was=APP.view;f();if(APP.view==="crash"&&liveOn()){flushAcc().then(lcStart)}else if(was==="crash")lcStop();if(APP.view==="home")loadFeed()}}
+{const f=route;route=function(){const was=APP.view;f();if(APP.view==="crash"&&liveOn()){lcStart();flushAcc()}else if(was==="crash"&&APP.view!=="crash")lcStop();if(APP.view==="home")loadFeed()}}
 {const f=restoreSession;restoreSession=async function(){await f();loadFeed();if(APP.view==="crash"&&liveOn())lcStart()}}
 
 /* ---------- Render ---------- */
@@ -2060,7 +2066,9 @@ GAMES.splice(1,0,{v:"online",name:"League Online",icon:"wifi",art:"on",line:"Pla
 
 let lastScreen=null;
 function render(){
-  document.getElementById("app").innerHTML=APP.view==="league"?VIEWS[S.screen]():CV[APP.view]();
+  const app=document.getElementById("app"),key=APP.view==="league"?"L"+S.screen:APP.view;
+  if(app.classList)app.classList.toggle("still",key===lastScreen);
+  app.innerHTML=APP.view==="league"?VIEWS[S.screen]():CV[APP.view]();
   const bc=document.getElementById("bigcash");
   if(bc){const k="bc"+S.round+"-"+S.turn;if(!done.has(k)){done.add(k);countUp(bc,+bc.dataset.from,+bc.dataset.to,1500)}else bc.textContent=money(+bc.dataset.to);
     bc.style.color=+bc.dataset.to<0?"var(--loss)":"var(--cream)"}
