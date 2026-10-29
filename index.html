@@ -614,6 +614,29 @@ h1,h2,h3{font-weight:700;letter-spacing:.01em}
 .mp-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--mute);font-weight:700;font-size:13px}
 .mp-chip.ok{color:var(--money);border-color:#58c98a66}
 .mp-wait{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;border:1px dashed var(--gold-lo);color:var(--gold-hi);font-weight:700}
+/* live */
+.live-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#ef6a581a;border:1px solid #ef6a5855;color:#ff9a8c;font-weight:800;font-size:12px;letter-spacing:.06em}
+.live-pill i,.online-dot{width:7px;height:7px;border-radius:50%;background:#ff5b4a;box-shadow:0 0 8px #ff5b4a;animation:pulseDot 1.4s infinite;display:inline-block}
+.online-dot{background:var(--money);box-shadow:0 0 8px var(--money);margin:0 2px 0 4px}
+.lc-bar{position:absolute;left:12px;right:12px;top:12px;height:4px;border-radius:999px;background:#ffffff10;overflow:hidden;z-index:2}
+.lc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi));transition:width .1s linear}
+.cr-mult.wait{color:#f4ecd699;font-size:clamp(40px,7vw,72px)}
+.lc-hist{position:absolute;left:16px;right:16px;bottom:44px;justify-content:flex-end;pointer-events:none;opacity:.9}
+.lc-list{display:grid;gap:6px;max-height:300px;overflow:auto}
+.lc-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:9px;background:#0e0d09;border:1px solid var(--line);font-size:13.5px}
+.lc-row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lc-row.me{border-color:var(--gold-lo)}
+.lc-row .pos{color:var(--money);font-weight:700}.lc-row .neg{color:var(--loss);font-weight:700}
+#lcBtn{width:100%}#lcBtn.cash{background:linear-gradient(180deg,#8ff0b4,#3fbf74);box-shadow:0 6px 20px -6px #58c98acc;color:#06210f}
+.feed{display:grid;gap:6px}
+.feed-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:4px 12px;align-items:center;padding:9px 12px;border-radius:10px;background:#0e0d09;border:1px solid var(--line);font-size:13.5px;animation:rise .4s both}
+.feed-row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.feed-row .pos{color:var(--money);font-weight:700}
+.feed-row .mult{color:var(--gold-hi);font-weight:700}.feed-row small{grid-column:1/-1;color:var(--mute);font-size:11px;margin-top:-2px}
+#liveFeed{margin-top:16px}
+.tiles .tile:first-child{grid-column:span 2}
+.tiles .tile:last-child:nth-child(4n+1){grid-column:span 2}
+.tiles .tile:nth-child(2){grid-column:span 2}
+@media (max-width:900px){.tiles .tile:nth-child(2){grid-column:auto}.tiles .tile:last-child:nth-child(4n+1){grid-column:auto}}
+@media (max-width:520px){.tiles .tile{grid-column:auto!important}}
 </style>
 
 </head>
@@ -1819,6 +1842,94 @@ function rewards(){
 }
 ROUTES.push("rewards");CV.rewards=rewards;
 
+
+
+/* ---------- Live Crash (shared rounds) ---------- */
+const LC={st:null,off:0,poll:0,raf:0,busy:false,auto:0,lastRound:0,boomed:0};
+const liveOn=()=>!!ACC&&NET_OK!==false;
+function lcStart(){if(LC.poll)return;lcFetch();LC.poll=setInterval(lcFetch,800);if(!LC.raf)LC.raf=requestAnimationFrame(lcFrame)}
+function lcStop(){clearInterval(LC.poll);LC.poll=0;cancelAnimationFrame(LC.raf);LC.raf=0}
+async function lcFetch(){if(LC.busy)return;try{lcAdopt(await rpc("cr_state",{p_token:ACC?ACC.token:null}))}catch(e){}}
+function lcAdopt(s){
+  LC.off=s.now-Date.now();const prev=LC.st,newRound=!prev||prev.round.id!==s.round.id;LC.st=s;
+  if(s.me&&ACC){const b=ACC.p.bucks;Object.assign(ACC.p,{bucks:+s.me.bucks,best:+s.me.best,profit:+s.me.profit,hands:+s.me.hands,wagered:+s.me.wagered,rake:+s.me.rake,claimedTier:+s.me.claimedTier});if(b!==ACC.p.bucks)bumpWallet(ACC.p.bucks-b)}
+  if(s.round.crashed&&LC.boomed!==s.round.id){LC.boomed=s.round.id;const mb=s.myBet;if(mb&&!mb.cashedAt)SFX.boom();else if(mb&&mb.cashedAt)SFX.thunk();else SFX.thunk()}
+  if(newRound){if(prev)SFX.whoosh();if(APP.view==="crash")render()}else lcPanel();
+}
+function lcPhase(){const s=LC.st;if(!s)return{ph:"load",m:1};const now=Date.now()+LC.off,r=s.round;
+  if(r.crashed)return{ph:"crashed",m:+r.cp};if(now<r.betUntil)return{ph:"bet",m:1,left:(r.betUntil-now)/1000};
+  return{ph:"run",m:Math.exp(CR_K*(now-r.betUntil)/1000)}}
+function lcFrame(){
+  if(APP.view!=="crash"||!liveOn()){LC.raf=0;return}
+  const P_=lcPhase(),mb=LC.st&&LC.st.myBet;
+  CR.m=P_.m;CR.state=P_.ph==="crashed"?"crashed":P_.ph==="run"?(mb&&mb.cashedAt?"cashed":"run"):"idle";CR.cashAt=mb&&mb.cashedAt?+mb.cashedAt:0;CR.ret=mb?+mb.payout:0;CR.stake=mb?+mb.amount:0;
+  if(mb&&!mb.cashedAt&&mb.auto&&P_.ph==="run"&&P_.m>=+mb.auto){CR.cashAt=+mb.auto;CR.state="cashed"}
+  crPaint();
+  const st=document.getElementById("lcStatus"),bar=document.getElementById("lcBar"),btn=document.getElementById("lcBtn");
+  if(st)st.textContent=P_.ph==="bet"?`Launching in ${P_.left.toFixed(1)}s`:P_.ph==="run"?"Live":P_.ph==="crashed"?`Crashed at ${(+LC.st.round.cp).toFixed(2)}x`:"Connecting...";
+  if(bar)bar.style.width=P_.ph==="bet"?Math.max(0,Math.min(100,P_.left/7*100))+"%":"0%";
+  const el=document.getElementById("crMult");if(el&&P_.ph==="bet"){el.textContent=P_.left.toFixed(1)+"s";el.className="cr-mult num wait"}
+  if(btn&&P_.ph==="run"&&mb&&!mb.cashedAt&&!(mb.auto&&P_.m>=+mb.auto))btn.innerHTML=`${ic("coins")} Cash out ${fmtB(Math.floor(mb.amount*P_.m))}`;
+  if(LC.lastPh!==P_.ph){LC.lastPh=P_.ph;lcPanel()}
+  LC.raf=requestAnimationFrame(lcFrame);
+}
+function lcBtnHtml(){
+  const P_=lcPhase(),mb=LC.st&&LC.st.myBet;
+  if(P_.ph==="bet")return mb?`<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("check")} Bet placed: ${fmtB(mb.amount)}${mb.auto?` · auto ${(+mb.auto).toFixed(2)}x`:""}</button>`
+    :`<button id="lcBtn" class="btn btn-gold btn-lg" data-a="lcBet" ${LC.busy?"disabled":""}>${ic("rocket")} Place bet</button>`;
+  if(P_.ph==="run"&&mb&&!mb.cashedAt)return `<button id="lcBtn" class="btn btn-gold btn-lg cash" data-a="lcCash">${ic("coins")} Cash out</button>`;
+  if(mb&&mb.cashedAt)return `<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("check")} Cashed ${fmtB(mb.payout)} at ${(+mb.cashedAt).toFixed(2)}x</button>`;
+  return `<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("moon")} ${P_.ph==="run"?"Round in progress":"Next round soon"}</button>`;
+}
+function lcBetsHtml(){const s=LC.st;if(!s)return"";const P_=lcPhase();
+  return s.bets.length?s.bets.map(b=>{const st_=b.cashedAt?`<span class="pos">${(+b.cashedAt).toFixed(2)}x · +${fmtB(b.payout-b.amount)}</span>`:P_.ph==="crashed"?`<span class="neg">Busted</span>`:`<span class="mute">${P_.ph==="bet"?"Ready":"Riding"}</span>`;
+    return `<div class="lc-row ${b.me?"me":""}"><b>${esc(b.name)}</b><span class="num">${fmtB(b.amount)}</span>${st_}</div>`}).join(""):`<p class="mute" style="margin:0;font-size:13px">No bets yet this round. Be the first.</p>`}
+function lcPanel(){if(APP.view!=="crash")return;const a=document.getElementById("lcBtnWrap"),b=document.getElementById("lcBets"),h=document.getElementById("lcHist"),c=document.getElementById("lcCount");
+  if(a)a.innerHTML=lcBtnHtml();if(b)b.innerHTML=lcBetsHtml();if(h&&LC.st)h.innerHTML=LC.st.history.map(x=>`<span class="h ${x>=2?"hi":"lo"}">${(+x).toFixed(2)}</span>`).join("");
+  if(c&&LC.st)c.textContent=`${LC.st.bets.length} player${LC.st.bets.length===1?"":"s"} this round`;
+  const inp=document.getElementById("bet_crash");if(inp)inp.disabled=lcPhase().ph!=="bet"||!!(LC.st&&LC.st.myBet)}
+Object.assign(A,{
+  lcAuto(v){LC.auto=v;SFX.click();render()},
+  async lcBet(){if(LC.busy)return;const amt=BETS.crash;if(!(amt>=1)||amt>me().bucks){toast(amt>me().bucks?"Not enough Bucks for that bet":"Enter a bet of at least 1","bad");return}
+    LC.busy=true;lcPanel();try{await flushAcc();lcAdopt(await rpc("cr_bet",{p_token:ACC.token,p_amount:amt,p_auto:LC.auto||null}));SFX.chip()}catch(e){toast(e.message,"bad")}LC.busy=false;lcPanel()},
+  async lcCash(){if(LC.busy)return;LC.busy=true;try{lcAdopt(await rpc("cr_cash",{p_token:ACC.token}));const mb=LC.st.myBet;if(mb&&mb.cashedAt){SFX.win(+mb.cashedAt>=5?3:2);coinBurst(+mb.cashedAt>=5?80:40)}}catch(e){toast(e.message,"bad")}LC.busy=false;lcPanel()}
+});
+function crashLive(){
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Crash</h2><span class="live-pill"><i></i>Live</span><span class="mute" id="lcCount"></span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("crash",!!(LC.st&&LC.st.myBet)||lcPhase().ph!=="bet")}
+    <div><label class="lbl2">Auto cash out</label><div class="seg wrap">${[[0,"Off"],[1.5,"1.5x"],[2,"2x"],[3,"3x"],[5,"5x"],[10,"10x"]].map(([v,l])=>`<button class="${LC.auto===v?"on":""}" data-a="lcAuto" data-v="${v}">${l}</button>`).join("")}</div></div>
+    <div id="lcBtnWrap">${lcBtnHtml()}</div>
+    <div><label class="lbl2">This round</label><div class="lc-list" id="lcBets">${lcBetsHtml()}</div></div>
+   </aside>
+   <section class="table-felt crash-felt"><div class="lc-bar"><i id="lcBar"></i></div><canvas id="crCanvas" aria-label="Crash multiplier chart"></canvas>
+    <div class="cr-over"><div id="crMult" class="cr-mult num">1.00x</div><div class="cr-sub" id="lcStatus">Connecting...</div></div>
+    <div class="hist lc-hist" id="lcHist"></div></section>
+  </div>
+  <p class="fine">Everyone on the site plays the same rounds. Bets close when the countdown hits zero.</p></div>`;
+}
+{const solo=CV.crash;CV.crash=function(){if(liveOn())return crashLive();let h=solo();if(ACC||NET_OK===false)return h;
+  return h.replace('<div class="side-layout">',`<div class="broke">${ic("wifi")}<span>Log in to play live Crash with everyone on the site.</span><button class="btn btn-gold" data-a="go" data-v="account">Log in</button></div><div class="side-layout">`)}}
+
+/* ---------- Live wins feed + online count ---------- */
+APP.feed=null;
+async function loadFeed(){try{APP.feed=await rpc("bb_feed",{p_token:ACC?ACC.token:null});if(APP.view==="home"){const el=document.getElementById("liveFeed");if(el)el.outerHTML=feedHtml();else render()}
+  const oc=document.getElementById("onlineCount");if(oc)oc.textContent=APP.feed.online}catch(e){}}
+function ago(ms){const s=Math.max(0,Math.round((Date.now()-ms)/1000));return s<60?`${s}s ago`:s<3600?`${Math.floor(s/60)}m ago`:`${Math.floor(s/3600)}h ago`}
+function feedHtml(){const f=APP.feed;return `<section class="felt" id="liveFeed"><div class="sec-h"><h3>Live wins</h3><span class="live-pill"><i></i><span>${f?f.online:"-"} online</span></span></div>
+  ${!f?`<p class="mute">Loading...</p>`:!f.feed.length?`<p class="mute" style="font-size:13.5px">No big wins yet. Hit a 2x or better and you'll show up here.</p>`:
+  `<div class="feed">${f.feed.slice(0,8).map(x=>`<div class="feed-row"><b>${esc(x.name)}</b><span class="mute">${esc(x.game)}</span><span class="num pos">+${fmtB(x.payout-x.bet)}</span><span class="mult num">${(+x.mult).toFixed(2)}x</span><small>${ago(x.at)}</small></div>`).join("")}</div>`}</section>`}
+{const f=CV.home;CV.home=function(){let h=f();if(NET_OK===false)return h;
+  h=h.replace('<div class="eyebrow">Play money only</div>',`<div class="eyebrow">Play money only${APP.feed?` · <span class="online-dot"></span><span id="onlineCount">${APP.feed.online}</span> online now`:""}</div>`);
+  return h.replace('<p class="fine">Butla Bucks are play money.',`${feedHtml()}<p class="fine">Butla Bucks are play money.`)}}
+const GAME_NAMES={blackjack:"Blackjack",roulette:"Roulette",slots:"Butla Slots",mines:"Mines",plinko:"Plinko"};
+{const f=record;record=function(stake,ret){f(stake,ret);const g=GAME_NAMES[APP.view];if(ACC&&g&&ret>stake&&(ret>=stake*2||ret-stake>=500))rpc("bb_feed_post",{p_token:ACC.token,p_game:g,p_bet:Math.round(stake),p_payout:Math.round(ret)}).catch(()=>{})}}
+if(typeof window!=="undefined"&&window.setInterval)setInterval(()=>{if(NET_OK!==false&&(typeof document==="undefined"||!document.hidden))loadFeed()},10000);
+{const f=route;route=function(){const was=APP.view;f();if(APP.view==="crash"&&liveOn()){flushAcc().then(lcStart)}else if(was==="crash")lcStop();if(APP.view==="home")loadFeed()}}
+{const f=restoreSession;restoreSession=async function(){await f();loadFeed();if(APP.view==="crash"&&liveOn())lcStart()}}
 
 /* ---------- Render ---------- */
 const VIEWS={home,setup,pass,turn,market,event:eventScreen,end};
