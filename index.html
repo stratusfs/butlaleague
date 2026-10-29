@@ -2297,7 +2297,7 @@ airReset();
 Object.assign(A,{
   airStart(){if(AIR.state==="run")return;const s=takeBet("air");if(!s)return;airReset();AIR.stake=s;AIR.cp=crPoint();AIR.state="run";AIR.last=performance.now();SFX.engine(1.4);SFX.whoosh();render();
     cancelAnimationFrame(AIR.raf);AIR.raf=requestAnimationFrame(airLoop);document.getElementById("airCanvas")?.focus()},
-  airCash(){if(AIR.state!=="run")return;AIR.ret=Math.floor(AIR.stake*AIR.m);bank(AIR.ret);AIR.state="cashed";AIR.hist.unshift({m:AIR.m,ok:true});AIR.hist=AIR.hist.slice(0,12);
+  airCash(){if(AIR.state!=="run"||performance.now()-AIR.last>120)return;AIR.ret=Math.floor(AIR.stake*AIR.m);bank(AIR.ret);AIR.state="cashed";AIR.hist.unshift({m:AIR.m,ok:true});AIR.hist=AIR.hist.slice(0,12);
     record(AIR.stake,AIR.ret);if(AIR.ret<AIR.stake*5)SFX.win(AIR.m>=3?2:1);airUI();setTimeout(()=>{if(APP.view==="air")render()},700)},
   airMove(d){if(AIR.state!=="run")return;const n=Math.max(0,Math.min(AIR_LANES-1,AIR.lane+(+d)));if(n!==AIR.lane){AIR.lane=n;SFX.v(500+n*160,.06,{type:"triangle",v:.03})}}
 });
@@ -2328,8 +2328,9 @@ function airLoop(now){
   const PX=.2;
   for(const o of AIR.obs){o.x-=AIR.speed*dt*(o.kind==="bolt"?1.9:1);
     if(o.hit)continue;const dx=Math.abs(o.x-PX),dl=Math.abs(o.lane-AIR.y);
-    if(o.kind==="storm"&&dx<.055*o.r&&dl<.42){airCrash(o);return}
-    if(o.kind==="bolt"&&dx<.03&&dl<.35){airCrash(o);return}
+    const G=AIR.geo||{W:700,S:45,sc:1.7},dpx=dx*G.W,plane=21*G.sc;
+    if(o.kind==="storm"&&dpx<G.S*o.r*1.35+plane&&dl<.5){airCrash(o);return}
+    if(o.kind==="bolt"&&dpx<G.S*.85+plane&&dl<.4){airCrash(o);return}
     if((o.kind==="coin"||o.kind==="boost")&&dx<.05&&dl<.45){o.hit=true;
       if(o.kind==="coin"){AIR.m=+(AIR.m+o.v).toFixed(2);SFX.coin();airPop(`+${o.v.toFixed(2)}x`,o)}else{AIR.m=+(AIR.m*1.2).toFixed(2);SFX.win(1);airPop("x1.2",o)}}}
   AIR.obs=AIR.obs.filter(o=>o.x>-.2&&!(o.hit&&o.kind!=="storm"));
@@ -2338,7 +2339,7 @@ function airLoop(now){
   airPaint();airUI();AIR.raf=requestAnimationFrame(airLoop);
 }
 function airPop(txt,o){AIR.sparks.push({txt,x:o.x,lane:o.lane,life:1})}
-function airCrash(o){AIR.state="crashed";AIR.why=o&&o.kind==="strike"?"strike":"cloud";AIR.boom={x:.2,y:AIR.y,t0:performance.now()};AIR.shake=1;AIR.hist.unshift({m:AIR.m,ok:false});AIR.hist=AIR.hist.slice(0,12);
+function airCrash(o){AIR.state="crashed";document.querySelectorAll("#airBtn,.air-cash").forEach(b=>{b.disabled=true;b.innerHTML=`${ic("x")} Crashed`});AIR.why=o&&o.kind==="strike"?"strike":"cloud";AIR.boom={x:.2,y:AIR.y,t0:performance.now()};AIR.shake=1;AIR.hist.unshift({m:AIR.m,ok:false});AIR.hist=AIR.hist.slice(0,12);
   record(AIR.stake,0);SFX.boom();SFX.lose();
   const t0=performance.now();(function f(n){airPaint();if(n-t0<1100&&APP.view==="air")requestAnimationFrame(f);else if(APP.view==="air")render()})(t0)}
 function airUI(){const el=document.getElementById("airMult");if(el){el.textContent=AIR.m.toFixed(2)+"x";el.className="air-hud-m num "+(AIR.state==="crashed"?"crashed":AIR.state==="cashed"?"cashed":"")}
@@ -2354,7 +2355,7 @@ function airPaint(){
   AIR.bg.forEach(c=>cloudPath(x,c.x*W,c.y*H*.85+20,22*c.s,`rgba(255,255,255,${.35+c.k})`));
   const top=H*.14,laneH=(H*.8)/AIR_LANES,LY=l=>top+laneH*(l+.5);
   x.setLineDash([6,10]);x.strokeStyle="#ffffff33";x.lineWidth=1.5;for(let l=0;l<AIR_LANES-1;l++){x.beginPath();x.moveTo(0,top+laneH*(l+1));x.lineTo(W,top+laneH*(l+1));x.stroke()}x.setLineDash([]);
-  const S=Math.min(laneH*.42,W*.07);
+  const S=Math.min(laneH*.42,W*.07);AIR.geo={W,S,sc:Math.max(.9,S/26)};
   for(const o of AIR.obs){const ox=o.x*W,oy=LY(o.lane);
     if(o.kind==="storm"){cloudPath(x,ox+3,oy+5,S*o.r,"#00000033");cloudPath(x,ox,oy,S*o.r,"#4b5563");cloudPath(x,ox-S*.15*o.r,oy-S*.2*o.r,S*.75*o.r,"#6b7280");
       if(Math.sin(now/90+o.ph)>.6){x.strokeStyle="#ffe14a";x.lineWidth=3;x.beginPath();x.moveTo(ox,oy+S*.5);x.lineTo(ox-6,oy+S*.95);x.lineTo(ox+4,oy+S*.95);x.lineTo(ox-4,oy+S*1.45);x.stroke()}}
@@ -2570,7 +2571,7 @@ if(typeof window!=="undefined"&&window.setInterval){setTimeout(()=>{if(NET_OK!==
 {const f=route;route=function(){f();if(APP.view==="admin"){ADM.data=null;admLoad()}}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793264776";
+const BUILD="1793264884";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
