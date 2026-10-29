@@ -599,6 +599,21 @@ h1,h2,h3{font-weight:700;letter-spacing:.01em}
 .sheet.tiers{min-width:460px}.sheet.tiers td:first-child,.sheet.tiers th:first-child{text-align:left}
 @media (max-width:820px){.rw-grid{grid-template-columns:1fr}}
 @media (max-width:640px){.cnav button{padding:9px 10px}}
+/* online */
+.art-on .tile-art{background:radial-gradient(circle at 50% 60%,#13314d,#060f18);color:#7cc4ff}
+.mp-box{display:grid;justify-items:center;text-align:center;gap:12px;padding:28px}
+.mp-box .av,.auth .av{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font-size:32px;color:var(--gold);border:1.5px solid var(--gold-lo);background:var(--panel)}
+.mp-box h3{font-size:24px}.mp-box p{margin:0}.mp-box .addp{width:100%}
+.room-code{display:grid;justify-items:center;gap:10px;text-align:center}
+.room-code .code{font-size:clamp(44px,10vw,72px);font-weight:700;letter-spacing:.25em;color:var(--gold-hi);text-shadow:0 0 30px #e8b64755;padding-left:.25em}
+.mp-list{display:grid;gap:8px}
+.mp-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0e0d09;animation:rise .4s both}
+.mp-row.me{border-color:var(--gold-lo)}.mp-row .tag{margin-left:auto;display:flex;gap:6px;align-items:center;color:var(--mute);font-size:13px;font-weight:700}
+.mp-row.empty{color:var(--mute);border-style:dashed;font-size:13.5px}
+.mp-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.mp-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--mute);font-weight:700;font-size:13px}
+.mp-chip.ok{color:var(--money);border-color:#58c98a66}
+.mp-wait{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;border:1px dashed var(--gold-lo);color:var(--gold-hi);font-weight:700}
 </style>
 
 </head>
@@ -849,7 +864,7 @@ function settle(){
 function toEvent(){
   if(!S.eventDeck.length)S.eventDeck=shuffle(EVENTS.map((_,i)=>i));
   const ev=EVENTS[S.eventDeck.pop()],out=ev.apply(S.players);
-  S.evRes={ev,rows:S.players.map((p,i)=>{const o=out[i];const before=p.cash;if(o)p.cash+=o[0];const r=rescue(p);
+  S.evRes={ev,evi:EVENTS.indexOf(ev),rows:S.players.map((p,i)=>{const o=out[i];const before=p.cash;if(o)p.cash+=o[0];const r=rescue(p);
     return {d:o?o[0]:null,note:o?o[1]:"Not affected",before,after:p.cash,rescued:r!==null}})};
   S.players.forEach(p=>p.hist.push(p.cash));
   S.screen="event";render();
@@ -916,12 +931,12 @@ function topBar(){
 }
 function board(){
   return `<section class="board" aria-label="Scoreboard">${S.players.map((p,i)=>{const t=typeOf(p.type);
-   return `<div class="seat ${["turn","pass"].includes(S.screen)&&i===S.turn?"on":""}">
+   return `<div class="seat ${["turn","pass","waiting"].includes(S.screen)&&i===S.turn?"on":""}">
     <div class="seat-h"><span class="dot" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span>
       <span class="tag">${p.bot?ic("bot"):""}${ic(t.icon)} ${t.name}${p.public?" · Public":""}</span></div>
     <div class="cash ${p.cash<0?"neg":""}">${money(p.cash)}</div>
     <div class="stats"><span class="st" title="Stars">${ic("star")}<b>${p.stars}</b></span><span title="Machines">${ic("cog")}<b>${p.machines}</b></span><span title="Workers">${ic("hardhat")}<b>${p.workers}</b></span><span title="Score" style="margin-left:auto">${ic("trophy")}<b>${score(p)}</b></span></div>
-    ${["turn","pass"].includes(S.screen)?`<div class="faceup ${p.plan?"":"wait"}">${p.plan?`${ic("check")} Plan locked in${p.public?`: ${PRODUCTS[p.plan.pick].name}`:""}`:i===S.turn?`${ic("zap")} Planning now`:`${ic("moon")} Waiting`}</div>`:""}
+    ${["turn","pass","waiting"].includes(S.screen)?`<div class="faceup ${p.plan||p.mpPlanned?"":"wait"}">${p.plan||p.mpPlanned?`${ic("check")} Plan locked in${p.public&&p.plan?`: ${PRODUCTS[p.plan.pick].name}`:""}`:i===S.turn?`${ic("zap")} Planning now`:`${ic("moon")} Waiting`}</div>`:""}
     ${S.screen==="__never"&&p.public&&p.rd?`<div class="faceup">${ic("eye")} Face-up: ${PRODUCTS[p.rd.product].name}</div>`:""}
    </div>`}).join("")}</section>`;
 }
@@ -1029,7 +1044,7 @@ function market(){
   </section></div>`;
 }
 function eventScreen(){
-  const e=S.evRes,ev=e.ev,id="ev"+S.round;
+  const e=S.evRes,ev=EVENTS[e.evi]||e.ev,id="ev"+S.round;
   const f=front({icon:ev.icon,title:ev.name,sub:ev.text(),tag:ev.who},"event");
   return `<div class="screen">${topBar()}${board()}
   <section class="felt"><div class="turn-head" style="justify-content:center"><h2>End of round ${S.round}</h2></div>
@@ -1804,8 +1819,134 @@ function rewards(){
 }
 ROUTES.push("rewards");CV.rewards=rewards;
 
+
 /* ---------- Render ---------- */
 const VIEWS={home,setup,pass,turn,market,event:eventScreen,end};
+
+/* ---------- Online multiplayer Business League ---------- */
+P.wifi='<path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.86a10 10 0 0 1 14 0"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/>';
+P.copy2='<rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>';
+const MP={code:null,view:null,ver:-1,remote:null,active:false,host:false,seat:-1,poll:0,busy:false,settling:false,err:"",joinCode:""};
+const clone=o=>JSON.parse(JSON.stringify(o));
+const myIdx=()=>Math.max(0,((S&&S.seatList)||[]).indexOf(MP.seat));
+const idxOfSeat=seat=>((S&&S.seatList)||[]).indexOf(seat);
+const mpCall=(fn,args)=>rpc(fn,Object.assign({p_token:ACC.token,p_code:MP.code},args||{}));
+function mpSet(view){MP.view=view;MP.code=view.room.code;MP.host=!!view.me?.host;MP.seat=view.me?view.me.seat:-1;lsSet("bbbl-room",MP.code)}
+function mpStartPolling(){clearInterval(MP.poll);MP.poll=setInterval(mpTick,1500)}
+function mpStop(){clearInterval(MP.poll);MP.poll=0;MP.code=null;MP.view=null;MP.active=false;MP.ver=-1;MP.remote=null;lsDel("bbbl-room");
+  try{const s=JSON.parse(lsGet("bbbl-cfg4")||"null");CFG=Object.assign({},DEF,s||{})}catch(e){CFG=Object.assign({},DEF)}}
+async function mpTick(){
+  if(!MP.code||!ACC||MP.busy)return;
+  try{mpSet(await mpCall("mp_get"))}catch(e){if(/not in that room|No room/i.test(e.message)){toast("The room was closed.","bad");mpStop();A.go("online")}return}
+  const r=MP.view.room;
+  if(r.status==="lobby"){if(APP.view==="online")render();return}
+  if(S&&S.players&&(S.screen==="turn"||S.screen==="waiting")&&r.version===MP.ver)MP.view.players.forEach(v=>{const p=S.players[idxOfSeat(v.seat)];if(p)p.mpPlanned=v.planned});
+  if(r.version!==MP.ver&&r.state){MP.ver=r.version;mpApply(r.state)}
+  else if(APP.view==="league"&&S.screen==="waiting")render();
+  if(MP.host&&r.state&&r.state.screen==="plan"&&!MP.settling&&MP.view.players.every(p=>p.planned))hostSettle(false);
+}
+function mpApply(st){
+  MP.remote=clone(st);MP.active=true;CFG=Object.assign({},DEF,st.cfg||{});
+  S=clone(st);delete S.cfg;delete S.mpPaid;delete S.rewarded;delete S.reward;S.turn=myIdx();
+  if(st.screen==="plan"){const fresh=MP.view&&MP.view.room.version===MP.ver;
+    if(fresh)MP.view.players.forEach(v=>{const p=S.players[idxOfSeat(v.seat)];if(p)p.mpPlanned=v.planned});
+    const meP=S.players[S.turn];S.peeked=false;S.pick=null;S.improve=false;S.superOn=true;S.buys=0;S.wentPublic=false;S.turnStart=meP.cash;
+    S.screen=fresh&&meP.mpPlanned?"waiting":"turn"}
+  if(APP.view!=="league"){APP.view="league";if(typeof location!=="undefined")location.hash="league"}
+  render();if(st.screen==="market")SFX.whoosh();
+}
+async function mpPush(status){
+  const st=clone(S);st.cfg=Object.assign({},CFG);st.screen=S.screen==="turn"||S.screen==="pass"||S.screen==="waiting"?"plan":S.screen;
+  ["pick","peeked","improve","superOn","buys","wentPublic","turnStart","mpPaid","rewarded","reward"].forEach(k=>delete st[k]);
+  MP.ver=await mpCall("mp_push",{p_state:st,p_status:status||"playing"});MP.remote=clone(st);
+}
+function applyPlan(p,pl){
+  pl=pl||{};const start=p.cash;
+  if(pl.wentPublic&&p.type==="co"&&!p.public){p.public=true;p.cash+=CFG.publicBonus}
+  if(pl.peeked)p.cash-=CFG.research;
+  let buys=Math.max(0,Math.min(+pl.buys||0,CFG.maxMachines-p.machines));for(let i=0;i<buys;i++){p.cash-=CFG.machineCost;p.machines++}
+  p.workers=Math.max(0,Math.min(CFG.maxWorkers,Math.floor(+pl.workers||0)));
+  p.plan={pick:Math.max(0,Math.min(PRODUCTS.length-1,Math.floor(+pl.pick||0))),improve:!!pl.improve,superOn:pl.superOn!==false,peeked:!!pl.peeked,buys,wentPublic:!!pl.wentPublic,start};
+}
+async function hostSettle(force){
+  if(MP.settling)return;MP.settling=true;
+  try{const plans=await mpCall("mp_host_plans",{p_round:MP.remote.round});
+    S=clone(MP.remote);delete S.cfg;S.turn=myIdx();
+    S.players.forEach((p,i)=>{delete p.mpPlanned;const got=plans.find(x=>idxOfSeat(x.seat)===i);if(got)applyPlan(p,got.plan);else if(force)botPlan(p)});
+    if(!S.players.every(p=>p.plan)){MP.settling=false;return}
+    settle();await mpPush();
+  }catch(e){toast(e.message,"bad")}
+  MP.settling=false;
+}
+/* hook the League engine */
+{const f=nextPlanner;nextPlanner=function(){if(!MP.active)return f();
+  S.players.forEach(p=>{delete p.mpPlanned;delete p.plan});S.screen="plan";mpPush().then(()=>mpApply(clone(MP.remote))).catch(e=>toast(e.message,"bad"))}}
+{const f=lockIn;lockIn=async function(){if(!MP.active)return f();
+  const p=cur(),plan={pick:S.pick,improve:S.improve,superOn:S.superOn,peeked:S.peeked,buys:S.buys,wentPublic:S.wentPublic,workers:p.workers};
+  S.screen="waiting";p.mpPlanned=true;render();
+  try{mpSet(await mpCall("mp_plan",{p_round:S.round,p_plan:plan}));SFX.chip();render();mpTick()}catch(e){toast(e.message,"bad");S.screen="turn";render()}}}
+{const f=toEvent;toEvent=function(){if(MP.active&&!MP.host)return;f();if(MP.active)mpPush().catch(e=>toast(e.message,"bad"))}}
+{const f=nextRound;nextRound=function(){if(MP.active&&!MP.host)return;if(MP.active&&S.round>=CFG.rounds){S.screen="end";render();mpPush("done").catch(()=>{});return}f()}}
+/* waiting screen + host-only buttons */
+VIEWS.waiting=function(){
+  const pl=MP.view?MP.view.players:[],waiting=pl.filter(p=>!p.planned);
+  return `<div class="screen">${topBar()}${board()}<div class="felt pass"><div class="av">${ic("check")}</div>
+   <div class="eyebrow">Round ${S.round} · Plan locked in</div><h2>Waiting for ${waiting.length?waiting.map(p=>esc(p.name)).join(", "):"market day"}</h2>
+   <div class="mp-chips">${pl.map(p=>`<span class="mp-chip ${p.planned?"ok":""}">${ic(p.planned?"check":"moon")} ${esc(p.name)}</span>`).join("")}</div>
+   ${MP.host&&waiting.length?`<button class="btn btn-ghost" data-a="mpForce">${ic("bot")} Let the CPU plan for anyone still waiting</button>`:""}</div></div>`;
+};
+A.mpForce=function(){if(MP.host)hostSettle(true)};
+const waitHost=t=>`<div class="mp-wait">${ic("moon")} Waiting for ${esc(MP.view?.room.host||"the host")} to ${t}</div>`;
+{const f=VIEWS.market;VIEWS.market=function(){let h=f();if(MP.active&&!MP.host)h=h.replace(/<button class="btn btn-gold btn-lg" data-a="next">[\s\S]*?<\/button>/,waitHost("flip the event card"));return h}}
+{const f=VIEWS.event;VIEWS.event=function(){let h=f();if(MP.active&&!MP.host)h=h.replace(/<button class="btn btn-gold btn-lg" data-a="round">[\s\S]*?<\/button>/,waitHost("start the next round"));return h}}
+{const f=VIEWS.end;VIEWS.end=function(){
+  if(MP.active&&!S.mpPaid){S.mpPaid=true;S.rewarded=true;S.reward=0;const key="bbbl-mp-paid-"+MP.code+"-"+MP.ver;
+    if(!lsGet(key)){const ranked=[...S.players].sort((a,b)=>score(b)-score(a)),mine=S.players[myIdx()];
+      if(mine){S.reward=Math.max(0,score(mine)*10)+(ranked[0]===mine?250:0);if(S.reward)bank(S.reward);me().league=Math.max(me().league||0,score(mine));saveW();lsSet(key,"1")}}}
+  let h=f();if(MP.active)h=h.replace(/<div class="row-c"><button class="btn btn-gold btn-lg" data-a="again">[\s\S]*$/,`<div class="row-c"><button class="btn btn-gold btn-lg" data-a="mpLeave">${ic("home")} Back to online lobby</button></div></div>`);
+  return h}}
+{const f=A.quitYes;A.quitYes=function(){if(MP.active){A.mpLeave();ui.drawer=null;renderLayer();return}f()}}
+/* online lobby */
+Object.assign(A,{
+  async mpCreate(){if(!ACC)return A.go("account");MP.err="";MP.busy=true;render();try{mpSet(await rpc("mp_create",{p_token:ACC.token}));mpStartPolling()}catch(e){MP.err=e.message}MP.busy=false;render()},
+  async mpJoin(){if(!ACC)return A.go("account");const c=(document.getElementById("mpCode")?.value||"").trim().toUpperCase();if(c.length<5){MP.err="Room codes are 5 characters.";render();return}
+    MP.err="";MP.busy=true;render();try{mpSet(await rpc("mp_join",{p_token:ACC.token,p_code:c}));mpStartPolling();SFX.chip()}catch(e){MP.err=e.message}MP.busy=false;render()},
+  async mpType(t){try{mpSet(await mpCall("mp_type",{p_type:t}));SFX.chip();render()}catch(e){toast(e.message,"bad")}},
+  async mpLeave(){const c=MP.code;try{if(c&&ACC)await mpCall("mp_leave")}catch(e){}mpStop();S.screen="home";A.go("online");render()},
+  async mpStart(){if(!MP.host)return;const pl=MP.view.players;if(pl.length<2){toast("You need at least 2 players.","bad");return}
+    try{CFG=Object.assign({},DEF,JSON.parse(lsGet("bbbl-cfg4")||"null")||{})}catch(e){}
+    S.seats=pl.map(p=>({name:p.name,bot:false,type:p.type}));S.seatList=pl.map(p=>p.seat);MP.active=true;MP.remote={};newGame()},
+  mpCopy(){const c=MP.code;try{navigator.clipboard.writeText(c).then(()=>toast(`Copied ${c}`),()=>toast(`Room code: ${c}`))}catch(e){toast(`Room code: ${c}`)}}
+});
+function online(){
+  if(!ACC)return `<div class="screen">${cHead()}<section class="felt auth"><div class="av">${ic("wifi")}</div><h2>Play online</h2>
+    <p class="mute" style="margin:0">Play the Business League against friends on their own phones. You need an account so everyone can see who's who.</p>
+    <button class="btn btn-gold btn-lg" data-a="go" data-v="account">${ic("userplus")} Sign up or log in</button></section></div>`;
+  if(!MP.code)return `<div class="screen">${cHead()}
+   <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Play online</h2><span class="mute">Business League with friends, each on their own device</span></div>
+   <div class="grid2 even">
+    <section class="felt mp-box"><div class="av">${ic("crown")}</div><h3>Host a game</h3><p class="mute">Create a room and share the code. You start the game once everyone's in.</p>
+     <button class="btn btn-gold btn-lg" data-a="mpCreate" ${MP.busy?"disabled":""}>${ic("plus")} Create room</button></section>
+    <section class="felt mp-box"><div class="av">${ic("users")}</div><h3>Join a game</h3><p class="mute">Got a code from a mate? Type it in.</p>
+     <form class="addp" onsubmit="event.preventDefault();A.mpJoin()"><input id="mpCode" maxlength="5" autocomplete="off" placeholder="ABCDE" aria-label="Room code" style="text-transform:uppercase;letter-spacing:.3em;text-align:center;font-family:var(--f-num)"><button class="btn btn-gold" type="submit" ${MP.busy?"disabled":""}>${ic("login")} Join</button></form></section>
+   </div>${MP.err?`<div class="auth-err" style="margin-top:14px">${ic("alert")} ${esc(MP.err)}</div>`:""}
+   <p class="fine">Everyone plans in secret on their own device, then market day reveals all the plans together. Winners earn Butla Bucks.</p></div>`;
+  const v=MP.view,mine=v.players.find(p=>p.seat===MP.seat);
+  return `<div class="screen">${cHead()}
+   <div class="game-head"><button class="btn btn-ghost sm" data-a="mpLeave">${ic("logout")} ${MP.host?"Close room":"Leave"}</button><h2>Room lobby</h2></div>
+   <section class="felt room-code"><div class="eyebrow">Room code</div><div class="code num">${esc(MP.code)}</div>
+    <button class="btn btn-ghost sm" data-a="mpCopy">${ic("copy2")} Copy code</button><p class="mute" style="margin:0;font-size:13px">Friends go to Play online, tap Join and enter this code.</p></section>
+   <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Players</h3><span class="mute">${v.players.length} of 4</span></div>
+    <div class="mp-list">${v.players.map(p=>`<div class="mp-row ${p.seat===MP.seat?"me":""}"><span class="dot" style="background:${SEAT_COLORS[p.seat]}"></span><b>${esc(p.name)}</b>${p.host?`<span class="chip gold">Host</span>`:""}<span class="tag">${ic(typeOf(p.type).icon)} ${typeOf(p.type).name}</span></div>`).join("")}
+     ${Array.from({length:4-v.players.length},()=>`<div class="mp-row empty">${ic("moon")} Waiting for a player</div>`).join("")}</div></section>
+   <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Your business</h3></div>
+    <div class="types">${TYPES().map(t=>`<button class="type ${mine&&mine.type===t.id?"on":""}" data-a="mpType" data-v="${t.id}"><span class="t">${ic(t.icon)} ${t.name}</span><span class="cost">Start ${money(t.start)} · Register ${money(t.reg)}</span><small>${t.tax}.</small><small>${t.perk}.</small></button>`).join("")}</div></section>
+   <div class="row-c">${MP.host?`<button class="btn btn-gold btn-lg" data-a="mpStart" ${v.players.length<2?"disabled":""}>${ic("play")} ${v.players.length<2?"Waiting for players":"Start the game"}</button>`:waitHost("start the game")}</div></div>`;
+}
+ROUTES.push("online");CV.online=online;
+GAMES.splice(1,0,{v:"online",name:"League Online",icon:"wifi",art:"on",line:"Play the Business League against friends, each on their own device.",tag:"2-4 players"});
+{const f=restoreSession;restoreSession=async function(){await f();const c=lsGet("bbbl-room");if(ACC&&c){MP.code=c;try{mpSet(await mpCall("mp_get"));mpStartPolling();mpTick()}catch(e){mpStop()}}}}
+
 let lastScreen=null;
 function render(){
   document.getElementById("app").innerHTML=APP.view==="league"?VIEWS[S.screen]():CV[APP.view]();
