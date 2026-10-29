@@ -849,6 +849,48 @@ body{overflow-x:clip}
 /* tile rays: a big centred circle so rotation never exposes corners */
 .tile-art::before{inset:auto;left:50%;top:50%;width:max(260%,700px);aspect-ratio:1;height:auto;border-radius:50%;transform:translate(-50%,-50%) rotate(0deg);transition:transform 6s linear}
 .tile:hover .tile-art::before{transform:translate(-50%,-50%) rotate(60deg)}
+/* ===== Butla Office ===== */
+.art-of .tile-art{background:radial-gradient(circle at 50% 60%,#2b3540,#0d1116);color:#9ad1ff}
+.off-top{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.off-badge{flex:1;min-width:240px;display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.off-badge>.ic{font-size:30px;color:var(--gold)}.off-badge div{display:grid}.off-badge small{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.off-badge b{font-family:var(--f-display);font-size:22px}.off-badge span{font-size:13px;color:var(--mute)}
+.off-stats{display:flex;gap:10px;flex-wrap:wrap}.off-stats div{display:grid;padding:12px 16px;border-radius:14px;background:var(--panel);border:1px solid var(--line);min-width:120px}
+.off-stats small{font-size:11px;color:var(--mute);font-weight:700}.off-stats b{font-size:20px;color:var(--gold-hi)}
+.office{border-radius:24px;padding:22px;background:linear-gradient(180deg,#2a2d33 0,#1b1d21 55%,#4a3a26 55%,#3a2d1d 100%);border:1px solid #3a3d44;display:grid;gap:14px;justify-items:center}
+.desk{width:100%;max-width:820px;display:grid;justify-items:center;position:relative}
+.monitor{width:100%;border-radius:14px;background:#0f1114;padding:10px;box-shadow:0 0 0 2px #2d3036,0 20px 40px -14px #000;position:relative}
+.monitor::after{content:"";position:absolute;left:50%;bottom:-26px;width:90px;height:26px;transform:translateX(-50%);background:linear-gradient(#2d3036,#1b1d21);clip-path:polygon(25% 0,75% 0,100% 100%,0 100%)}
+.screen-top{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#e8e9ec;border-radius:8px 8px 0 0}
+.screen-top .dot{width:10px;height:10px;border-radius:50%}.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+.screen-top .app{margin-left:8px;font-size:12px;font-weight:700;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.screen-body{background:#fbfbf8;border-radius:0 0 8px 8px;padding:26px 24px 18px;min-height:190px;display:grid;gap:14px;align-content:center;color:#1b1d21}
+.screen-body.urgent{background:#fff4f2}
+.urg{justify-self:start;display:flex;gap:6px;align-items:center;padding:4px 10px;border-radius:999px;background:#d8432f;color:#fff;font-weight:800;font-size:12px;letter-spacing:.06em;animation:btnPulse 1.2s infinite}
+.off-line{font:600 clamp(18px,3vw,26px)/1.5 var(--f-num);letter-spacing:.01em;word-break:break-word}
+.off-line .done{color:#1f8a4c}.off-line .cur{background:#e8b647;color:#1a1205;border-radius:3px;animation:caret 1s steps(1) infinite}.off-line .todo{color:#8a8f99}
+@keyframes caret{50%{background:#e8b64755}}
+.off-line.shake .cur{background:#ef6a58;color:#fff}
+.off-bar{height:6px;border-radius:999px;background:#e3e4e8;overflow:hidden}.off-bar i{display:block;height:100%;background:linear-gradient(90deg,#58c98a,#1f8a4c);transition:width .1s}
+.off-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:#6b7080}.off-meta b{color:#d8432f}
+.desk-items{position:absolute;right:-10px;bottom:-34px;display:flex;align-items:flex-end;gap:8px;pointer-events:none}
+.mug{font-size:34px;color:#f4ecd6;filter:drop-shadow(0 4px 6px #0008)}
+.plant{width:28px;height:44px;border-radius:6px 6px 4px 4px;background:linear-gradient(#3a8a4c 0 55%,#a0522d 55%)}
+.payslip{margin-top:20px;display:grid;justify-items:center;gap:2px;padding:10px 18px;border-radius:14px;background:#0b0a07cc;border:1px solid #58c98a66;text-align:center;animation:pop .35s both;min-width:min(380px,100%)}
+.payslip b{font-size:20px;color:var(--money)}.payslip span{font-size:13px;color:var(--cream)}.payslip small{font-size:12.5px;color:var(--mute)}
+.payslip.none{border-color:#ef6a5866}.payslip.none b{color:var(--loss)}.payslip.hint{border-color:var(--line);margin-top:20px}
+.off-event{display:flex;gap:8px;align-items:center;padding:8px 14px;border-radius:999px;background:#e8b64722;color:var(--gold-hi);font-weight:700;font-size:13.5px;animation:pop .4s both}
+.kbd{width:100%;max-width:680px;display:grid;gap:6px;padding:10px;border-radius:16px;background:#14161a;border:1px solid #2d3036;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.kb-row{display:flex;gap:5px;justify-content:center}
+.kb{flex:1;max-width:52px;height:46px;border:0;border-radius:8px;background:#2d3036;color:#f4ecd6;font:700 17px var(--f-body);box-shadow:0 3px 0 #0b0c0e;display:grid;place-items:center;padding:0}
+.kb:active{transform:translateY(2px);box-shadow:0 1px 0 #0b0c0e;background:#3a3e46}
+.kb.wide{max-width:76px;font-size:13px}.kb.k-space{max-width:none;flex:5}.kb.on{background:var(--gold);color:#1a1205}
+.ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.rung{display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:#0e0d09;border:1px solid var(--line);font-size:13px}
+.rung b{font-size:14px}.rung span{color:var(--mute)}.rung.on{border-color:var(--gold);background:#e8b64714}.rung.on b{color:var(--gold-hi)}.rung.past{opacity:.6}
+@media (hover:hover) and (pointer:fine) and (min-width:900px){.kbd{display:none}}
+@media (max-width:640px){.office{padding:12px;border-radius:18px}.screen-body{padding:18px 14px 14px;min-height:150px}.kb{height:42px;font-size:15px}.kbd{padding:6px;gap:5px}.kb-row{gap:4px}
+  .ladder{grid-template-columns:repeat(2,minmax(0,1fr))}.desk-items{display:none}.off-stats div{min-width:0;flex:1}}
 </style>
 
 </head>
@@ -2576,8 +2618,126 @@ if(typeof window!=="undefined"&&window.setInterval){setTimeout(()=>{if(NET_OK!==
 {const f=cHead;cHead=function(){let h=f();if(isAdmin())h=h.replace('<button class="btn btn-ghost icon-btn" data-a="sound"',`<button class="btn btn-ghost icon-btn adm-btn ${APP.view==="admin"?"on":""}" data-a="go" data-v="admin" aria-label="Admin dashboard">${ic("shield2")}</button><button class="btn btn-ghost icon-btn" data-a="sound"`);return h}}
 {const f=route;route=function(){f();if(APP.view==="admin"){ADM.data=null;admLoad()}}}
 
+
+/* ---------- Butla Office: type the paperwork, earn slowly ---------- */
+P.monitor='<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>';
+P.briefcase='<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>';
+P.mug='<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/>';
+P.backspace='<path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z"/><path d="m18 9-6 6M12 9l6 6"/>';
+const OFF_LINES=[
+ "Please find attached the spreadsheet you asked for.","Per my last email, the printer is still broken.","Just circling back on the thing from the meeting.",
+ "Can we take this offline and touch base next week?","Reminder: the fridge will be cleaned out on Friday.","Whoever took my yoghurt, I know it was you.",
+ "The quarterly report is late because the stapler is missing.","Let us align our synergies going forward.","I have added a meeting to discuss the other meeting.",
+ "Kindly reply all so everyone knows you replied.","Sorry, I was on mute the whole time.","Can everyone see my screen? How about now?",
+ "The coffee machine is now accepting suggestions.","Please do not microwave fish in the kitchen again.","My calendar is wide open except for every day.",
+ "Thanks in advance for doing my job for me.","Let us put a pin in that and never talk about it again.","Friendly reminder that timesheets were due yesterday.",
+ "Big Butla wants the numbers on his desk by lunch.","The wifi password is on the whiteboard, upside down.","I am working from home and definitely not in bed.",
+ "We are a family here, so the overtime is unpaid.","Please stop booking the big room for one person.","This could have been an email, and now it is.",
+ "Moving forward, all forward movement will be reviewed.","The team lunch is cancelled due to lack of budget.","Office plant number four has passed away.",
+ "IT says to turn it off and on again, again.","I am out of office until further notice or Monday.","Let us circle the wagons and boil the ocean.",
+ "The new chairs will arrive in six to eight business years.","Please initial each page, then sign the last page twice.","Due to cutbacks, the light at the end of the tunnel is off.",
+ "Your password must contain a number, a symbol and a secret.","The elevator is out, so please take the stairs of growth.","Do not reply to this email. Replies are not monitored.",
+ "Invoice number 4417 is attached for your records.","Kindly approve the request to request approval.","Big Butla says the dress code is now suits only.",
+ "The fire drill is at ten, so please act surprised.","Quick question: can you stay late tonight?","Who changed the font on the template to comic sans?",
+ "We are pivoting from pivoting to something else.","The printer on level two is now the printer on level three.","Please refill the paper tray when you take the last page.",
+ "Sales are up, morale is down, and the coffee is gone.","Hi team, a quick one: everything is urgent.","Your leave request has been received and ignored.",
+ "Remember to smile at the client, even on the phone.","The budget meeting has been moved to cut costs."];
+const OFF_URGENT=["URGENT: Big Butla needs this signed in five minutes.","URGENT: The client is in the lobby. Look busy.","URGENT: Who left the photocopier copying a sandwich?",
+ "URGENT: Board meeting moved to now. Bring donuts.","URGENT: Delete the email I just sent to everyone."];
+const OFF_RANKS=[{n:"Intern",at:0,rate:.3},{n:"Junior Clerk",at:25,rate:.45},{n:"Data Entry Officer",at:75,rate:.6},{n:"Senior Typist",at:150,rate:.8},
+ {n:"Office Manager",at:300,rate:1},{n:"Regional Manager",at:500,rate:1.3},{n:"Director of Paperwork",at:800,rate:1.7},{n:"Big Butla's Right Hand",at:1200,rate:2.2}];
+const OFF_EVENTS=[["The printer jammed. You fixed it with a gentle kick.","printer"],["Big Butla walked past. You looked very busy.","boss"],
+ ["You spilled coffee on your keyboard. It still works, mostly.","coffee"],["Free cake in the kitchen. Morale +1.","cake"],["Someone replied all. Your inbox is on fire.","fire"],
+ ["The air con is set to Antarctica again.","cold"],["You've been in this meeting for three hours.","meeting"]];
+const OFF={line:"",urgent:false,typed:"",errs:0,t0:0,done:0,earned:0,streak:0,last:null,shift:false,msg:"",bag:[]};
+const offKey=()=>"bbbl-office-"+(ACC?ACC.p.name.toLowerCase():"guest");
+function offLoad(){try{const s=JSON.parse(lsGet(offKey())||"null");OFF.done=s?.done||0;OFF.earned=s?.earned||0}catch(e){OFF.done=0;OFF.earned=0}}
+function offSave(){lsSet(offKey(),JSON.stringify({done:OFF.done,earned:OFF.earned}))}
+const offRank=()=>{let r=0;OFF_RANKS.forEach((x,i)=>{if(OFF.done>=x.at)r=i});return r};
+function offNext(){
+  if(Math.random()<.08){OFF.line=OFF_URGENT[Math.floor(Math.random()*OFF_URGENT.length)];OFF.urgent=true}
+  else{if(!OFF.bag.length)OFF.bag=shuffle(OFF_LINES.map((_,i)=>i));OFF.line=OFF_LINES[OFF.bag.pop()];OFF.urgent=false}
+  OFF.typed="";OFF.errs=0;OFF.t0=0;
+}
+function offType(ch){
+  if(APP.view!=="office")return;if(!OFF.line)offNext();
+  if(!OFF.t0)OFF.t0=performance.now();
+  const want=OFF.line[OFF.typed.length];
+  if(want!==undefined&&ch.toLowerCase()===want.toLowerCase()){OFF.typed+=want;SFX.v(1400+Math.random()*300,.025,{type:"square",v:.015})}
+  else{OFF.errs++;SFX.v(180,.08,{type:"square",v:.03});const el=document.getElementById("offLine");if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}}
+  if(OFF.typed.length>=OFF.line.length)offSubmit();else offPaint();
+}
+function offBack(){if(OFF.typed.length){OFF.typed=OFF.typed.slice(0,-1);offPaint()}}
+function offSubmit(){
+  const secs=(performance.now()-OFF.t0)/1000,len=OFF.line.length,cps=len/Math.max(.01,secs);
+  const acc=Math.max(0,1-OFF.errs/len),rk=OFF_RANKS[offRank()];
+  let pay=0,note="";
+  if(cps>13){note="Whoa, slow down. HR thinks you're a robot. No pay for that one.";OFF.streak=0}
+  else{pay=Math.round(len*rk.rate*(OFF.urgent?2:1)*acc*acc*(1+Math.min(OFF.streak,10)*.03));OFF.streak=acc>=.95?OFF.streak+1:0;
+    note=acc===1?(OFF.urgent?"Urgent job done. Double pay!":"Perfect. Not a single typo."):acc>=.9?"Good enough for government work.":"Lots of typos. Your boss has questions."}
+  const before=offRank();OFF.done++;OFF.earned+=pay;offSave();
+  if(pay>0){bank(pay);SFX.coin()}
+  OFF.last={pay,acc,wpm:Math.round(cps*60/5),note};
+  if(offRank()>before){const r=OFF_RANKS[offRank()];toast(`${ic("briefcase")} Promoted to ${r.n}! Pay is now ${r.rate} Bucks per letter`,"good");SFX.win(3);coinBurst(80)}
+  OFF.msg=Math.random()<.12?OFF_EVENTS[Math.floor(Math.random()*OFF_EVENTS.length)][0]:"";
+  offNext();render();
+}
+function offLineHtml(){const t=OFF.typed,l=OFF.line;return `<span class="done">${esc(t)}</span><span class="cur">${l[t.length]===" "?"&nbsp;":esc(l[t.length]||"")}</span><span class="todo">${esc(l.slice(t.length+1))}</span>`}
+function offPaint(){const el=document.getElementById("offLine");if(el)el.innerHTML=offLineHtml();
+  const p=document.getElementById("offProg");if(p)p.style.width=(OFF.typed.length/OFF.line.length*100)+"%";
+  const e=document.getElementById("offErr");if(e)e.textContent=OFF.errs}
+const KB=[["q","w","e","r","t","y","u","i","o","p"],["a","s","d","f","g","h","j","k","l"],["shift","z","x","c","v","b","n","m","back"],["123",",","space",".","?"]];
+const KB2=[["1","2","3","4","5","6","7","8","9","0"],[":",";","'","\"","!","(",")","-","/"],["abc",",","space",".","?"]];
+Object.assign(A,{
+  offKey(k){k=String(k);SFX.init();
+    if(k==="shift"){OFF.shift=!OFF.shift;offKb();return}if(k==="back"){offBack();return}if(k==="123"){OFF.num=true;offKb();return}if(k==="abc"){OFF.num=false;offKb();return}
+    let ch=k==="space"?" ":k;if(OFF.shift&&ch.length===1&&/[a-z]/.test(ch)){ch=ch.toUpperCase();OFF.shift=false;offKb()}offType(ch)},
+  offSkip(){offNext();OFF.streak=0;render()}
+});
+function offKbHtml(){const rows=OFF.num?KB2:KB;return rows.map(r=>`<div class="kb-row">${r.map(k=>`<button class="kb ${k.length>1?"wide k-"+k:""} ${k==="shift"&&OFF.shift?"on":""}" data-a="offKey" data-v="${k==="\""?"&quot;":k===","?"comma":k}" aria-label="${k}">${k==="back"?ic("backspace"):k==="shift"?ic("arrowUp"):k==="space"?"space":OFF.shift&&k.length===1?k.toUpperCase():esc(k)}</button>`).join("")}</div>`).join("")}
+function offKb(){const el=document.getElementById("offKb");if(el)el.innerHTML=offKbHtml()}
+{const f=A.offKey;A.offKey=function(k){return f(k==="comma"?",":k)}}
+if(typeof document!=="undefined"&&document.addEventListener){
+  document.addEventListener("keydown",e=>{if(APP.view!=="office"||e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target;if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+    if(e.key==="Backspace"){offBack();e.preventDefault();return}if(e.key.length===1){offType(e.key);e.preventDefault()}});
+  document.addEventListener("paste",e=>{if(APP.view==="office"){e.preventDefault();toast("Nice try. No copy-paste in this office.","bad")}});
+}
+function office(){
+  if(!OFF.line){offLoad();offNext()}
+  const rk=offRank(),r=OFF_RANKS[rk],nx=OFF_RANKS[rk+1],L=OFF.last;
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Butla Office</h2><span class="mute">Type the paperwork. Get paid. Repeat forever.</span></div>
+  <div class="off-top">
+   <div class="off-badge">${ic("briefcase")}<div><small>Your job</small><b>${r.n}</b><span>${r.rate} Bucks per letter${nx?` · ${nx.at-OFF.done} more to ${nx.n}`:" · top of the ladder"}</span></div></div>
+   <div class="off-stats"><div><small>Sentences typed</small><b class="num">${fmtB(OFF.done)}</b></div><div><small>Earned at work</small><b class="num">${fmtC(OFF.earned)}</b></div><div><small>Streak</small><b class="num">${OFF.streak}</b></div></div>
+  </div>
+  <section class="office">
+   <div class="desk">
+    <div class="monitor">
+     <div class="screen-top"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="app">ButlaDocs · ${OFF.urgent?"URGENT.docx":"paperwork_final_v"+(OFF.done+3)+".docx"}</span></div>
+     <div class="screen-body ${OFF.urgent?"urgent":""}">
+      ${OFF.urgent?`<div class="urg">${ic("alert")} URGENT · double pay</div>`:""}
+      <div id="offLine" class="off-line">${offLineHtml()}</div>
+      <div class="off-bar"><i id="offProg" style="width:${OFF.typed.length/OFF.line.length*100}%"></i></div>
+      <div class="off-meta"><span>Typos: <b id="offErr">${OFF.errs}</b></span><span>${OFF.line.length} letters · about ${fmtB(Math.round(OFF.line.length*r.rate*(OFF.urgent?2:1)))} Bucks</span></div>
+     </div>
+    </div>
+    <div class="desk-items"><span class="mug">${ic("mug")}</span><span class="plant"></span></div>
+   </div>
+   ${L?`<div class="payslip ${L.pay?"":"none"}"><b>${L.pay?`+${fmtB(L.pay)} Bucks`:"No pay"}</b><span>${Math.round(L.acc*100)}% accurate · ${L.wpm} WPM</span><small>${esc(L.note)}</small></div>`:`<div class="payslip hint"><span>Start typing the sentence on the screen. ${"ontouchstart" in window?"Use the keyboard below.":"Use your keyboard."}</span></div>`}
+   ${OFF.msg?`<div class="off-event">${ic("mug")} ${esc(OFF.msg)}</div>`:""}
+   <div id="offKb" class="kbd">${offKbHtml()}</div>
+   <div class="row-c" style="margin-top:6px"><button class="btn btn-ghost sm" data-a="offSkip">${ic("shuffle")} Skip this one (resets streak)</button></div>
+  </section>
+  <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Career ladder</h3><span class="mute">Promotions come with sentences typed</span></div>
+   <div class="ladder">${OFF_RANKS.map((x,i)=>`<div class="rung ${i===rk?"on":i<rk?"past":""}"><b>${x.n}</b><span>${x.at} sentences</span><span class="num">${x.rate}/letter</span></div>`).join("")}</div></section></div>`;
+}
+ROUTES.push("office");CV.office=office;
+GAMES.splice(2,0,{v:"office",name:"Butla Office",icon:"monitor",art:"of",line:"Need Bucks? Get a job. Type the office paperwork, get promoted, get paid.",tag:"Earn · No bet"});
+{const f=route;route=function(){f();if(APP.view==="office"){offLoad()}}}
+
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793266787";
+const BUILD="1793267057";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
