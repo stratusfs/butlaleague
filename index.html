@@ -798,6 +798,12 @@ img[src^="data:image/webp"]{aspect-ratio:560/537;height:auto}
 .air-cash{position:absolute;left:22px;bottom:22px;display:flex;align-items:center;gap:8px;padding:14px 20px;border:0;border-radius:14px;font-weight:900;font-size:16px;color:#06210f;background:linear-gradient(180deg,#8ff0b4,#3fbf74);box-shadow:0 6px 0 #1f6b45,0 10px 24px -6px #58c98acc}
 .air-cash:active{transform:translateY(3px);box-shadow:0 3px 0 #1f6b45}
 @media (min-width:901px){.air-cash{display:none}}
+.mp-timer{display:grid;justify-items:center;gap:10px}
+.mp-tchip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#0e0d09;border:1px solid var(--line);font-weight:700;color:var(--mute)}
+.mp-tchip b{color:var(--gold-hi);font-size:18px}.mp-tchip.late{color:#ffb3a8;border-color:#ef6a5866}.mp-tchip.go{color:var(--money);border-color:#58c98a66}
+.mp-turn-timer{display:flex;align-items:center;gap:8px;justify-content:center;margin:0 0 12px;padding:10px 14px;border-radius:12px;background:#e8b64714;border:1px solid var(--gold-lo);font-weight:700}
+.mp-turn-timer b{color:var(--gold-hi);font-size:18px}.mp-turn-timer .ic{color:var(--gold)}
+.mp-turn-timer.late{background:#ef6a581a;border-color:#ef6a5888;color:#ffb3a8;animation:btnPulse 1.2s infinite}
 </style>
 
 </head>
@@ -2428,7 +2434,7 @@ Object.assign(GAME_NAMES,{pokies:"Butla Pokies",air:"Butla Air",dice:"Dice",hilo
 {const f=afterRender;afterRender=function(){f();if(APP.view==="air")airPaint(AIR.state==="gone"?1:0)}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793263308";
+const BUILD="1793263696";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
@@ -2458,7 +2464,9 @@ async function mpTick(){
   if(S&&S.players&&(S.screen==="turn"||S.screen==="waiting")&&r.version===MP.ver)MP.view.players.forEach(v=>{const p=S.players[idxOfSeat(v.seat)];if(p)p.mpPlanned=v.planned});
   if(r.version!==MP.ver&&r.state){MP.ver=r.version;mpApply(r.state)}
   else if(APP.view==="league"&&S.screen==="waiting")render();
-  if(MP.host&&r.state&&r.state.screen==="plan"&&!MP.settling&&MP.view.players.every(p=>p.planned))hostSettle(false);
+  {const had=!!MP.deadline;if(r.state&&r.state.screen==="plan"&&r.planAge!=null)MP.deadline=Date.now()+(MP_PLAN_SECS-r.planAge)*1000;else MP.deadline=null;
+   if(!had&&MP.deadline&&APP.view==="league"&&S.screen==="turn"&&!document.getElementById("mpTurnTimer"))render()}
+  if(MP.host&&r.state&&r.state.screen==="plan"&&!MP.settling){if(MP.view.players.every(p=>p.planned))hostSettle(false);else if(r.forceRound!=null&&r.forceRound===r.state.round)hostSettle(true)}
 }
 function mpApply(st){
   MP.remote=clone(st);MP.active=true;CFG=Object.assign({},DEF,st.cfg||{});
@@ -2508,10 +2516,22 @@ VIEWS.waiting=function(){
   return `<div class="screen">${topBar()}${board()}<div class="felt pass"><div class="av">${ic("check")}</div>
    <div class="eyebrow">Round ${S.round} · Plan locked in</div><h2>Waiting for ${waiting.length?waiting.map(p=>esc(p.name)).join(", "):"market day"}</h2>
    <div class="mp-chips">${pl.map(p=>`<span class="mp-chip ${p.planned?"ok":""}">${ic(p.planned?"check":"moon")} ${esc(p.name)}</span>`).join("")}</div>
-   ${MP.host&&waiting.length?`<button class="btn btn-ghost" data-a="mpForce">${ic("bot")} Let the CPU plan for anyone still waiting</button>`:""}</div></div>`;
+   ${waiting.length?`<div class="mp-timer" id="mpTimer">${mpTimerHtml(waiting)}</div>`:""}</div></div>`;
 };
-A.mpForce=function(){if(MP.host)hostSettle(true)};
+const MP_PLAN_SECS=15;
+const mpLeft=()=>MP.deadline?Math.max(0,Math.ceil((MP.deadline-Date.now())/1000)):MP_PLAN_SECS;
+function mpTimerHtml(waiting){const left=mpLeft(),names=waiting.map(p=>esc(p.name)).join(" and ");
+  if(MP.view?.room?.forceRound===S.round)return `<span class="mp-tchip go">${ic("bot")} CPU is taking over for ${names}...</span>`;
+  return left>0?`<span class="mp-tchip"><b class="num">${left}s</b> for ${names} to lock in</span><button class="btn btn-ghost" disabled>${ic("bot")} CPU takeover in ${left}s</button>`
+    :`<span class="mp-tchip late">${names} ${waiting.length>1?"are":"is"} taking a while</span><button class="btn btn-gold" data-a="mpForce">${ic("bot")} CPU takeover for ${names}</button>`}
+A.mpForce=async function(){if(mpLeft()>0)return;try{mpSet(await mpCall("mp_force"));SFX.click();render();mpTick()}catch(e){toast(e.message,"bad")}};
+if(typeof window!=="undefined"&&window.setInterval)setInterval(()=>{if(!MP.active||!MP.deadline)return;
+  const el=document.getElementById("mpTimer"),pl=MP.view?MP.view.players.filter(p=>!p.planned):[];if(el&&pl.length){const h=mpTimerHtml(pl);if(el.innerHTML!==h)el.innerHTML=h}
+  const tb=document.getElementById("mpTurnTimer");if(tb){const l=mpLeft();tb.innerHTML=l>0?`${ic("alert")} <b class="num">${l}s</b> to lock in your plan`:`${ic("alert")} Time's up. Lock in now or another player can hand your turn to the CPU`;tb.classList.toggle("late",l===0)}
+},250);
 const waitHost=t=>`<div class="mp-wait">${ic("moon")} Waiting for ${esc(MP.view?.room.host||"the host")} to ${t}</div>`;
+{const f=VIEWS.turn;VIEWS.turn=function(){let h=f();if(MP.active&&MP.deadline){const l=mpLeft();
+  h=h.replace('<div class="turn-head">',`<div class="mp-turn-timer ${l===0?"late":""}" id="mpTurnTimer">${ic("alert")} <b class="num">${l}s</b> to lock in your plan</div><div class="turn-head">`)}return h}}
 {const f=VIEWS.market;VIEWS.market=function(){let h=f();if(MP.active&&!MP.host)h=h.replace(/<button class="btn btn-gold btn-lg" data-a="next">[\s\S]*?<\/button>/,waitHost("flip the event card"));return h}}
 {const f=VIEWS.event;VIEWS.event=function(){let h=f();if(MP.active&&!MP.host)h=h.replace(/<button class="btn btn-gold btn-lg" data-a="round">[\s\S]*?<\/button>/,waitHost("start the next round"));return h}}
 {const f=VIEWS.end;VIEWS.end=function(){
