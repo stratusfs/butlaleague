@@ -813,6 +813,39 @@ img[src^="data:image/webp"]{aspect-ratio:560/537;height:auto}
 .wallet span{min-width:0}.wallet b{max-width:16ch;overflow:hidden;text-overflow:ellipsis}
 .tier-badge.legend{background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 30%,transparent),color-mix(in srgb,var(--tc) 8%,transparent),color-mix(in srgb,var(--tc) 30%,transparent));background-size:200% 100%;animation:shine 2.4s linear infinite;box-shadow:0 0 14px color-mix(in srgb,var(--tc) 50%,transparent)}
 @keyframes shine{to{background-position:200% 0}}
+/* leaderboard columns on phones: show the sorted one */
+.sheet.lb th.on{color:var(--gold-hi)}
+@media (max-width:640px){.sheet.lb th:nth-child(n+3):not(.on),.sheet.lb td:nth-child(n+3):not(.on){display:none!important}.sheet.lb th.on,.sheet.lb td.on{display:table-cell!important}}
+.sheet.lb .pos{color:var(--money)}.sheet.lb .neg{color:var(--loss)}
+/* admin */
+.adm-btn.on{border-color:var(--gold);color:var(--gold-hi)}
+.adm-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.adm-stat{display:grid;gap:2px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.adm-stat small{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}.adm-stat b{font-size:26px;color:var(--gold-hi)}.adm-stat span{font-size:12px;color:var(--mute)}
+.adm-ta{width:100%;min-height:80px;resize:vertical;background:#0e0d09;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--cream);font:inherit;margin-bottom:10px}
+.adm-q{background:#0e0d09;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--cream);font:inherit;min-width:0;width:100%;max-width:280px}
+.sheet.adm{min-width:720px}.sheet.adm td:first-child,.sheet.adm th:first-child{text-align:left}
+.sheet.adm tr.banned td{opacity:.55}.sheet.adm .pos{color:var(--money)}.sheet.adm .neg{color:var(--loss)}
+.adm-open td{background:#0e0d09}.adm-manage{display:grid;gap:10px;padding:6px 0;text-align:left}
+.adm-acts{display:flex;gap:8px;flex-wrap:wrap}
+.chip.bad{color:var(--loss);border-color:#ef6a5866}
+.btn.danger{color:#ffb3a8;border-color:#ef6a5866}
+.btn-danger{background:linear-gradient(180deg,#ff8a7a,#d8432f);color:#fff;border:0}
+.danger-zone{border-color:#ef6a5844}
+.adm-global{display:grid;gap:8px}
+.adm-g{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:12px;background:#0e0d09;border:1px solid var(--line);flex-wrap:wrap}
+.adm-g b{display:block}.adm-g small{color:var(--mute);font-size:12.5px}
+.adm-dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:62;width:min(440px,calc(100% - 32px));padding:22px;border-radius:18px;background:var(--panel);border:1px solid #ef6a5866;display:grid;gap:12px;box-shadow:0 30px 60px -20px #000;animation:pop .25s both}
+.adm-dialog h3{font-size:22px}.adm-dialog p{margin:0}.adm-dialog .adm-q{max-width:none}
+.ann-bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;justify-content:center;padding:10px max(16px,env(safe-area-inset-left,0px));padding-top:calc(10px + env(safe-area-inset-top,0px));background:linear-gradient(90deg,#c8902a,#ffdd85,#c8902a);color:#1a1205;font-weight:800;text-align:center;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)))}
+.ann-bar button{border:0;background:#1a120522;border-radius:8px;width:28px;height:28px;display:grid;place-items:center;color:#1a1205;flex:none}
+@media (max-width:900px){.adm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sec-h .seg[role=tablist]{max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
+.sec-h .seg[role=tablist]::-webkit-scrollbar{display:none}
+.sec-h .seg[role=tablist] button{white-space:nowrap;flex:none}
+.ann-bar{margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px))) 0 calc(-1*max(16px,env(safe-area-inset-left,0px)));width:auto;max-width:none}
+body{overflow-x:clip}
+@media (max-width:640px){.sec-h:has(.seg[role=tablist]){display:grid}.sec-h .seg[role=tablist]{width:100%}.wallet b{max-width:11ch}.ann-bar{font-size:13.5px}}
 </style>
 
 </head>
@@ -1757,7 +1790,7 @@ async function restoreSession(){
   render();
 }
 APP.glb={};APP.auth={tab:"login",err:"",busy:false};
-function withMe(rows,k){if(!rows||!ACC)return rows;const p=ACC.p,mine={username:p.name,bucks:p.bucks,best:p.best,league:p.league,hands:p.hands};
+function withMe(rows,k){if(!rows||!ACC)return rows;const p=ACC.p,mine={username:p.name,bucks:p.bucks,best:p.best,league:p.league,hands:p.hands,wagered:p.wagered||0,profit:p.profit||0};
   const out=rows.filter(r=>r.username!==p.name);out.push(mine);out.sort((a,b)=>b[k]-a[k]);return out}
 async function loadLB(sort){try{APP.glb[sort]=await rpc("bb_leaderboard",{p_sort:sort,p_limit:50});if(["home","leaderboard"].includes(APP.view))render()}catch(e){}}
 Object.assign(A,{
@@ -1965,16 +1998,16 @@ const _ar=afterRender;afterRender=function(){const before=seenCards.size;_ar();i
 /* ---------- Leaderboard (global when online) ---------- */
 function leadersOnline(){
   if(NET_OK===false)return leaders();
-  const tabs=[["bucks","Richest","coins"],["best","Biggest win","trend"],["league","League score","crown"]],k=APP.lb,rows=withMe(APP.glb[k],k);
-  const unit=k==="league"?"points":"Bucks",mine=r=>ACC&&r.username===ACC.p.name;
+  const tabs=[["bucks","Richest","coins"],["wagered","Total wagered","trend"],["profit","Total earned","dollar"],["best","Biggest win","star"],["league","League","crown"]],k=APP.lb,rows=withMe(APP.glb[k],k);
+  const unit=k==="league"?"points":k==="wagered"?"Bucks wagered":k==="profit"?"Bucks earned":"Bucks",mine=r=>ACC&&r.username===ACC.p.name;
   return `<div class="screen">${cHead()}
   <div class="sec-h" style="margin-top:8px"><div><div class="eyebrow">${ic("globe2")} Worldwide leaderboard</div><h2 style="font-size:36px">Biggest bosses</h2></div>
    <div class="seg" role="tablist">${tabs.map(([v,l,i])=>`<button role="tab" aria-selected="${k===v}" class="${k===v?"on":""}" data-a="lbSort" data-v="${v}">${ic(i)} ${l}</button>`).join("")}</div></div>
   ${ACC?"":`<div class="broke">${ic("userplus")}<span>Play as a guest and your Bucks stay on this device. Sign up to get on the leaderboard.</span><button class="btn btn-gold" data-a="go" data-v="account">Sign up free</button></div>`}
   <section class="felt">${!rows?`<p class="mute" style="text-align:center;padding:30px 0">Loading the leaderboard...</p>`:!rows.length?`<p class="mute" style="text-align:center;padding:30px 0">No players yet. Sign up and be the first boss on the board.</p>`:`
-   <div class="podium3">${rows.slice(0,3).map((r,i)=>`<div class="pod p${i+1}" style="--i:${i}"><div class="pod-rank">${i+1}</div><b>${esc(r.username)}</b><span class="num">${fmtB(r[k])}</span><small>${unit}</small></div>`).join("")}</div>
-   <div class="table-box"><table class="sheet lb"><thead><tr><th>#</th><th>Player</th><th>Butla Bucks</th><th>Biggest win</th><th>League best</th><th>Hands played</th></tr></thead><tbody>
-   ${rows.map((r,n)=>`<tr class="${mine(r)?"first":""}" style="--i:${Math.min(n,12)}"><td>${n+1}</td><td>${esc(r.username)}${mine(r)?` <span class="chip gold">You</span>`:""}</td><td>${fmtB(r.bucks)}</td><td>${fmtB(r.best)}</td><td>${r.league}</td><td>${fmtB(r.hands)}</td></tr>`).join("")}</tbody></table></div>`}
+   <div class="podium3">${rows.slice(0,3).map((r,i)=>`<div class="pod p${i+1}" style="--i:${i}"><div class="pod-rank">${i+1}</div><b>${esc(r.username)}</b><span class="num">${k==="profit"&&r[k]>0?"+":""}${fmtC(r[k]||0)}</span><small>${unit}</small></div>`).join("")}</div>
+   <div class="table-box"><table class="sheet lb"><thead><tr><th>#</th><th>Player</th><th class="${k==="bucks"?"on":""}">Bucks</th><th class="${k==="wagered"?"on":""}">Wagered</th><th class="${k==="profit"?"on":""}">Earned</th><th class="${k==="best"?"on":""}">Biggest win</th><th class="${k==="league"?"on":""}">League</th></tr></thead><tbody>
+   ${rows.map((r,n)=>`<tr class="${mine(r)?"first":""}" style="--i:${Math.min(n,12)}"><td>${n+1}</td><td>${esc(r.username)}${mine(r)?` <span class="chip gold">You</span>`:""}</td><td class="${k==="bucks"?"on":""}">${fmtC(r.bucks)}</td><td class="${k==="wagered"?"on":""}">${fmtC(r.wagered||0)}</td><td class="${(r.profit||0)>=0?"pos":"neg"} ${k==="profit"?"on":""}">${(r.profit||0)>=0?"+":""}${fmtC(r.profit||0)}</td><td class="${k==="best"?"on":""}">${fmtC(r.best)}</td><td class="${k==="league"?"on":""}">${r.league}</td></tr>`).join("")}</tbody></table></div>`}
   </section></div>`;
 }
 CV.leaderboard=leadersOnline;
@@ -2449,8 +2482,92 @@ GAMES.push({v:"air",name:"Butla Air",icon:"plane",art:"air",line:"Fly through th
 Object.assign(GAME_NAMES,{pokies:"Butla Pokies",air:"Butla Air",dice:"Dice",hilo:"Hi-Lo"});
 {const f=afterRender;afterRender=function(){f();if(APP.view==="air")airPaint(AIR.state==="gone"?1:0)}}
 
+
+/* ---------- Admin dashboard (server checks is_admin on every call) ---------- */
+P.shield2='<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/>';
+P.megaphone=P.megaphone||'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>';
+const ADM={data:null,err:"",busy:false,q:"",confirm:null,sel:null};
+{const f=accFrom;accFrom=function(pr,token){const a=f(pr,token);a.p.isAdmin=!!pr.isAdmin;return a}}
+const isAdmin=()=>!!(ACC&&ACC.p.isAdmin);
+async function admLoad(){if(!isAdmin())return;try{ADM.data=await rpc("adm_overview",{p_token:ACC.token});ADM.err=""}catch(e){ADM.err=e.message}if(APP.view==="admin")render()}
+async function admDo(fn,args,okMsg){ADM.busy=true;render();try{ADM.data=await rpc(fn,Object.assign({p_token:ACC.token},args));ADM.err="";toast(`${ic("check")} ${okMsg}`,"good");SFX.click();
+  const pr=await rpc("bb_me",{p_token:ACC.token});Object.assign(ACC.p,{bucks:+pr.bucks,best:+pr.best,profit:+pr.profit,hands:+pr.hands,league:+pr.league,wagered:+pr.wagered,rake:+pr.rake,claimedTier:+pr.claimedTier});bumpWallet(0);APP.glb={}}
+  catch(e){toast(e.message,"bad")}ADM.busy=false;ADM.confirm=null;render()}
+const ADM_GLOBAL={reset_all_stats:["Reset ALL stats","Every player goes back to 1,000 Bucks and all stats, ranks, rakeback, the wins feed and Crash history are wiped.",true],
+  reset_leaderboards:["Reset leaderboards only","Clears biggest win, total earned, total wagered, hands and League scores. Balances stay.",true],
+  clear_feed:["Clear the live wins feed","Removes every entry from the lobby's Live wins.",false],close_rooms:["Close all League rooms","Ends every online League game in progress.",true],
+  reset_crash:["Reset live Crash","Clears Crash history and any open bets (those bets are lost).",true],logout_everyone:["Log everyone else out","Every player except you has to log in again.",false]};
+const ADM_PLAYER={reset:["Reset stats","Back to 1,000 Bucks with all stats wiped."],ban:["Suspend","They are logged out and can't log back in."],unban:["Unsuspend",""],logout:["Force log out",""],
+  make_admin:["Make admin","They get full access to this dashboard."],remove_admin:["Remove admin",""],delete:["Delete account","Permanently deletes the account."]};
+Object.assign(A,{
+  admQ(){ADM.q=(document.getElementById("admQ")?.value||"").toLowerCase();render()},
+  admSel(u){u=String(u);ADM.sel=ADM.sel===u?null:u;render()},
+  admAsk(kind,a,b){a=String(a);ADM.confirm={kind,a,b};render();setTimeout(()=>document.getElementById("admConfirmIn")?.focus(),50)},
+  admCancel(){ADM.confirm=null;render()},
+  admGo(){const c=ADM.confirm;if(!c)return;const typed=(document.getElementById("admConfirmIn")?.value||"").trim().toUpperCase();
+    const need=c.kind==="g"&&ADM_GLOBAL[c.a][2]?"RESET":c.kind==="p"&&(c.b==="delete"||c.b==="reset")?c.a.toUpperCase():"";
+    if(need&&typed!==need){toast(`Type ${need} to confirm`,"bad");return}
+    if(c.kind==="g")admDo("adm_global",{p_action:c.a},ADM_GLOBAL[c.a][0]+" done");else admDo("adm_player",{p_username:c.a,p_action:c.b},`${ADM_PLAYER[c.b][0]}: ${c.a}`)},
+  admBucks(u,mode){u=String(u);const v=Math.floor(+document.getElementById("admAmt_"+u)?.value);if(!(v>=0)&&mode==="set_bucks"||isNaN(v)){toast("Enter a number","bad");return}
+    admDo("adm_player",{p_username:u,p_action:mode,p_amount:v},mode==="set_bucks"?`${u} now has ${fmtB(v)} Bucks`:`${v>=0?"Gave":"Took"} ${fmtB(Math.abs(v))} Bucks ${v>=0?"to":"from"} ${u}`)},
+  admGive(){const v=Math.floor(+document.getElementById("admGiveAmt")?.value);if(!(v>0)){toast("Enter an amount above 0","bad");return}admDo("adm_global",{p_action:"give_everyone",p_amount:v},`Gave everyone ${fmtB(v)} Bucks`)},
+  admAnnounce(clear){const t=clear?"":(document.getElementById("admAnn")?.value||"");admDo("adm_global",{p_action:"announce",p_text:t},clear?"Announcement removed":"Announcement posted").then(loadAnnouncement)}
+});
+function admin(){
+  if(!isAdmin())return `<div class="screen">${cHead()}<section class="felt auth"><div class="av">${ic("shield2")}</div><h2>Admins only</h2><p class="mute" style="margin:0">Log in with an admin account to see this page.</p></section></div>`;
+  if(!ADM.data&&!ADM.err)admLoad();
+  const d=ADM.data;
+  const stat=(l,v,s="")=>`<div class="adm-stat"><small>${l}</small><b class="num">${v}</b>${s?`<span>${s}</span>`:""}</div>`;
+  const rows=d?d.list.filter(p=>!ADM.q||p.username.toLowerCase().includes(ADM.q)):[];
+  const c=ADM.confirm;
+  return `<div class="screen">${cHead()}
+  <div class="sec-h" style="margin-top:8px"><div><div class="eyebrow">${ic("shield2")} Admin</div><h2 style="font-size:36px">Dashboard</h2></div><button class="btn btn-ghost" data-a="admRefresh">${ic("refresh")} Refresh</button></div>
+  ${ADM.err?`<div class="auth-err">${ic("alert")} ${esc(ADM.err)}</div>`:""}
+  ${!d?`<p class="mute">Loading...</p>`:`
+  <div class="adm-stats">${stat("Players",fmtB(d.players),`${d.newToday} new today`)}${stat("Online now",fmtB(d.online))}${stat("Bucks in circulation",fmtC(d.bucks))}${stat("Total wagered",fmtC(d.wagered))}${stat("Players' net result",(d.profit>=0?"+":"")+fmtC(d.profit))}${stat("Bets placed",fmtC(d.hands))}${stat("Live League rooms",d.rooms)}${stat("Crash rounds",fmtB(d.crashRounds))}</div>
+  <div class="grid2 even" style="margin-top:16px">
+   <section class="felt"><div class="sec-h"><h3>${ic("megaphone")} Announcement</h3><span class="mute">Shows as a banner for everyone</span></div>
+    <textarea id="admAnn" class="adm-ta" maxlength="240" placeholder="e.g. Double rakeback weekend!">${esc(d.announcement||"")}</textarea>
+    <div class="ctl-btns"><button class="btn btn-gold" data-a="admAnnounce" ${ADM.busy?"disabled":""}>${ic("megaphone")} Post</button>${d.announcement?`<button class="btn btn-ghost" data-a="admAnnounce" data-v="1">${ic("x")} Remove</button>`:""}</div></section>
+   <section class="felt"><div class="sec-h"><h3>${ic("gift")} Give everyone Bucks</h3><span class="mute">Adds to every balance</span></div>
+    <div class="addp"><input id="admGiveAmt" type="number" min="1" step="1" placeholder="Amount, e.g. 5000"><button class="btn btn-gold" data-a="admGive" ${ADM.busy?"disabled":""}>${ic("coins")} Give</button></div></section>
+  </div>
+  <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Players</h3><input id="admQ" class="adm-q" placeholder="Search players" value="${esc(ADM.q)}" oninput="A.admQ()"></div>
+   <div class="table-box"><table class="sheet adm"><thead><tr><th>Player</th><th>Bucks</th><th>Wagered</th><th>Earned</th><th>Biggest win</th><th>Last seen</th><th></th></tr></thead><tbody>
+   ${rows.map(p=>`<tr class="${p.banned?"banned":""}"><td>${esc(p.username)}${p.admin?` <span class="chip gold">Admin</span>`:""}${p.banned?` <span class="chip bad">Suspended</span>`:""}</td><td>${fmtC(p.bucks)}</td><td>${fmtC(p.wagered)}</td><td class="${p.profit>=0?"pos":"neg"}">${p.profit>=0?"+":""}${fmtC(p.profit)}</td><td>${fmtC(p.best)}</td><td>${p.seen?ago(p.seen):"-"}</td>
+     <td><button class="btn btn-ghost sm" data-a="admSel" data-v="${esc(p.username)}">${ADM.sel===p.username?"Close":"Manage"}</button></td></tr>
+     ${ADM.sel===p.username?`<tr class="adm-open"><td colspan="7"><div class="adm-manage">
+      <div class="addp"><input id="admAmt_${esc(p.username)}" type="number" step="1" placeholder="Amount"><button class="btn btn-gold sm" data-a="admBucks" data-v="${esc(p.username)},set_bucks">Set balance</button><button class="btn btn-ghost sm" data-a="admBucks" data-v="${esc(p.username)},add_bucks">Add (use - to take)</button></div>
+      <div class="adm-acts">${["reset","logout",p.banned?"unban":"ban",p.admin?"remove_admin":"make_admin","delete"].map(k=>`<button class="btn btn-ghost sm ${k==="delete"||k==="ban"||k==="reset"?"danger":""}" data-a="admAsk" data-v="p,${esc(p.username)},${k}">${ADM_PLAYER[k][0]}</button>`).join("")}</div>
+     </div></td></tr>`:""}`).join("")}</tbody></table></div></section>
+  <section class="felt danger-zone" style="margin-top:16px"><div class="sec-h"><h3>${ic("alert")} Site controls</h3><span class="mute">These affect everyone</span></div>
+   <div class="adm-global">${Object.entries(ADM_GLOBAL).map(([k,[t,s,hard]])=>`<div class="adm-g"><div><b>${t}</b><small>${s}</small></div><button class="btn ${hard?"btn-danger":"btn-ghost"} sm" data-a="admAsk" data-v="g,${k}">${t}</button></div>`).join("")}</div></section>
+  <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Recent big wins</h3></div>
+   <div class="feed">${d.feed.slice(0,12).map(x=>`<div class="feed-row"><b>${esc(x.name)}</b><span class="mute">${esc(x.game)}</span><span class="num pos">+${fmtC(x.payout-x.bet)}</span><span class="mult num">${(+x.mult).toFixed(2)}x</span><small>${ago(x.at)}</small></div>`).join("")||`<p class="mute">None yet</p>`}</div></section>`}
+  ${c?`<div class="scrim" data-a="admCancel"></div><div class="adm-dialog" role="dialog" aria-modal="true">
+    ${(()=>{const g=c.kind==="g",title=g?ADM_GLOBAL[c.a][0]:`${ADM_PLAYER[c.b][0]}: ${esc(c.a)}`,desc=g?ADM_GLOBAL[c.a][1]:ADM_PLAYER[c.b][1],need=g&&ADM_GLOBAL[c.a][2]?"RESET":!g&&(c.b==="delete"||c.b==="reset")?c.a.toUpperCase():"";
+      return `<h3>${title}?</h3>${desc?`<p class="mute">${desc}</p>`:""}${need?`<label for="admConfirmIn" class="lbl2">Type <b style="color:var(--cream)">${esc(need)}</b> to confirm</label><input id="admConfirmIn" class="adm-q" autocomplete="off" onkeydown="if(event.key==='Enter')A.admGo()">`:""}
+      <div class="ctl-btns"><button class="btn btn-danger" data-a="admGo" ${ADM.busy?"disabled":""}>Yes, do it</button><button class="btn btn-ghost" data-a="admCancel">Cancel</button></div>`})()}</div>`:""}
+  </div>`;
+}
+A.admRefresh=()=>{ADM.data=null;admLoad();render()};
+ROUTES.push("admin");CV.admin=admin;
+
+/* Announcement banner for everyone */
+APP.ann=null;
+async function loadAnnouncement(){try{APP.ann=await rpc("bb_announcement",{});paintAnn()}catch(e){}}
+function paintAnn(){let el=document.getElementById("annBar");const a=APP.ann,dis=lsGet("bbbl-ann-dismiss");
+  if(!a||!a.text||dis===String(a.at)){el?.remove();return}
+  if(!el){el=document.createElement("div");el.id="annBar";el.className="ann-bar";document.body.prepend(el)}
+  el.innerHTML=`${ic("megaphone")}<span>${esc(a.text)}</span><button aria-label="Dismiss" onclick="lsSet('bbbl-ann-dismiss','${a.at}');paintAnn()">${ic("x")}</button>`}
+if(typeof window!=="undefined"&&window.setInterval){setTimeout(()=>{if(NET_OK!==false)loadAnnouncement()},1500);setInterval(()=>{if(NET_OK!==false&&!document.hidden)loadAnnouncement()},60000)}
+
+/* Nav: admin link; leaderboard: total wagered + total earned */
+{const f=cHead;cHead=function(){let h=f();if(isAdmin())h=h.replace('<button class="btn btn-ghost icon-btn" data-a="sound"',`<button class="btn btn-ghost icon-btn adm-btn ${APP.view==="admin"?"on":""}" data-a="go" data-v="admin" aria-label="Admin dashboard">${ic("shield2")}</button><button class="btn btn-ghost icon-btn" data-a="sound"`);return h}}
+{const f=route;route=function(){f();if(APP.view==="admin"){ADM.data=null;admLoad()}}}
+
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793264336";
+const BUILD="1793264611";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
