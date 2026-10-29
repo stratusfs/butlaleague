@@ -323,6 +323,19 @@ button.card{padding:0;border:0;background:none;color:inherit;text-align:center}
 .card.sm{--w:100px}.seg-group .hand{flex-wrap:nowrap}
 @media (max-width:1100px){.prod-grid{grid-template-columns:1fr}}
 @media (max-width:520px){.card.sm{--w:92px}.seg-group .hand{gap:6px}}
+.faceup.wait{color:var(--mute)}
+.trait-panel{margin-top:16px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0e0d09;font-size:13.5px;color:var(--mute);min-height:52px}
+.trait-panel>.ic{font-size:22px;color:var(--c-prod);margin-top:2px}
+.trait-panel b{display:block;color:var(--cream);font-size:14px}
+.crowd-note{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;margin:22px auto 8px;font-weight:700;color:var(--gold-hi);animation:rise .45s both}
+.crowd-note .ic{font-size:18px}
+.sheet.mkt{min-width:640px;margin-top:6px}
+.sheet.mkt td{vertical-align:top}
+.sheet.mkt td small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--mute);margin-top:3px;max-width:34ch;line-height:1.35}
+.sheet .pos{color:var(--money)}.sheet .neg{color:var(--loss)}
+.reveal .cap{display:flex;align-items:center;justify-content:center;gap:6px;text-transform:none;letter-spacing:.02em;font-size:13px;color:var(--cream)}
+.reveal{gap:14px}
+@media (min-width:900px){.reveal .card{--w:150px}}
 </style>
 
 </head>
@@ -401,8 +414,9 @@ Object.assign(P,{
 /* ---------- Rules config (defaults come from the printed cards) ---------- */
 const DEF={rounds:5,research:1,matchPrice:3,missPrice:2,wage:2,super:1,superFine:5,maxWorkers:3,machineCost:4,machineMult:2,maxMachines:1,improveCost:2,improveBonus:1,
   soleStart:10,soleReg:1,freeProfit:4,flatTax:2,partStart:14,partReg:2,partFee:1,coStart:10,coReg:4,coTaxPct:25,coRescue:5,publicBonus:10,
-  starPts:3,machPts:2,workerPts:1};
-const FIELDS=[["Game","rounds","Rounds",""],["Game","research","Market research cost","$"],["Game","matchPrice","Sale price on a match","$"],["Game","missPrice","Sale price, no match","$"],
+  starPts:3,machPts:2,workerPts:1,crowdOn:1,crowdDrop:1,crowdFloor:1,traitsOn:1,partyBonus:3};
+const FIELDS=[["New rules","crowdOn","Crowded markets (1 on, 0 off)",""],["New rules","crowdDrop","Match price drop per extra seller","$"],["New rules","crowdFloor","Lowest a crowded match can go","$"],["New rules","traitsOn","Product abilities (1 on, 0 off)",""],
+  ["Game","rounds","Rounds",""],["Game","research","Market research cost","$"],["Game","matchPrice","Sale price on a match","$"],["Game","missPrice","Sale price, no match","$"],
   ["Workers","wage","Wage per worker","$"],["Workers","super","Super per worker","$"],["Workers","superFine","Tax Check fine (no super)","$"],["Workers","maxWorkers","Max workers",""],
   ["Machines & improve","machineCost","Machine price","$"],["Machines & improve","machineMult","Products per worker with a machine",""],["Machines & improve","maxMachines","Max machines",""],["Machines & improve","improveCost","Improve cost","$"],["Machines & improve","improveBonus","Improve price boost","$"],
   ["Sole trader","soleStart","Starting money","$"],["Sole trader","soleReg","Register cost","$"],["Sole trader / partnership tax","freeProfit","Tax-free profit per round","$"],["Sole trader / partnership tax","flatTax","Tax above that","$"],
@@ -410,8 +424,8 @@ const FIELDS=[["Game","rounds","Rounds",""],["Game","research","Market research 
   ["Company","coStart","Starting money","$"],["Company","coReg","Register cost","$"],["Company","coTaxPct","Tax on profit","%"],["Company","coRescue","Run out? Go back to","$"],["Company","publicBonus","Go public bonus","$"],
   ["Score sheet","starPts","Points per star",""],["Score sheet","machPts","Points per machine",""],["Score sheet","workerPts","Points per worker",""]];
 let CFG=Object.assign({},DEF);
-try{const s=JSON.parse(localStorage.getItem("bbbl-cfg3")||"null");if(s)CFG=Object.assign({},DEF,s)}catch(e){}
-const saveCfg=()=>{try{localStorage.setItem("bbbl-cfg3",JSON.stringify(CFG))}catch(e){}};
+try{const s=JSON.parse(localStorage.getItem("bbbl-cfg4")||"null");if(s)CFG=Object.assign({},DEF,s)}catch(e){}
+const saveCfg=()=>{try{localStorage.setItem("bbbl-cfg4",JSON.stringify(CFG))}catch(e){}};
 
 /* ---------- Your cards ---------- */
 const TYPES=()=>[
@@ -427,10 +441,20 @@ const CUSTOMERS=[
  {seg:"Eco-buyers",icon:"globe",want:"Want eco-friendly products"},{seg:"Eco-buyers",icon:"refresh",want:"Want reusable products"},
  {seg:"Seniors",icon:"glasses",want:"Want easy-to-use products"},{seg:"Seniors",icon:"pill",want:"Want health products"}];
 const PRODUCTS=[
- {name:"Bubble Tea Stall",icon:"soda",seg:"Teens"},{name:"Phone Cases",icon:"phone",seg:"Teens"},{name:"Gaming Headset",icon:"headphones",seg:"Teens"},
- {name:"Healthy Lunchbox",icon:"package",seg:"Families"},{name:"Kids Party Service",icon:"cake",seg:"Families"},{name:"Board Game Café",icon:"dice",seg:"Families"},
- {name:"Bamboo Toothbrush",icon:"leaf",seg:"Eco-buyers"},{name:"Reusable Water Bottle",icon:"droplet",seg:"Eco-buyers"},{name:"Second-hand Clothes Shop",icon:"shirt",seg:"Eco-buyers"},
- {name:"Big-button Phone",icon:"call",seg:"Seniors"},{name:"Vitamin Delivery",icon:"truck",seg:"Seniors"},{name:"Garden Service",icon:"sprout",seg:"Seniors"}];
+ {id:"bubble",name:"Bubble Tea Stall",icon:"soda",seg:"Teens",k:"Quick Serve",t:"Each worker makes 3, machine or not. Sells for $1 less."},
+ {id:"cases",name:"Phone Cases",icon:"phone",seg:"Teens",k:"Trendy",t:"+$1 each on a match, but -$1 each on a miss."},
+ {id:"headset",name:"Gaming Headset",icon:"headphones",seg:"Teens",k:"Premium",t:"Sells for $1 more. Workers cost $1 more."},
+ {id:"lunchbox",name:"Healthy Lunchbox",icon:"package",seg:"Families",k:"Steady",t:"Never hit by crowded markets: always full price on a match."},
+ {id:"party",name:"Kids Party Service",icon:"cake",seg:"Families",k:"Big Booking",t:()=>`+$${CFG.partyBonus} bonus on a match.`},
+ {id:"cafe",name:"Board Game Café",icon:"dice",seg:"Families",k:"Regulars",t:"+$1 for each star you already have (max $3)."},
+ {id:"bamboo",name:"Bamboo Toothbrush",icon:"leaf",seg:"Eco-buyers",k:"Low Cost",t:"Workers cost $1 less."},
+ {id:"bottle",name:"Reusable Water Bottle",icon:"droplet",seg:"Eco-buyers",k:"Green Credit",t:"Pay no tax this round."},
+ {id:"clothes",name:"Second-hand Clothes Shop",icon:"shirt",seg:"Eco-buyers",k:"Upcycled",t:"Improve is free."},
+ {id:"bigphone",name:"Big-button Phone",icon:"call",seg:"Seniors",k:"Handmade",t:"Sells for double. Machines don't help."},
+ {id:"vitamin",name:"Vitamin Delivery",icon:"truck",seg:"Seniors",k:"Subscription",t:"+$2 if you also sold it last round."},
+ {id:"garden",name:"Garden Service",icon:"sprout",seg:"Seniors",k:"Outdoors",t:"Ignores Machine Broke and Staff Sick."}];
+const traitText=x=>typeof x.t==="function"?x.t():x.t;
+const T=(pick,id)=>!!CFG.traitsOn&&pick!=null&&PRODUCTS[pick].id===id;
 P.package='<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>';
 
 /* Events hit the whole table at the end of each round. apply(players, round) returns {index: [delta, note]} */
@@ -447,7 +471,7 @@ const EVENTS=[
    apply:ps=>ps.map(p=>p.stars>0?[2,"Has a star"]:null)},
  {icon:"home",name:"Rent Goes Up!",text:()=>"Everyone pays $1.",who:"Everyone",apply:ps=>ps.map(()=>[-1,"Rent"])},
  {icon:"thermo",name:"Staff Sick!",text:()=>"Lose 1 worker's products this round.",who:"Everyone",
-   apply:ps=>ps.map(p=>p.rd&&p.rd.workers>0?[-(p.rd.perWorker*p.rd.price),`Lost ${p.rd.perWorker} product${p.rd.perWorker>1?"s":""}`]:null)},
+   apply:ps=>ps.map(p=>!p.rd||p.rd.workers<1?null:T(p.rd.product,"garden")?[0,"Outdoors: not affected"]:[-(p.rd.perWorker*p.rd.price),`Lost ${p.rd.perWorker} product${p.rd.perWorker>1?"s":""}`])},
  {icon:"landmark",name:"Government Grant!",text:()=>"Sole Traders get $3.",who:"Sole Traders",apply:ps=>ps.map(p=>p.type==="sole"?[3,"Sole Trader grant"]:null)},
  {icon:"truck",name:"Big Order!",text:()=>"Player with the most workers gets $3.",who:"Most workers",
    apply:ps=>{const m=Math.max(...ps.map(p=>p.workers));return ps.map(p=>m>0&&p.workers===m?[3,`${m} workers`]:null)}},
@@ -473,36 +497,71 @@ const cur=()=>S.players[S.turn];
 
 function newGame(){
   S.players=S.seats.map((s,i)=>{const t=typeOf(s.type);const c=t.start-t.reg;
-    return {name:s.name.trim()||`Player ${i+1}`,bot:s.bot,type:s.type,cash:c,workers:1,machines:0,stars:0,public:false,hist:[c],color:SEAT_COLORS[i]}});
-  S.round=1;S.turn=0;S.custDeck=shuffle(CUSTOMERS.map((_,i)=>i));S.eventDeck=shuffle(EVENTS.map((_,i)=>i));S.brokeNext=false;done.clear();
-  beginTurn();
+    return {name:s.name.trim()||`Player ${i+1}`,bot:s.bot,type:s.type,cash:c,workers:1,machines:0,stars:0,public:false,hist:[c],color:SEAT_COLORS[i],lastProd:null}});
+  S.round=1;S.custDeck=shuffle(CUSTOMERS.map((_,i)=>i));S.eventDeck=shuffle(EVENTS.map((_,i)=>i));S.brokeNext=false;done.clear();
+  beginRound();
 }
-function beginTurn(){
-  if(S.turn===0){
-    if(!S.custDeck.length)S.custDeck=shuffle(CUSTOMERS.map((_,i)=>i));
-    S.cust=S.custDeck.pop();S.machinesOff=S.brokeNext;S.brokeNext=false;S.players.forEach(p=>p.rd=null);
-  }
-  const p=cur();
-  S.peeked=false;S.pick=null;S.improve=false;S.superOn=true;S.buys=0;S.wentPublic=false;S.turnStart=p.cash;
-  if(p.bot){botPlay();return}
+function beginRound(){
+  if(!S.custDeck.length)S.custDeck=shuffle(CUSTOMERS.map((_,i)=>i));
+  S.cust=S.custDeck.pop();S.machinesOff=S.brokeNext;S.brokeNext=false;S.market=null;
+  S.players.forEach(p=>{p.rd=null;p.plan=null});S.turn=0;nextPlanner();
+}
+function nextPlanner(){
+  while(S.turn<S.players.length&&S.players[S.turn].bot){botPlan(S.players[S.turn]);S.turn++}
+  if(S.turn>=S.players.length){settle();return}
+  const p=cur();S.peeked=false;S.pick=null;S.improve=false;S.superOn=true;S.buys=0;S.wentPublic=false;S.turnStart=p.cash;
   S.screen=S.players.filter(x=>!x.bot).length>1?"pass":"turn";render();
 }
-function botPlay(){
-  const p=cur(),c=CUSTOMERS[S.cust];
-  if(p.type==="co"&&!p.public&&p.cash<6){p.public=true;p.cash+=CFG.publicBonus;S.wentPublic=true}
-  if(p.cash>=CFG.research){p.cash-=CFG.research;S.peeked=true}
-  const pool=PRODUCTS.map((x,i)=>i).filter(i=>!S.peeked||PRODUCTS[i].seg===c.seg);S.pick=pool[Math.floor(Math.random()*pool.length)];
-  if(p.machines<CFG.maxMachines&&p.cash>=CFG.machineCost+CFG.wage+CFG.super){p.cash-=CFG.machineCost;p.machines++;S.buys++}
-  const per=CFG.wage+CFG.super;p.workers=Math.max(1,Math.min(CFG.maxWorkers,Math.floor(p.cash/per)||1,S.peeked?CFG.maxWorkers:1));
-  S.improve=S.peeked&&p.cash>=CFG.improveCost+p.workers*per;
-  resolve();
+function lockIn(){
+  const p=cur();p.plan={pick:S.pick,improve:S.improve,superOn:S.superOn,peeked:S.peeked,buys:S.buys,wentPublic:S.wentPublic,start:S.turnStart};
+  S.turn++;nextPlanner();
+}
+const sumB=b=>b.reduce((a,x)=>a+x[1],0);
+function botPlan(p){
+  const c=CUSTOMERS[S.cust],start=p.cash;let peeked=false,wentPublic=false,buys=0;
+  if(p.type==="co"&&!p.public&&p.cash<6){p.public=true;p.cash+=CFG.publicBonus;wentPublic=true}
+  if(p.cash>=CFG.research){p.cash-=CFG.research;peeked=true}
+  if(p.machines<CFG.maxMachines&&p.cash>=CFG.machineCost+CFG.wage+CFG.super){p.cash-=CFG.machineCost;p.machines++;buys++}
+  p.workers=p.machines?CFG.maxWorkers:Math.min(CFG.maxWorkers,2);
+  const others=S.players.length-1;let best=0,bv=-1e9;
+  PRODUCTS.forEach((x,i)=>{const o={pick:i,improve:false,superOn:true},cs=costs(p,o);
+    const pm=peeked?(x.seg===c.seg?1:0):.25,sellers=1+Math.round(others*Math.random()*.8);
+    const win=cs.units*priceFor(p,o,true,sellers)+sumB(bonusFor(p,o,true))+CFG.starPts;
+    const lose=cs.units*priceFor(p,o,false,1)+sumB(bonusFor(p,o,false));
+    const v=pm*win+(1-pm)*lose-cs.costs+Math.random()*2.5;if(v>bv){bv=v;best=i}});
+  const cs=costs(p,{pick:best,improve:false,superOn:true});
+  const improve=peeked&&cs.units>=3&&p.cash>=CFG.improveCost;
+  p.plan={pick:best,improve,superOn:true,peeked,buys,wentPublic,start};
 }
 
 /* ---------- Maths ---------- */
-function plan(p){
-  const machinesWork=p.machines>0&&!S.machinesOff,per=machinesWork?CFG.machineMult:1,units=p.workers*per;
-  const wages=p.workers*CFG.wage,sup=S.superOn?p.workers*CFG.super:0,fee=p.type==="part"?CFG.partFee:0,imp=S.improve?CFG.improveCost:0;
-  return {machinesWork,per,units,wages,sup,fee,imp,costs:wages+sup+fee+imp};
+function costs(p,o){
+  const mOK=p.machines>0&&(!S.machinesOff||T(o.pick,"garden"));
+  let per=mOK?CFG.machineMult:1;
+  if(T(o.pick,"bubble"))per=Math.max(per,3);
+  if(T(o.pick,"bigphone"))per=1;
+  const units=p.workers*per,wageEach=Math.max(0,CFG.wage+(T(o.pick,"headset")?1:0)-(T(o.pick,"bamboo")?1:0));
+  const wages=p.workers*wageEach,sup=o.superOn?p.workers*CFG.super:0,fee=p.type==="part"?CFG.partFee:0;
+  const imp=o.improve?(T(o.pick,"clothes")?0:CFG.improveCost):0;
+  return {machinesWork:mOK,per,units,wages,sup,fee,imp,costs:wages+sup+fee+imp};
+}
+function crowdPrice(sellers){return CFG.crowdOn?Math.max(CFG.crowdFloor,CFG.matchPrice-CFG.crowdDrop*(sellers-1)):CFG.matchPrice}
+function priceFor(p,o,match,sellers){
+  let b;
+  b=match?(T(o.pick,"lunchbox")?CFG.matchPrice:crowdPrice(sellers)):CFG.missPrice;
+  if(T(o.pick,"cases"))b+=match?1:-1;
+  if(T(o.pick,"bubble"))b-=1;
+  if(T(o.pick,"headset"))b+=1;
+  if(T(o.pick,"bigphone"))b*=2;
+  if(o.improve)b+=CFG.improveBonus;
+  return Math.max(0,b);
+}
+function bonusFor(p,o,match){
+  const b=[];
+  if(T(o.pick,"party")&&match)b.push(["Big Booking",CFG.partyBonus]);
+  if(T(o.pick,"cafe")&&p.stars>0)b.push(["Regulars",Math.min(3,p.stars)]);
+  if(T(o.pick,"vitamin")&&p.lastProd===o.pick)b.push(["Subscription",2]);
+  return b;
 }
 function taxOn(p,profit){
   if(profit<=0)return 0;
@@ -510,18 +569,21 @@ function taxOn(p,profit){
   return profit>CFG.freeProfit?CFG.flatTax:0;
 }
 function rescue(p){if(p.type==="co"&&p.cash<=0){const was=p.cash;p.cash=CFG.coRescue;return was}return null}
-function resolve(){
-  const p=cur(),c=CUSTOMERS[S.cust],prod=PRODUCTS[S.pick],match=prod.seg===c.seg,pl=plan(p);
-  const price=(match?CFG.matchPrice:CFG.missPrice)+(S.improve?CFG.improveBonus:0),rev=pl.units*price,profit=rev-pl.costs,tax=taxOn(p,profit);
-  p.cash+=profit-tax;if(match)p.stars++;
-  const rescued=rescue(p);
-  p.rd={workers:p.workers,perWorker:pl.per,price,improved:S.improve,superPaid:S.superOn,product:S.pick};
-  S.res={match,prod,c,price,rev,profit,tax,...pl,rescued,before:S.turnStart,after:p.cash,research:S.peeked?CFG.research:0,buys:S.buys,wentPublic:S.wentPublic};
-  S.screen="result";render();
+function settle(){
+  const c=CUSTOMERS[S.cust],sellers=S.players.filter(p=>PRODUCTS[p.plan.pick].seg===c.seg).length;
+  S.market={sellers,rows:S.players.map(p=>{
+    const o=p.plan,prod=PRODUCTS[o.pick],match=prod.seg===c.seg,cs=costs(p,o),price=priceFor(p,o,match,sellers),bon=bonusFor(p,o,match);
+    const sales=cs.units*price,rev=sales+sumB(bon),profit=rev-cs.costs,noTax=T(o.pick,"bottle"),tax=noTax?0:taxOn(p,profit);
+    const star=match;
+    p.cash+=profit-tax;if(star)p.stars++;
+    const rescued=rescue(p);
+    p.rd={workers:p.workers,perWorker:cs.per,price,improved:o.improve,superPaid:o.superOn,product:o.pick};p.lastProd=o.pick;
+    const upfront=(o.peeked?CFG.research:0)+o.buys*CFG.machineCost-(o.wentPublic?CFG.publicBonus:0);
+    return {match,star,prod,price,sales,bon,rev,profit,tax,noTax:noTax&&profit>0,...cs,rescued,upfront,before:o.start,after:p.cash,improve:o.improve,superOn:o.superOn}
+  })};
+  S.screen="market";render();
 }
-function afterTurn(){
-  S.turn++;
-  if(S.turn<S.players.length){beginTurn();return}
+function toEvent(){
   if(!S.eventDeck.length)S.eventDeck=shuffle(EVENTS.map((_,i)=>i));
   const ev=EVENTS[S.eventDeck.pop()],out=ev.apply(S.players);
   S.evRes={ev,rows:S.players.map((p,i)=>{const o=out[i];const before=p.cash;if(o)p.cash+=o[0];const r=rescue(p);
@@ -529,7 +591,7 @@ function afterTurn(){
   S.players.forEach(p=>p.hist.push(p.cash));
   S.screen="event";render();
 }
-function nextRound(){if(S.round>=CFG.rounds){S.screen="end";render();return}S.round++;S.turn=0;beginTurn()}
+function nextRound(){if(S.round>=CFG.rounds){S.screen="end";render();return}S.round++;beginRound()}
 
 /* ---------- Actions ---------- */
 const A={
@@ -547,8 +609,8 @@ const A={
  buy(){const p=cur();if(p.cash<CFG.machineCost||p.machines>=CFG.maxMachines)return;p.cash-=CFG.machineCost;p.machines++;S.buys++;render();floatAt("#buyBtn",`-${money(CFG.machineCost)}`,"neg")},
  toggle(k){S[k]=!S[k];render()},
  goPublic(){const p=cur();if(p.type!=="co"||p.public)return;p.public=true;p.cash+=CFG.publicBonus;S.wentPublic=true;render();floatAt("#pubBtn",`+${money(CFG.publicBonus)}`,"pos")},
- sell(){if(S.pick==null){const h=document.getElementById("prodGrid");h?.classList.add("shake");setTimeout(()=>h?.classList.remove("shake"),450);h?.scrollIntoView({behavior:"smooth",block:"center"});return}resolve()},
- next(){afterTurn()},
+ sell(){if(S.pick==null){const h=document.getElementById("prodGrid");h?.classList.add("shake");setTimeout(()=>h?.classList.remove("shake"),450);h?.scrollIntoView({behavior:"smooth",block:"center"});return}lockIn()},
+ next(){toEvent()},
  round(){nextRound()},
  again(){newGame()},
  drawer(k){ui.drawer=k;renderLayer()},
@@ -590,21 +652,22 @@ function topBar(){
 }
 function board(){
   return `<section class="board" aria-label="Scoreboard">${S.players.map((p,i)=>{const t=typeOf(p.type);
-   return `<div class="seat ${["turn","pass","result"].includes(S.screen)&&i===S.turn?"on":""}">
+   return `<div class="seat ${["turn","pass"].includes(S.screen)&&i===S.turn?"on":""}">
     <div class="seat-h"><span class="dot" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span>
       <span class="tag">${p.bot?ic("bot"):""}${ic(t.icon)} ${t.name}${p.public?" · Public":""}</span></div>
     <div class="cash ${p.cash<0?"neg":""}">${money(p.cash)}</div>
     <div class="stats"><span class="st" title="Stars">${ic("star")}<b>${p.stars}</b></span><span title="Machines">${ic("cog")}<b>${p.machines}</b></span><span title="Workers">${ic("hardhat")}<b>${p.workers}</b></span><span title="Score" style="margin-left:auto">${ic("trophy")}<b>${score(p)}</b></span></div>
-    ${p.public&&p.rd?`<div class="faceup">${ic("eye")} Face-up: ${PRODUCTS[p.rd.product].name}</div>`:""}
+    ${["turn","pass"].includes(S.screen)?`<div class="faceup ${p.plan?"":"wait"}">${p.plan?`${ic("check")} Plan locked in${p.public?`: ${PRODUCTS[p.plan.pick].name}`:""}`:i===S.turn?`${ic("zap")} Planning now`:`${ic("moon")} Waiting`}</div>`:""}
+    ${S.screen==="__never"&&p.public&&p.rd?`<div class="faceup">${ic("eye")} Face-up: ${PRODUCTS[p.rd.product].name}</div>`:""}
    </div>`}).join("")}</section>`;
 }
 
 /* ---------- Screens ---------- */
 function home(){
   const steps=[["Start","Pick Sole Trader, Partnership or Company. Each costs a different amount to start and pays tax differently.","building"],
-   ["Each round",`Pay $${CFG.research} to see the Customer card, then pick one of 12 products.`,"search"],
+   ["Plan",`Pay $${CFG.research} to see the Customer card, then secretly pick one of 12 products${CFG.traitsOn?", each with its own ability":""}.`,"search"],
    ["Workers",`Each one costs $${CFG.wage} pay plus $${CFG.super} super. A machine makes each worker produce ${CFG.machineMult}.`,"hardhat"],
-   ["Sell",`Match the customer's group and sell for $${CFG.matchPrice} each plus a star.`,"star"],
+   ["Market day",`Everyone reveals at once. Match the customer group for $${CFG.matchPrice} each and a star${CFG.crowdOn?", but the price drops when rivals match too":""}.`,"star"],
    ["Tax","Pay your tax. When everyone's done, flip an event card for the table.","receipt"],
    ["Win",`After ${CFG.rounds} rounds add money, stars x${CFG.starPts}, machines x${CFG.machPts} and workers x${CFG.workerPts}.`,"trophy"]];
   return `<div class="screen"><section class="hero"><img class="hero-logo" src="${LOGO}" alt="Big Butla Business League logo">
@@ -615,7 +678,7 @@ function home(){
   <div class="sec-h"><h3>How a round plays</h3><span class="mute">In this order, every round</span></div>
   <div class="steps">${steps.map((s,i)=>`<div class="step" style="--i:${i}"><div class="n">${ic(s[2])}</div><b>${s[0]}</b><span>${s[1]}</span></div>`).join("")}</div>
   <div class="sec-h" style="margin-top:28px"><h3>The deck</h3><span class="mute">${CUSTOMERS.length} customers · ${PRODUCTS.length} products · ${EVENTS.length} events</span></div>
-  <div class="hand deck-peek">${[custFront(CUSTOMERS[1]),front({icon:"headphones",title:"Gaming Headset",tag:"Target: Teens"},"prod"),front({icon:"flame",title:"Gone Viral!",sub:"The richest player sells 2 extra."},"event"),front({icon:"cog",title:"Machine",sub:"Each worker now makes 2 products.",tag:`Cost: $${CFG.machineCost}`},"act")].map((f,i)=>`<div class="card fan tilt" style="--i:${i}">${f}</div>`).join("")}</div>
+  <div class="hand deck-peek">${[custFront(CUSTOMERS[1]),front({icon:"headphones",title:"Gaming Headset",sub:"Sells for $1 more. Workers cost $1 more.",tag:"Premium · Teens"},"prod"),front({icon:"flame",title:"Gone Viral!",sub:"The richest player sells 2 extra."},"event"),front({icon:"cog",title:"Machine",sub:"Each worker now makes 2 products.",tag:`Cost: $${CFG.machineCost}`},"act")].map((f,i)=>`<div class="card fan tilt" style="--i:${i}">${f}</div>`).join("")}</div>
   </div>`;
 }
 function setup(){
@@ -634,27 +697,28 @@ function setup(){
 function pass(){
   const p=cur();
   return `<div class="screen">${topBar()}${board()}<div class="felt pass"><div class="av">${ic(typeOf(p.type).icon)}</div>
-   <div class="eyebrow">Round ${S.round} · Next up</div><h2>${esc(p.name)}</h2><p class="mute" style="margin:0">Hand the device over. Everyone else, look away from the Customer card.</p>
+   <div class="eyebrow">Round ${S.round} · Next up</div><h2>${esc(p.name)}</h2><p class="mute" style="margin:0">Hand the device over. Everyone else, look away: plans stay secret until market day.</p>
    <button class="btn btn-gold btn-lg" data-a="ready">I'm ${esc(p.name)}, show my turn ${ic("chev")}</button></div></div>`;
 }
 function turn(){
-  const p=cur(),t=typeOf(p.type),c=CUSTOMERS[S.cust],pl=plan(p),prod=S.pick!=null?PRODUCTS[S.pick]:null;
-  const custCard=S.peeked?flipCard(`c-${S.round}-${S.turn}`,custFront(c),"CUSTOMER","users",120):`<div class="card">${back("CUSTOMER","users")}</div>`;
-  const bonus=S.improve?CFG.improveBonus:0,mPrice=CFG.matchPrice+bonus,nPrice=CFG.missPrice+bonus;
-  const willMatch=prod&&S.peeked?prod.seg===c.seg:null;
-  const revTxt=!prod?"Pick a product":willMatch===true?money(pl.units*mPrice):willMatch===false?money(pl.units*nPrice):`${money(pl.units*nPrice)} or ${money(pl.units*mPrice)}`;
+  const p=cur(),t=typeOf(p.type),c=CUSTOMERS[S.cust],pl=costs(p,{pick:S.pick,improve:S.improve,superOn:S.superOn}),prod=S.pick!=null?PRODUCTS[S.pick]:null;
+  const pl0=null;const custCard=S.peeked?flipCard(`c-${S.round}-${S.turn}`,custFront(c),"CUSTOMER","users",120):`<div class="card">${back("CUSTOMER","users")}</div>`;
+  const o={pick:S.pick,improve:S.improve,superOn:S.superOn},willMatch=prod&&S.peeked?prod.seg===c.seg:null;
+  const est=(m,n)=>money(pl.units*priceFor(p,o,m,n)+sumB(bonusFor(p,o,m)));
+  const revTxt=!prod?"Pick a product":willMatch===false?est(false,1):(CFG.crowdOn&&!T(S.pick,"lunchbox")&&S.players.length>1&&willMatch!==false)?`${est(true,1)} alone · ${est(true,2)} shared`:willMatch?est(true,1):`${est(false,1)} or ${est(true,1)}`;
   const canBuy=p.machines<CFG.maxMachines&&p.cash>=CFG.machineCost;
   return `<div class="screen">${topBar()}${board()}
   <div class="turn-head"><h2>${esc(p.name)}'s turn</h2><span class="chip gold">${ic(t.icon)} ${t.name}</span><span class="chip">${ic("receipt")} ${t.tax}</span></div>
   <div class="grid2">
    <section class="felt market" id="custCard"><div class="eyebrow">Market research</div>${custCard}
-     ${S.peeked?`<p class="mute"><b style="color:var(--cream)">${c.seg}</b> are buying this round. Sell them a ${c.seg} product for $${CFG.matchPrice} each and a star.</p>`
+     ${S.peeked?`<p class="mute"><b style="color:var(--cream)">${c.seg}</b> are buying this round. Sell them a ${c.seg} product for $${CFG.matchPrice} each and a star.${CFG.crowdOn&&S.players.length>1?` Rivals who match too will push the price down, so you might do better elsewhere.`:""}</p>`
      :`<p class="mute">Pay to look at the Customer card before you pick, or take a gamble.</p><button class="btn btn-gold" data-a="peek" ${p.cash<CFG.research?"disabled":""}>${ic("eye")} Pay ${money(CFG.research)} to look</button>`}
    </section>
-   <section class="felt"><div class="sec-h"><div><div class="eyebrow">Product</div><h3>Pick what you'll sell</h3></div><span class="mute">Each product targets one customer group</span></div>
+   <section class="felt"><div class="sec-h"><div><div class="eyebrow">Product</div><h3>Pick what you'll sell</h3></div><span class="mute">${CFG.traitsOn?"Every product has its own ability":"Each product targets one customer group"}</span></div>
      <div class="prod-grid" id="prodGrid">${SEGMENTS.map(seg=>`<div class="seg-group ${S.peeked&&seg===c.seg?"hot":""}"><div class="seg-h">For ${seg}${S.peeked&&seg===c.seg?` <span class="chip gold">${ic("star")} Match</span>`:""}</div>
-       <div class="hand">${PRODUCTS.map((x,i)=>x.seg!==seg?"":`<button class="card sm pickable tilt ${S.pick===i?"sel":""}" style="--i:${i}" data-a="pick" data-v="${i}" aria-pressed="${S.pick===i}" aria-label="${x.name}, targets ${x.seg}">
-         <span class="check">${ic("check")}</span>${front({icon:x.icon,title:x.name,tag:`Target: ${x.seg}`},"prod")}</button>`).join("")}</div></div>`).join("")}</div>
+       <div class="hand">${PRODUCTS.map((x,i)=>x.seg!==seg?"":`<button class="card sm pickable tilt ${S.pick===i?"sel":""}" style="--i:${i}" data-a="pick" data-v="${i}" aria-pressed="${S.pick===i}" aria-label="${x.name}, targets ${x.seg}${CFG.traitsOn?`. ${x.k}: ${traitText(x)}`:""}" title="${CFG.traitsOn?`${x.k}: ${traitText(x)}`:x.seg}">
+         <span class="check">${ic("check")}</span>${front({icon:x.icon,title:x.name,tag:CFG.traitsOn?x.k:`Target: ${x.seg}`},"prod")}</button>`).join("")}</div></div>`).join("")}</div>
+     ${CFG.traitsOn?`<div class="trait-panel">${prod?`${ic(prod.icon)}<span><b>${prod.name} · ${prod.k}</b>${traitText(prod)}</span>`:`${ic("sparkles")}<span>Tap a product to see its ability.</span>`}</div>`:""}
    </section>
   </div>
   <section class="felt" style="margin-top:16px"><div class="sec-h"><div><div class="eyebrow">Action cards</div><h3>Workers, machines &amp; upgrades</h3></div></div>
@@ -662,45 +726,41 @@ function turn(){
     <div class="stepper"><div class="h">${ic("hardhat")} Workers</div>
       <div class="ctl"><button class="btn btn-ghost icon-btn" data-a="work" data-v="-1" aria-label="Fewer workers" ${p.workers<=0?"disabled":""}>${ic("minus")}</button>
        <span class="val">${p.workers}</span><button class="btn btn-ghost icon-btn" data-a="work" data-v="1" aria-label="More workers" ${p.workers>=CFG.maxWorkers?"disabled":""}>${ic("plus")}</button></div>
-      <small>Each makes ${pl.per} product${pl.per>1?"s":""}. $${CFG.wage} wages + $${CFG.super} super every round.</small></div>
+      <small>Each makes ${pl.per} product${pl.per>1?"s":""}. $${pl.wages/(p.workers||1)||CFG.wage} wages + $${CFG.super} super every round.</small></div>
     <button class="toggle ${S.superOn?"on":""}" data-a="toggle" data-v="superOn" aria-pressed="${S.superOn}"><span class="sw"></span><span><b>Pay super</b><small>${S.superOn?`$${CFG.super} per worker. Safe from a Tax Check.`:`Saving $${p.workers*CFG.super}. A Tax Check card costs $${CFG.superFine}.`}</small></span></button>
     <div class="stepper"><div class="h">${ic("cog")} Machine${S.machinesOff&&p.machines?` <span class="chip" style="color:var(--loss);border-color:#ef6a5866">Broken this round</span>`:""}</div>
       <div class="ctl"><span class="val">${p.machines}</span><button id="buyBtn" class="btn btn-ghost" data-a="buy" ${canBuy?"":"disabled"}>${ic("plus")} Buy ${money(CFG.machineCost)}</button></div>
       <small>Buy once. Each worker makes ${CFG.machineMult} products.${p.machines>=CFG.maxMachines?" You own the max.":""}</small></div>
-    <button class="toggle ${S.improve?"on":""}" data-a="toggle" data-v="improve" aria-pressed="${S.improve}"><span class="sw"></span><span><b>${ic("bulb")} Improve</b><small>$${CFG.improveCost}: sell for $${CFG.improveBonus} more this round. Beats Copycat.</small></span></button>
+    <button class="toggle ${S.improve?"on":""}" data-a="toggle" data-v="improve" aria-pressed="${S.improve}"><span class="sw"></span><span><b>${ic("bulb")} Improve</b><small>${T(S.pick,"clothes")?"Free with Upcycled":`$${CFG.improveCost}`}: sell for $${CFG.improveBonus} more this round. Beats Copycat.</small></span></button>
     ${p.type==="co"?`<button id="pubBtn" class="toggle ${p.public?"on":""}" data-a="goPublic" ${p.public?"disabled":""}><span class="sw"></span><span><b>${ic("trend")} Go public</b><small>${p.public?"Done. Your product plays face-up.":`Once only: +$${CFG.publicBonus}, then play your product face-up.`}</small></span></button>`:""}
    </div>
   </section>
   <div class="summary">
    <div class="figs"><div>Products<b>${pl.units}</b></div><div>Costs<b>${money(pl.costs)}</b></div><div>Sales<b class="g">${revTxt}</b></div>${p.type==="part"?`<div>Partner<b>${money(CFG.partFee)}</b></div>`:""}</div>
-   <button class="btn btn-gold btn-lg" data-a="sell">${ic("dollar")} Sell &amp; pay tax</button>
+   <button class="btn btn-gold btn-lg" data-a="sell">${ic("check")} Lock in plan</button>
   </div></div>`;
 }
-function result(){
-  const r=S.res,p=cur(),id=`${S.round}-${S.turn}`;
-  const sale=front({icon:r.prod.icon,title:r.prod.name,sub:r.match?`${r.c.seg} wanted it`:`${r.c.seg} wanted something else`,tag:r.match?`Match: $${r.price} each + star`:`No match: $${r.price} each`,stamp:r.match?"Match":"Miss"},"prod",r.match?"good":"bad");
-  const lines=[];
-  if(r.wentPublic)lines.push(["Went public",CFG.publicBonus]);
-  if(r.research)lines.push(["Market research",-r.research]);
-  if(r.buys)lines.push(["Bought a machine",-r.buys*CFG.machineCost]);
-  lines.push([`Sold ${r.units} x ${r.prod.name} at $${r.price}`,r.rev]);
-  lines.push([`Wages (${p.workers} worker${p.workers===1?"":"s"})`,-r.wages]);
-  lines.push([r.sup?"Super":"Super skipped",-r.sup]);
-  if(r.fee)lines.push(["Paid your partner",-r.fee]);
-  if(r.imp)lines.push(["Improved product",-r.imp]);
-  lines.push([r.profit>0?`Tax on ${money(r.profit)} profit`:"Tax (no profit)",-r.tax]);
-  if(r.rescued!==null)lines.push([`Company ran out at ${money(r.rescued)}, back to ${money(CFG.coRescue)}`,CFG.coRescue-r.rescued]);
-  const net=r.after-r.before,last=S.turn===S.players.length-1;
+function market(){
+  const m=S.market,c=CUSTOMERS[S.cust],id="m"+S.round,n=S.players.length,cp=crowdPrice(m.sellers);
+  const cards=S.players.map((p,i)=>{const r=m.rows[i];
+    const f=front({icon:r.prod.icon,title:r.prod.name,sub:CFG.traitsOn?r.prod.k:r.prod.seg,tag:`${r.units} sold at $${r.price}`,stamp:r.match?"Match":"Miss"},"prod",r.match?"good":"bad");
+    return `<div>${flipCard(id+"p"+i,f,"PRODUCT","package",800+i*380)}<div class="cap"><span class="dot" style="background:${p.color}"></span> ${esc(p.name)}</div></div>`}).join("");
+  const note=m.sellers===0?`Nobody sold to ${c.seg} this round.`:!CFG.crowdOn||n===1?`${m.sellers} matched ${c.seg}.`:m.sellers===1?`Only one player sold to ${c.seg}: full $${CFG.matchPrice} price.`:`${m.sellers} players sold to ${c.seg}, so the match price dropped to $${cp}.`;
+  const d0=800+n*380;
   return `<div class="screen">${topBar()}${board()}
-  <section class="felt"><div class="turn-head" style="justify-content:center"><h2>${esc(p.name)} · round ${S.round}</h2>${p.bot?`<span class="chip">${ic("bot")} CPU played</span>`:""}</div>
+  <section class="felt"><div class="turn-head" style="justify-content:center"><h2>Market day · round ${S.round}</h2></div>
    <div class="reveal">
-    <div>${flipCard("cu"+id,custFront(r.c),"CUSTOMER","users",200)}<div class="cap">Customer</div></div>
-    <div>${flipCard("pr"+id,sale,"PRODUCT","package",750)}<div class="cap">Your product</div></div>
+    <div>${flipCard(id+"c",custFront(c),"CUSTOMER","users",250)}<div class="cap">Customers</div></div>
+    ${cards}
    </div>
-   <div class="ledger">${lines.map((l,i)=>`<div class="ln" style="--i:${i}"><span>${l[0]}</span><span class="${l[1]>0?"pos":l[1]<0?"neg":""}">${l[1]===0?"$0":signed(l[1])}</span></div>`).join("")}
-    <div class="ln tot" style="--i:${lines.length}"><span>Net this turn${r.match?` · ${ic("star")} +1 star`:""}</span><span class="${net>=0?"pos":"neg"}">${signed(net)}</span></div></div>
-   <div class="bigcash"><div class="eyebrow">Money now</div><div class="num" id="bigcash" data-from="${r.before}" data-to="${r.after}">${money(r.before)}</div></div>
-   <div class="row-c"><button class="btn btn-gold btn-lg" data-a="next">${last?`${ic("zap")} Flip the event card`:`Next player ${ic("chev")}`}</button></div>
+   <p class="crowd-note" style="animation-delay:${d0}ms">${ic(m.sellers>1&&CFG.crowdOn?"users":"star")} ${note}</p>
+   <div class="table-box"><table class="sheet mkt"><thead><tr><th>Player</th><th>Sales</th><th>Bought</th><th>Running costs</th><th>Tax</th><th>Net</th><th>Money</th></tr></thead><tbody>
+   ${S.players.map((p,i)=>{const r=m.rows[i],net=r.after-r.before,notes=[];
+     r.bon.forEach(b=>notes.push(`${b[0]} +$${b[1]}`));if(r.noTax)notes.push("Green Credit: no tax");if(r.star)notes.push("+1 star");if(!r.superOn&&p.workers)notes.push("Skipped super");if(r.improve)notes.push("Improved");if(r.rescued!==null)notes.push(`Back to $${CFG.coRescue}`);
+     return `<tr style="--i:${i};animation-delay:${d0+200+i*150}ms"><td><span class="dot" style="background:${p.color}"></span>${esc(p.name)}<small>${r.units} x ${r.prod.name} at $${r.price}${notes.length?` · ${notes.join(" · ")}`:""}</small></td>
+       <td class="pos">${signed(r.rev)}</td><td>${r.upfront?signed(-r.upfront):"$0"}</td><td>${signed(-r.costs)}</td><td>${r.tax?signed(-r.tax):"$0"}</td><td class="${net>=0?"pos":"neg"}"><b>${signed(net)}</b></td><td>${money(r.after)}</td></tr>`}).join("")}
+   </tbody></table></div>
+   <div class="row-c"><button class="btn btn-gold btn-lg" data-a="next">${ic("zap")} Flip the event card</button></div>
   </section></div>`;
 }
 function eventScreen(){
@@ -757,11 +817,14 @@ function renderLayer(){
     body=head("How to play")+`<div class="rules-list">
      ${TYPES().map(t=>R(t.icon,t.name,`Start ${money(t.start)}, register ${money(t.reg)}. ${t.tax}. ${t.perk}.`)).join("")}
      ${R("search","Market research",`One Customer card is drawn each round. Pay $${CFG.research} to see it before you pick a product.`)}
+     ${R("eye","Secret plans","Everyone plans in secret, then all products are revealed together on market day.")}
      ${R("star","Selling",`Products made x price. Match the customer group: $${CFG.matchPrice} each and a star. No match: $${CFG.missPrice} each.`)}
+     ${CFG.crowdOn?R("users","Crowded markets",`Every extra player who matches the same customers drops the match price by $${CFG.crowdDrop} (lowest $${CFG.crowdFloor}). Sometimes the miss price is the better deal.`):""}
+     ${CFG.traitsOn?R("sparkles","Product abilities",PRODUCTS.map(x=>`<b style="display:inline;color:var(--cream)">${x.name}</b> (${x.k}): ${traitText(x)}`).join("<br>")):""}
      ${R("hardhat","Workers",`Up to ${CFG.maxWorkers}. Each makes 1 product and costs $${CFG.wage} wages + $${CFG.super} super every round. Skipping super risks a Tax Check.`)}
      ${R("cog","Machine",`$${CFG.machineCost}, buy once. Each worker makes ${CFG.machineMult} products.`)}
      ${R("bulb","Improve",`$${CFG.improveCost}: sell for $${CFG.improveBonus} more this round. Protects you from Copycat.`)}
-     ${R("receipt","Tax",`Profit is sales minus wages, super, partner pay and improvements. Pay tax on it, then the next player goes.`)}
+     ${R("receipt","Tax",`Profit is sales minus wages, super, partner pay and improvements. Pay tax on it.`)}
      ${R("zap","Events","Once everyone has played, one event card hits the whole table.")}
      ${R("trophy","Winning",`After ${CFG.rounds} rounds: money + stars x${CFG.starPts} + machines x${CFG.machPts} + workers x${CFG.workerPts}.`)}</div>`}
   if(ui.drawer==="quit")body=head("Leave this game?")+`<p class="mute">The current game will be lost.</p><div style="display:flex;gap:10px"><button class="btn btn-gold" data-a="quitYes">Leave game</button><button class="btn btn-ghost" data-a="close">Keep playing</button></div>`;
@@ -769,14 +832,14 @@ function renderLayer(){
 }
 
 /* ---------- Render ---------- */
-const VIEWS={home,setup,pass,turn,result,event:eventScreen,end};
+const VIEWS={home,setup,pass,turn,market,event:eventScreen,end};
 let lastScreen=null;
 function render(){
   document.getElementById("app").innerHTML=VIEWS[S.screen]();
   const bc=document.getElementById("bigcash");
   if(bc){const k="bc"+S.round+"-"+S.turn;if(!done.has(k)){done.add(k);countUp(bc,+bc.dataset.from,+bc.dataset.to,1500)}else bc.textContent=money(+bc.dataset.to);
     bc.style.color=+bc.dataset.to<0?"var(--loss)":"var(--cream)"}
-  if(S.screen!==lastScreen||S.screen==="result")window.scrollTo({top:0});
+  if(S.screen!==lastScreen)window.scrollTo({top:0});
   lastScreen=S.screen;
 }
 function countUp(el,a,b,delay){setTimeout(()=>{const t0=performance.now(),d=900;const tick=t=>{const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=money(Math.round(a+(b-a)*e));if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)},delay)}
@@ -788,8 +851,8 @@ function confetti(){
   const t0=performance.now();(function f(t){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()});
    if(t-t0<4200)requestAnimationFrame(f);else{x.clearRect(0,0,c.width,c.height);c.hidden=true}})(t0);
 }
-function boot(data){if(data&&data.S&&data.v===2){S=data.S;(data.done||[]).forEach(d=>done.add(d))}render();renderLayer()}
-window.claude?.hot?.snapshot?.(()=>({v:2,S:{...S,evRes:null,screen:S.screen==="event"?"home":S.screen},done:[...done]}));
+function boot(data){if(data&&data.S&&data.v===3){S=data.S;(data.done||[]).forEach(d=>done.add(d))}render();renderLayer()}
+window.claude?.hot?.snapshot?.(()=>({v:3,S:{...S,evRes:null,screen:S.screen==="event"?"home":S.screen},done:[...done]}));
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
 </script>
 
