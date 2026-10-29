@@ -2734,6 +2734,11 @@ const OFF_RANKS=[{n:"Intern",at:0,rate:.3},{n:"Junior Clerk",at:25,rate:.45},{n:
 const OFF_EVENTS=[["The printer jammed. You fixed it with a gentle kick.","printer"],["Big Butla walked past. You looked very busy.","boss"],
  ["You spilled coffee on your keyboard. It still works, mostly.","coffee"],["Free cake in the kitchen. Morale +1.","cake"],["Someone replied all. Your inbox is on fire.","fire"],
  ["The air con is set to Antarctica again.","cold"],["You've been in this meeting for three hours.","meeting"]];
+const OFF_SHIFT=120;
+const offPaidKey=()=>"bbbl-office-paid-"+(ACC?ACC.p.name.toLowerCase():"guest");
+function offPaidList(){try{return (JSON.parse(lsGet(offPaidKey())||"[]")||[]).filter(t=>Date.now()-t<3600e3)}catch(e){return[]}}
+function offShift(){return offPaidList().length}
+function offLog(){const l=offPaidList();l.push(Date.now());lsSet(offPaidKey(),JSON.stringify(l.slice(-OFF_SHIFT-5)))}
 const OFF={line:"",urgent:false,typed:"",errs:0,t0:0,done:0,earned:0,streak:0,last:null,shift:false,msg:"",bag:[]};
 const offKey=()=>"bbbl-office-"+(ACC?ACC.p.name.toLowerCase():"guest");
 function offLoad(){if(ACC){const loc=(()=>{try{return JSON.parse(lsGet(offKey())||"null")}catch(e){return null}})();OFF.done=Math.max(ACC.p.officeDone||0,loc?.done||0);OFF.earned=Math.max(ACC.p.officeEarned||0,loc?.earned||0);return}try{const s=JSON.parse(lsGet(offKey())||"null");OFF.done=s?.done||0;OFF.earned=s?.earned||0}catch(e){OFF.done=0;OFF.earned=0}}
@@ -2742,10 +2747,12 @@ const offRank=()=>{let r=0;OFF_RANKS.forEach((x,i)=>{if(OFF.done>=x.at)r=i});ret
 function offNext(){
   if(Math.random()<.08){OFF.line=OFF_URGENT[Math.floor(Math.random()*OFF_URGENT.length)];OFF.urgent=true}
   else{if(!OFF.bag.length)OFF.bag=shuffle(OFF_LINES.map((_,i)=>i));OFF.line=OFF_LINES[OFF.bag.pop()];OFF.urgent=false}
-  OFF.typed="";OFF.errs=0;OFF.t0=0;
+  OFF.typed="";OFF.errs=0;OFF.t0=0;OFF.keys=[];
 }
 function offType(ch){
   if(APP.view!=="office")return;if(!OFF.line)offNext();
+  const nowT=performance.now();if(!OFF.trustAt||nowT-OFF.trustAt>60)return;
+  (OFF.keys=OFF.keys||[]).push(nowT);
   if(!OFF.t0)OFF.t0=performance.now();
   const want=OFF.line[OFF.typed.length];
   if(want!==undefined&&ch.toLowerCase()===want.toLowerCase()){OFF.typed+=want;SFX.v(1400+Math.random()*300,.025,{type:"square",v:.015})}
@@ -2757,11 +2764,16 @@ function offSubmit(){
   const secs=(performance.now()-OFF.t0)/1000,len=OFF.line.length,cps=len/Math.max(.01,secs);
   const acc=Math.max(0,1-OFF.errs/len),rk=OFF_RANKS[offRank()];
   let pay=0,note="";
+  const ks=OFF.keys||[],gaps=ks.slice(1).map((t,i)=>t-ks[i]).filter(g=>g<1500),mean=gaps.reduce((a,b)=>a+b,0)/(gaps.length||1),
+    cv=gaps.length?Math.sqrt(gaps.reduce((a,g)=>a+(g-mean)*(g-mean),0)/gaps.length)/(mean||1):1;
+  const hour=offShift();
   if(cps>13){note="Whoa, slow down. HR thinks you're a robot. No pay for that one.";OFF.streak=0}
+  else if(gaps.length>=12&&cv<.18){note="Your typing rhythm is suspiciously perfect. HR flagged it as an auto-typer. No pay.";OFF.streak=0;OFF.flags=(OFF.flags||0)+1}
+  else if(hour>=OFF_SHIFT){note="Shift's over. You've done "+OFF_SHIFT+" sentences this hour. Come back later for more pay.";OFF.streak=0}
   else{pay=Math.round(len*rk.rate*(OFF.urgent?2:1)*acc*acc*(1+Math.min(OFF.streak,10)*.03));OFF.streak=acc>=.95?OFF.streak+1:0;
     note=acc===1?(OFF.urgent?"Urgent job done. Double pay!":"Perfect. Not a single typo."):acc>=.9?"Good enough for government work.":"Lots of typos. Your boss has questions."}
   const before=offRank();OFF.done++;OFF.earned+=pay;offSave();
-  if(pay>0){bank(pay);SFX.coin()}
+  if(pay>0){bank(pay);SFX.coin();offLog()}
   OFF.last={pay,acc,wpm:Math.round(cps*60/5),note};
   if(offRank()>before){const r=OFF_RANKS[offRank()];toast(`${ic("briefcase")} Promoted to ${r.n}! Pay is now ${r.rate} Bucks per letter`,"good");SFX.win(3);coinBurst(80)}
   OFF.msg=Math.random()<.12?OFF_EVENTS[Math.floor(Math.random()*OFF_EVENTS.length)][0]:"";
@@ -2783,7 +2795,8 @@ function offKbHtml(){const rows=OFF.num?KB2:KB;return rows.map(r=>`<div class="k
 function offKb(){const el=document.getElementById("offKb");if(el)el.innerHTML=offKbHtml()}
 {const f=A.offKey;A.offKey=function(k){return f(k==="comma"?",":k)}}
 if(typeof document!=="undefined"&&document.addEventListener){
-  document.addEventListener("keydown",e=>{if(APP.view!=="office"||e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target;if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+  document.addEventListener("click",e=>{const k=e.target.closest&&e.target.closest('[data-a="offKey"]');if(!k)return;if(!e.isTrusted){e.stopImmediatePropagation();e.preventDefault();return}OFF.trustAt=performance.now()},true);
+  document.addEventListener("keydown",e=>{if(APP.view!=="office"||e.ctrlKey||e.metaKey||e.altKey)return;if(!e.isTrusted||e.repeat){e.preventDefault();return}OFF.trustAt=performance.now();const t=e.target;if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
     if(e.key==="Backspace"){offBack();e.preventDefault();return}if(e.key.length===1){offType(e.key);e.preventDefault()}});
   document.addEventListener("paste",e=>{if(APP.view==="office"){e.preventDefault();toast("Nice try. No copy-paste in this office.","bad")}});
 }
@@ -2794,7 +2807,7 @@ function office(){
   <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Butla Office</h2><span class="mute">Type the paperwork. Get paid. Repeat forever.</span></div>
   <div class="off-top">
    <div class="off-badge">${ic("briefcase")}<div><small>Your job</small><b>${r.n}</b><span>${r.rate} Bucks per letter${nx?` · ${nx.at-OFF.done} more to ${nx.n}`:" · top of the ladder"}</span></div></div>
-   <div class="off-stats"><div><small>Sentences typed</small><b class="num">${fmtB(OFF.done)}</b></div><div><small>Earned at work</small><b class="num">${fmtC(OFF.earned)}</b></div><div><small>Streak</small><b class="num">${OFF.streak}</b></div></div>
+   <div class="off-stats"><div><small>Sentences typed</small><b class="num">${fmtB(OFF.done)}</b></div><div><small>Earned at work</small><b class="num">${fmtC(OFF.earned)}</b></div><div><small>Streak</small><b class="num">${OFF.streak}</b></div><div><small>This hour</small><b class="num ${offShift()>=OFF_SHIFT?"neg":""}">${offShift()}/${OFF_SHIFT}</b></div></div>
   </div>
   <section class="office">
    <div class="desk">
@@ -3022,7 +3035,7 @@ Object.assign(GAME_NAMES,{keno:"Keno",wheel:"Lucky Wheel",tower:"Tower"});
 {const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="coinflip"&&!CF.poll){cfFetch();CF.poll=setInterval(()=>{if(!document.hidden)cfFetch()},2000)}}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793267808";
+const BUILD="1793268262";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
