@@ -1780,8 +1780,11 @@ function accFrom(pr,token){return {token,p:{name:pr.username,bucks:+pr.bucks,bes
 let syncT=null;
 function saveAcc(){lsSet("bbbl-refill-"+ACC.p.name.toLowerCase(),String(ACC.p.lastRefill||0));clearTimeout(syncT);syncT=setTimeout(flushAcc,700)}
 async function flushAcc(){clearTimeout(syncT);if(!ACC)return;const p=ACC.p;
-  try{const sv=await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league,p_wagered:p.wagered||0});if(sv&&ACC){ACC.p.rake=+sv.rake;ACC.p.claimedTier=+sv.claimedTier}if(["home","leaderboard"].includes(APP.view))loadLB(APP.view==="home"?"bucks":APP.lb)}
-  catch(e){if(/session|log in/i.test(e.message)){ACC=null;lsDel(SKEY);toast(e.message,"bad");render()}}}
+  try{const sv=await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league,p_wagered:p.wagered||0,p_build:+BUILD});if(sv&&ACC){ACC.p.rake=+sv.rake;ACC.p.claimedTier=+sv.claimedTier}if(["home","leaderboard"].includes(APP.view))loadLB(APP.view==="home"?"bucks":APP.lb)}
+  catch(e){if(/out of date/i.test(e.message)){forceUpdate();return}if(/session|log in/i.test(e.message)){ACC=null;lsDel(SKEY);toast(e.message,"bad");render()}}}
+function forceUpdate(){if(document.getElementById("forceUpd"))return;const d=document.createElement("div");d.id="forceUpd";d.className="bigwin";
+  d.innerHTML=`<div class="bw-card"><div class="bw-crown">${ic("rotate")}</div><div class="bw-label" style="font-size:clamp(32px,7vw,56px)">Update needed</div><div class="bw-sub">This page is out of date, so your progress can't be saved.</div><button class="btn btn-gold btn-lg" style="margin-top:10px">Refresh now</button></div>`;
+  d.querySelector("button").onclick=()=>{const u=new URL(location.href);u.searchParams.set("v",Date.now());location.replace(u.toString())};document.body.appendChild(d)}
 if(typeof window!=="undefined"&&window.addEventListener)window.addEventListener("pagehide",()=>{if(ACC&&syncT)flushAcc()});
 async function restoreSession(){
   const tok=lsGet(SKEY);
@@ -2567,7 +2570,7 @@ if(typeof window!=="undefined"&&window.setInterval){setTimeout(()=>{if(NET_OK!==
 {const f=route;route=function(){f();if(APP.view==="admin"){ADM.data=null;admLoad()}}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793264611";
+const BUILD="1793264776";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
