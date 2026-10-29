@@ -1019,6 +1019,16 @@ body{overflow-x:clip}
  .office .row-c{margin-top:0!important}.office .row-c .btn{padding:4px 10px;font-size:12px}
 }
 .oc-side{gap:0;padding:6px 5px}.oc-brand{padding:2px 6px 5px}.oc-contact{padding:3px 6px}.oc-contact .oc-av{width:24px;height:24px;font-size:11px}
+/* ===== Office: native keyboard ===== */
+.off-in{position:absolute;z-index:5;opacity:.01;color:transparent;caret-color:transparent;background:transparent;border:0;outline:0;font-size:16px;padding:0;margin:0;-webkit-tap-highlight-color:transparent}
+.monitor{cursor:text}
+.oc-msg.draft{position:relative}
+body:not(.off-typing) .oc-msg.draft::after{content:"Tap to type";position:absolute;right:8px;top:-10px;padding:1px 8px;border-radius:999px;background:#2f6fd1;color:#fff;font:700 10.5px/1.6 Manrope,sans-serif}
+@media (hover:hover) and (pointer:fine){body:not(.off-typing) .oc-msg.draft::after{content:"Start typing"}}
+@media (orientation:landscape) and (max-height:520px){
+ .office{grid-template-columns:1fr}.office>.desk{grid-row:auto}.office>:not(.desk){grid-column:1}
+ .oc-main{height:auto;min-height:0;max-height:none}.oc-thread{min-height:80px}
+}
 </style>
 
 </head>
@@ -2867,9 +2877,8 @@ function office(){
     <div class="desk-row"><div class="deskkb" aria-hidden="true">${Array.from({length:4},(_,r)=>`<i style="--n:${[12,11,10,7][r]}">${"<b></b>".repeat([12,11,10,7][r])}</i>`).join("")}</div><div class="mouse" aria-hidden="true"></div></div>
     <div class="desk-items"><span class="mug">${ic("mug")}</span><span class="plant"></span><span class="papers"></span></div>
    </div>
-   ${L?`<div class="payslip ${L.pay?"":"none"}"><b>${L.pay?`+${fmtB(L.pay)} Bucks`:"No pay"}</b><span>${Math.round(L.acc*100)}% accurate · ${L.wpm} WPM</span><small>${esc(L.note)}</small></div>`:`<div class="payslip hint"><span>Type your reply to the message on screen. ${"ontouchstart" in window?"Use the keyboard below.":"Use your keyboard."}</span></div>`}
+   ${L?`<div class="payslip ${L.pay?"":"none"}"><b>${L.pay?`+${fmtB(L.pay)} Bucks`:"No pay"}</b><span>${Math.round(L.acc*100)}% accurate · ${L.wpm} WPM</span><small>${esc(L.note)}</small></div>`:`<div class="payslip hint"><span>Type your reply to the message on screen. ${"ontouchstart" in window?"Tap the chat to bring up your keyboard.":"Just start typing."}</span></div>`}
    ${OFF.msg?`<div class="off-event">${ic("mug")} ${esc(OFF.msg)}</div>`:""}
-   <div id="offKb" class="kbd">${offKbHtml()}</div>
    <div class="row-c" style="margin-top:6px"><button class="btn btn-ghost sm" data-a="offSkip">${ic("shuffle")} Skip this one (resets streak)</button></div>
   </section>
   <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Career ladder</h3><span class="mute">Promotions come with replies sent</span></div>
@@ -2950,6 +2959,33 @@ function ocAppHtml(rk){
    </div></div>`;
 }
 
+/* ---------- Office: type with the device's own keyboard (one persistent hidden input) ---------- */
+const offIn=(()=>{if(typeof document==="undefined"||!document.createElement)return null;
+  const i=document.createElement("input");i.id="offIn";i.type="text";i.className="off-in";i.spellcheck=false;
+  [["autocomplete","off"],["autocorrect","off"],["autocapitalize","none"],["enterkeyhint","send"],["aria-label","Type your reply"]].forEach(([k,v])=>i.setAttribute&&i.setAttribute(k,v));
+  let last=" ",ok=[false];const reset=()=>{i.value=" ";last=" ";ok=[false];try{i.setSelectionRange(1,1)}catch(e){}};i.value=" ";
+  i.addEventListener&&i.addEventListener("input",e=>{
+    if(!e.isTrusted||APP.view!=="office"){i.value=last;return}
+    const v=i.value;let p=0;while(p<v.length&&p<last.length&&v[p]===last[p])p++;
+    for(let k=last.length-1;k>=p;k--){if(ok[k])offBack()}ok.length=Math.min(ok.length,p);
+    let done=false;for(const ch of v.slice(p)){const before=OFF.typed.length,line=OFF.line;OFF.trustAt=performance.now();offType(ch);
+      if(OFF.line!==line||OFF.typed.length<before){done=true;break}ok.push(OFF.typed.length>before)}
+    last=v;if(done||(!e.isComposing&&(v.length>24||v==="")))reset()});
+  i.addEventListener&&i.addEventListener("compositionend",()=>{if(i.value.length>24)reset()});
+  i.addEventListener&&i.addEventListener("focus",()=>{document.body.classList.add("off-typing");reset()});
+  i.addEventListener&&i.addEventListener("blur",()=>document.body.classList.remove("off-typing"));
+  return i})();
+function offInSync(){if(!offIn)return;
+  if(APP.view!=="office"){if(offIn.parentNode){offIn.blur();offIn.remove()}return}
+  if(!offIn.parentNode)document.body.appendChild(offIn);
+  const l=document.getElementById("offLine");if(!l)return;const r=l.getBoundingClientRect();
+  Object.assign(offIn.style,{top:(r.top+scrollY)+"px",left:(r.left+scrollX)+"px",width:r.width+"px",height:Math.max(24,r.height)+"px"})}
+{const f=render;render=function(){const r=f.apply(this,arguments);try{offInSync()}catch(e){}return r}}
+{const f=offPaint;offPaint=function(){const r=f.apply(this,arguments);try{offInSync()}catch(e){}return r}}
+if(typeof document!=="undefined"&&document.addEventListener){
+  document.addEventListener("click",e=>{if(APP.view!=="office"||!offIn)return;if(e.target.closest&&e.target.closest(".monitor")){offInSync();offIn.focus()}});
+  addEventListener("resize",()=>{try{offInSync()}catch(e){}});
+}
 ROUTES.push("office");CV.office=office;
 GAMES.splice(2,0,{v:"office",name:"Butla Office",icon:"monitor",art:"of",line:"Need Bucks? Get a job. Answer your coworkers' messages, get promoted, get paid.",tag:"Earn · No bet"});
 {const f=route;route=function(){f();if(APP.view==="office"){offLoad();offFit()}}}
@@ -3155,7 +3191,7 @@ Object.assign(GAME_NAMES,{keno:"Keno",wheel:"Lucky Wheel",tower:"Tower"});
 {const f=restoreSession;restoreSession=async function(){await f();if(APP.view==="coinflip"&&!CF.poll){cfFetch();CF.poll=setInterval(()=>{if(!document.hidden)cfFetch()},2000)}}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793268898";
+const BUILD="1793269060";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
