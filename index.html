@@ -1133,7 +1133,8 @@ function coinBurst(n=60){
 /* ---------- Router ---------- */
 const ROUTES=["home","league","blackjack","roulette","slots","leaderboard"];
 let APP={view:"home",lb:"bucks"};
-function route(){const h=(typeof location!=="undefined"?location.hash:"").slice(1);APP.view=ROUTES.includes(h)?h:"home";render()}
+function route(){const h=(typeof location!=="undefined"?location.hash:"").slice(1);APP.view=ROUTES.includes(h)?h:"home";render();
+  if(typeof ACC!=="undefined"&&NET_OK!==false&&(APP.view==="home"||APP.view==="leaderboard")){(ACC?flushAcc():Promise.resolve()).then(()=>loadLB(APP.view==="home"?"bucks":APP.lb))}}
 if(typeof window!=="undefined"&&window.addEventListener)window.addEventListener("hashchange",route);
 Object.assign(A,{
   go(v){if(typeof location!=="undefined"&&location.hash!=="#"+v)location.hash=v;else{APP.view=v;render()}},
@@ -1169,7 +1170,7 @@ const GAMES=[
  {v:"roulette",name:"Roulette",icon:"wheel",art:"rl",line:"European wheel, single zero. Up to 35 to 1.",tag:"Min 10"},
  {v:"slots",name:"Butla Slots",icon:"slot",art:"sl",line:"Five lines, three reels. Three crowns pay 250x.",tag:"Min 5"}];
 function lobby(){
-  const p=me(),top=APP.glb&&APP.glb.bucks?APP.glb.bucks.slice(0,5).map(r=>({name:r.username,bucks:r.bucks,me:ACC&&r.username===ACC.p.name})):[...WAL.profiles].sort((a,b)=>b.bucks-a.bucks).slice(0,5).map(x=>({name:x.name,bucks:x.bucks,me:x===p}));
+  const p=me(),top=APP.glb&&APP.glb.bucks?withMe(APP.glb.bucks,"bucks").slice(0,5).map(r=>({name:r.username,bucks:r.bucks,me:ACC&&r.username===ACC.p.name})):[...WAL.profiles].sort((a,b)=>b.bucks-a.bucks).slice(0,5).map(x=>({name:x.name,bucks:x.bucks,me:x===p}));
   return `<div class="screen">${cHead()}
   <section class="lobby-hero">
    <img class="lobby-logo" src="${LOGO}" alt="Big Butla Business League logo">
@@ -1499,7 +1500,7 @@ function accFrom(pr,token){return {token,p:{name:pr.username,bucks:+pr.bucks,bes
 let syncT=null;
 function saveAcc(){lsSet("bbbl-refill-"+ACC.p.name.toLowerCase(),String(ACC.p.lastRefill||0));clearTimeout(syncT);syncT=setTimeout(flushAcc,700)}
 async function flushAcc(){clearTimeout(syncT);if(!ACC)return;const p=ACC.p;
-  try{await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league})}
+  try{await rpc("bb_save",{p_token:ACC.token,p_bucks:p.bucks,p_best:p.best,p_profit:p.profit,p_hands:p.hands,p_league:p.league});if(["home","leaderboard"].includes(APP.view))loadLB(APP.view==="home"?"bucks":APP.lb)}
   catch(e){if(/session|log in/i.test(e.message)){ACC=null;lsDel(SKEY);toast(e.message,"bad");render()}}}
 if(typeof window!=="undefined"&&window.addEventListener)window.addEventListener("pagehide",()=>{if(ACC&&syncT)flushAcc()});
 async function restoreSession(){
@@ -1509,6 +1510,8 @@ async function restoreSession(){
   render();
 }
 APP.glb={};APP.auth={tab:"login",err:"",busy:false};
+function withMe(rows,k){if(!rows||!ACC)return rows;const p=ACC.p,mine={username:p.name,bucks:p.bucks,best:p.best,league:p.league,hands:p.hands};
+  const out=rows.filter(r=>r.username!==p.name);out.push(mine);out.sort((a,b)=>b[k]-a[k]);return out}
 async function loadLB(sort){try{APP.glb[sort]=await rpc("bb_leaderboard",{p_sort:sort,p_limit:50});if(["home","leaderboard"].includes(APP.view))render()}catch(e){}}
 Object.assign(A,{
   authTab(t){APP.auth.tab=t;APP.auth.err="";render()},
@@ -1715,8 +1718,7 @@ const _ar=afterRender;afterRender=function(){const before=seenCards.size;_ar();i
 /* ---------- Leaderboard (global when online) ---------- */
 function leadersOnline(){
   if(NET_OK===false)return leaders();
-  const tabs=[["bucks","Richest","coins"],["best","Biggest win","trend"],["league","League score","crown"]],k=APP.lb,rows=APP.glb[k];
-  if(!rows)loadLB(k);
+  const tabs=[["bucks","Richest","coins"],["best","Biggest win","trend"],["league","League score","crown"]],k=APP.lb,rows=withMe(APP.glb[k],k);
   const unit=k==="league"?"points":"Bucks",mine=r=>ACC&&r.username===ACC.p.name;
   return `<div class="screen">${cHead()}
   <div class="sec-h" style="margin-top:8px"><div><div class="eyebrow">${ic("globe2")} Worldwide leaderboard</div><h2 style="font-size:36px">Biggest bosses</h2></div>
