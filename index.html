@@ -446,7 +446,7 @@ button.card{padding:0;border:0;background:none;color:inherit;text-align:center}
 .rl-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:center}
 .wheel-wrap{width:min(320px,100%)}.wheel{display:block;width:100%;height:auto;filter:drop-shadow(0 20px 30px #000a)}
 #rlWheel,#rlBall{transform-box:view-box;transform-origin:0 0}
-#rlWheel.spin{transition:transform 5.2s cubic-bezier(.12,.6,.12,1)}#rlBall.spin{transition:transform 5.5s cubic-bezier(.2,.7,.15,1)}
+
 .rl-info{display:grid;gap:14px;justify-items:start}
 .rl-result{display:flex;align-items:baseline;gap:10px;padding:8px 18px;border-radius:14px;animation:pop .4s both}
 .rl-result .num{font-size:52px;font-weight:700;line-height:1}.rl-result small{text-transform:uppercase;letter-spacing:.16em;font-weight:800}
@@ -1378,7 +1378,7 @@ function blackjack(){
 const WHEEL=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
 const REDS=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 const colorOf=n=>n===0?"green":REDS.has(n)?"red":"black";
-const RL={bets:{},chip:10,spinning:false,rot:0,ball:0,result:null,hist:[],last:null,msg:"",net:0,order:[]};
+const RL={bets:{},chip:10,spinning:false,rot:0,ball:0,shownRot:0,shownBall:0,result:null,hist:[],last:null,msg:"",net:0,order:[]};
 const rlTotal=()=>Object.values(RL.bets).reduce((a,b)=>a+b,0);
 function rlReturn(k,n){
   if(k.startsWith("n"))return +k.slice(1)===n?36:0;
@@ -1406,9 +1406,10 @@ Object.assign(A,{
     const cur=((RL.rot%360)+360)%360,want=((360-k*a)%360+360)%360;RL.rot+=360*5+((want-cur+360)%360);
     RL.ball=Math.floor(RL.ball/360)*360-360*8;
     render();
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{const w=document.getElementById("rlWheel"),b=document.getElementById("rlBall");
-      if(w){w.classList.add("spin");w.style.transform=`rotate(${RL.rot}deg)`}if(b){b.classList.add("spin");b.style.transform=`rotate(${RL.ball}deg)`}}));
-    await sleep(5600);
+    const w=document.getElementById("rlWheel"),b=document.getElementById("rlBall"),reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const spinTo=(el,from,to,ms,ease)=>{if(!el)return;if(el.animate&&!reduce){const an=el.animate([{transform:`rotate(${from}deg)`},{transform:`rotate(${to}deg)`}],{duration:ms,easing:ease,fill:"forwards"});an.onfinish=()=>{el.style.transform=`rotate(${to}deg)`}}else el.style.transform=`rotate(${to}deg)`};
+    spinTo(w,RL.shownRot,RL.rot,5200,"cubic-bezier(.12,.6,.12,1)");spinTo(b,RL.shownBall,RL.ball,5500,"cubic-bezier(.2,.7,.15,1)");
+    await sleep(5600);RL.shownRot=RL.rot;RL.shownBall=RL.ball;
     let ret=0;const wins=[];Object.entries(RL.bets).forEach(([key,v])=>{const r=rlReturn(key,n)*v;if(r){ret+=r;wins.push(key)}});
     if(ret)bank(ret);record(stake,ret);
     RL.result=n;RL.hist.unshift(n);RL.hist=RL.hist.slice(0,14);RL.net=ret-stake;RL.wins=wins;
@@ -1425,8 +1426,8 @@ function wheelSvg(){
   return `<svg class="wheel" viewBox="-160 -160 320 320" role="img" aria-label="Roulette wheel${RL.result!=null?`, landed on ${RL.result}`:""}">
    <defs><radialGradient id="rlHub"><stop offset="0" stop-color="#ffdd85"/><stop offset=".6" stop-color="#c8902a"/><stop offset="1" stop-color="#6b4a10"/></radialGradient><radialGradient id="rlBowl"><stop offset=".6" stop-color="#2a1f0c"/><stop offset="1" stop-color="#0b0a07"/></radialGradient></defs>
    <circle r="158" fill="#8a6514"/><circle r="152" fill="url(#rlBowl)"/>
-   <g id="rlWheel" style="transform:rotate(${RL.rot}deg)">${segs}<circle r="${r0}" fill="#1a150b" stroke="#c8902a" stroke-width="2"/>${spokes}<circle r="34" fill="url(#rlHub)"/><circle r="10" fill="#0b0a07"/></g>
-   <g id="rlBall" style="transform:rotate(${RL.ball}deg)"><circle cx="0" cy="-118" r="6.5" fill="#fbf6e9" stroke="#bcae8c" stroke-width="1"/></g>
+   <g id="rlWheel" style="transform:rotate(${RL.shownRot}deg)">${segs}<circle r="${r0}" fill="#1a150b" stroke="#c8902a" stroke-width="2"/>${spokes}<circle r="34" fill="url(#rlHub)"/><circle r="10" fill="#0b0a07"/></g>
+   <g id="rlBall" style="transform:rotate(${RL.shownBall}deg)"><circle cx="0" cy="-118" r="6.5" fill="#fbf6e9" stroke="#bcae8c" stroke-width="1"/></g>
    <path d="M-9 -160 9 -160 0 -143Z" fill="#ffdd85" stroke="#0b0a07" stroke-width="1.5"/></svg>`;
 }
 function roulette(){
@@ -2072,7 +2073,9 @@ function render(){
   const same=key===lastScreen,y=typeof window!=="undefined"?window.scrollY:0;
   if(app.classList)app.classList.toggle("still",same);
   if(same&&app.style)app.style.minHeight=app.offsetHeight+"px";
+  const keepWheel=APP.view==="roulette"&&RL.spinning?document.querySelector(".wheel-wrap .wheel"):null;
   app.innerHTML=APP.view==="league"?VIEWS[S.screen]():CV[APP.view]();
+  if(keepWheel){const nw=document.querySelector(".wheel-wrap .wheel");if(nw)nw.replaceWith(keepWheel)}
   if(same){if(window.scrollY!==y)window.scrollTo(0,y);requestAnimationFrame(()=>{if(app.style)app.style.minHeight=""})}
   const bc=document.getElementById("bigcash");
   if(bc){const k="bc"+S.round+"-"+S.turn;if(!done.has(k)){done.add(k);countUp(bc,+bc.dataset.from,+bc.dataset.to,1500)}else bc.textContent=money(+bc.dataset.to);
