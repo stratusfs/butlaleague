@@ -642,6 +642,8 @@ h1,h2,h3{font-weight:700;letter-spacing:.01em}
 #app.still .lc-row,#app.still .vip-bar i,#app.still .lobby-logo,#app.still .hero-logo,#app.still .seat-cfg,#app.still .reward,#app.still .pickable,
 #app.still .fan,#app.still .ledger .ln,#app.still .eff,#app.still .crowd-note,#app.still .rank,#app.still .bj-msg.idle,#app.still .over-msg,
 #app.still .rl-result,#app.still .mini-lb li,#app.still .auth,.still .feed-row{animation:none!important}
+img[src^="data:image/webp"]{aspect-ratio:560/537;height:auto}
+.top img{width:54px;height:auto;flex:none}
 </style>
 
 </head>
@@ -950,7 +952,7 @@ function flipCard(id,f,label,icon,delay,cls=""){
 const custFront=c=>front({icon:c.icon,title:c.seg,sub:c.want,tag:`Match = $${CFG.matchPrice} each + star`},"cust");
 
 function topBar(){
-  return `<header class="top"><img src="${LOGO}" alt="Big Butla Business League logo">
+  return `<header class="top"><img src="${LOGO}" width="560" height="537" decoding="sync" alt="Big Butla Business League logo">
    <div class="ttl">Big Butla<small>Round ${S.round} of ${CFG.rounds}${S.machinesOff?" · Machines broken":""}</small></div>
    <div class="pips" aria-label="Round progress">${Array.from({length:CFG.rounds},(_,i)=>`<i class="pip ${i+1<S.round?"done":i+1===S.round?"now":""}"></i>`).join("")}</div>
    <button class="wallet sm" data-a="go" data-v="home" aria-label="Back to the lobby">${ic("coins")}<span><b class="wallet-amt num" data-v="${me().bucks}">${fmtB(me().bucks)}</b></span></button>
@@ -977,7 +979,7 @@ function home(){
    ["Market day",`Everyone reveals at once. Match the customer group for $${CFG.matchPrice} each and a star${CFG.crowdOn?", but the price drops when rivals match too":""}.`,"star"],
    ["Tax","Pay your tax. When everyone's done, flip an event card for the table.","receipt"],
    ["Win",`After ${CFG.rounds} rounds add money, stars x${CFG.starPts}, machines x${CFG.machPts} and workers x${CFG.workerPts}.`,"trophy"]];
-  return `<div class="screen"><section class="hero"><img class="hero-logo" src="${LOGO}" alt="Big Butla Business League logo">
+  return `<div class="screen"><section class="hero"><img class="hero-logo" src="${LOGO}" width="560" height="537" decoding="sync" alt="Big Butla Business League logo">
     <div><div class="eyebrow">Card game · Playtest edition</div><h1>Big Butla<span>Business League</span></h1>
       <p>Register a business, hire your crew, read the customers and stay on the right side of the tax man. ${CFG.rounds} rounds to build the biggest empire at the table.</p>
       <div class="hero-ctas"><button class="btn btn-gold btn-lg" data-a="play">${ic("play")} Start a game</button>
@@ -990,7 +992,7 @@ function home(){
   </div>`;
 }
 function setup(){
-  return `<div class="screen"><header class="top"><img src="${LOGO}" alt=""><div class="ttl">New game<small>Set up the table</small></div><div class="pips"></div>
+  return `<div class="screen"><header class="top"><img src="${LOGO}" width="560" height="537" decoding="sync" alt=""><div class="ttl">New game<small>Set up the table</small></div><div class="pips"></div>
    <button class="btn btn-ghost icon-btn" data-a="drawer" data-v="cfg" aria-label="House rules">${ic("sliders")}</button><button class="btn btn-ghost icon-btn" data-a="home" aria-label="Back home">${ic("home")}</button></header>
   <div class="felt"><div class="sec-h"><h3>Players</h3><div class="seg" role="group" aria-label="Number of players">${[1,2,3,4].map(n=>`<button class="${S.seats.length===n?"on":""}" data-a="seats" data-v="${n}">${n}</button>`).join("")}</div></div>
    <div class="seats">${S.seats.map((s,i)=>`<div class="seat-cfg" style="animation-delay:${i*60}ms">
@@ -1215,7 +1217,7 @@ Object.assign(A,{
 
 /* ---------- Shared casino chrome ---------- */
 function cHead(){
-  return `<header class="top chead"><button class="brand" data-a="go" data-v="home" aria-label="Lobby"><img src="${LOGO}" alt=""><span class="ttl">Big Butla<small>Business League</small></span></button>
+  return `<header class="top chead"><button class="brand" data-a="go" data-v="home" aria-label="Lobby"><img src="${LOGO}" width="560" height="537" decoding="sync" alt=""><span class="ttl">Big Butla<small>Business League</small></span></button>
    <nav class="cnav" aria-label="Sections">${[["home","Lobby","home"],["rewards","Rewards","gift"],["leaderboard","Leaderboard","medal"]].map(([v,l,i])=>`<button class="${APP.view===v?"on":""}" data-a="go" data-v="${v}">${ic(i)}<span>${l}</span>${v==="rewards"&&typeof rewardsReady==="function"&&rewardsReady()?`<i class="dot-ready" aria-label="Rewards ready"></i>`:""}</button>`).join("")}</nav>
    <button class="btn btn-ghost icon-btn" data-a="sound" aria-label="${SFX.on?"Mute sound":"Turn sound on"}" aria-pressed="${SFX.on}">${ic(SFX.on?"volume":"mute")}</button>
    ${ACC||NET_OK===false?"":`<button class="btn btn-ghost login-btn" data-a="go" data-v="account">${ic("login")}<span>Log in</span></button>`}
@@ -1240,7 +1242,7 @@ function lobby(){
   const p=me(),top=APP.glb&&APP.glb.bucks?withMe(APP.glb.bucks,"bucks").slice(0,5).map(r=>({name:r.username,bucks:r.bucks,me:ACC&&r.username===ACC.p.name})):[...WAL.profiles].sort((a,b)=>b.bucks-a.bucks).slice(0,5).map(x=>({name:x.name,bucks:x.bucks,me:x===p}));
   return `<div class="screen">${cHead()}
   <section class="lobby-hero">
-   <img class="lobby-logo" src="${LOGO}" alt="Big Butla Business League logo">
+   <img class="lobby-logo" src="${LOGO}" width="560" height="537" decoding="sync" alt="Big Butla Business League logo">
    <div><div class="eyebrow">Play money only</div><h1>Big Butla<span>Business League</span></h1>
     <p>Run a business in the League, then take your Butla Bucks to the tables. Climb the leaderboard and become the biggest boss in the game.</p>
     <div class="hero-ctas">${canDaily()?`<button class="btn btn-gold btn-lg" data-a="daily">${ic("calendar")} Claim ${fmtB(DAILY)} daily bonus</button>`:`<button class="btn btn-gold btn-lg" data-a="go" data-v="league">${ic("play")} Play the League</button>`}
@@ -1607,7 +1609,7 @@ function account(){
     <button class="btn btn-ghost" data-a="logout">${ic("logout")} Log out</button></section></div>`}
   const a=APP.auth,su=a.tab==="signup";
   return `<div class="screen">${cHead()}<section class="felt auth">
-   <img src="${LOGO}" alt="" class="auth-logo"><h2>${su?"Join the League":"Welcome back"}</h2>
+   <img src="${LOGO}" width="560" height="537" decoding="sync" alt="" class="auth-logo"><h2>${su?"Join the League":"Welcome back"}</h2>
    <div class="seg" role="tablist"><button role="tab" aria-selected="${!su}" class="${su?"":"on"}" data-a="authTab" data-v="login">Log in</button><button role="tab" aria-selected="${su}" class="${su?"on":""}" data-a="authTab" data-v="signup">Sign up</button></div>
    <form class="auth-form" onsubmit="event.preventDefault();A.auth()">
     <label for="au_user">Username</label><input id="au_user" autocomplete="username" maxlength="18" required ${su?'pattern="[A-Za-z0-9_]{3,18}"':""} placeholder="${su?"3 to 18 letters, numbers or _":"Your username"}">
@@ -1626,7 +1628,7 @@ function betBox(k,dis){return `<div class="betbox"><label for="bet_${k}">Bet amo
   <input id="bet_${k}" type="number" min="1" step="1" inputmode="numeric" value="${BETS[k]}" data-bet="${k}" ${dis?"disabled":""}>
   <button class="mini" data-a="betMul" data-v="${k},0.5" ${dis?"disabled":""}>½</button><button class="mini" data-a="betMul" data-v="${k},2" ${dis?"disabled":""}>2×</button></div></div>`}
 if(typeof document!=="undefined"&&document.addEventListener)document.addEventListener("input",e=>{const k=e.target?.dataset?.bet;if(k)BETS[k]=Math.max(1,Math.floor(+e.target.value||1))});
-A.betMul=function(k,m){BETS[k]=Math.max(1,Math.min(me().bucks||1,Math.floor(BETS[k]*m)));SFX.chip();render()};
+A.betMul=function(k,m){BETS[k]=Math.max(1,Math.min(me().bucks||1,Math.floor(BETS[k]*m)));SFX.chip();const el=document.getElementById("bet_"+k);if(el)el.value=BETS[k];else render()};
 function takeBet(k){const b=BETS[k];if(!(b>=1)){toast("Enter a bet of at least 1","bad");return 0}if(b>me().bucks){toast("Not enough Bucks for that bet","bad");return 0}bank(-b);return b}
 
 /* ---------- Mines ---------- */
@@ -2067,8 +2069,11 @@ GAMES.splice(1,0,{v:"online",name:"League Online",icon:"wifi",art:"on",line:"Pla
 let lastScreen=null;
 function render(){
   const app=document.getElementById("app"),key=APP.view==="league"?"L"+S.screen:APP.view;
-  if(app.classList)app.classList.toggle("still",key===lastScreen);
+  const same=key===lastScreen,y=typeof window!=="undefined"?window.scrollY:0;
+  if(app.classList)app.classList.toggle("still",same);
+  if(same&&app.style)app.style.minHeight=app.offsetHeight+"px";
   app.innerHTML=APP.view==="league"?VIEWS[S.screen]():CV[APP.view]();
+  if(same){if(window.scrollY!==y)window.scrollTo(0,y);requestAnimationFrame(()=>{if(app.style)app.style.minHeight=""})}
   const bc=document.getElementById("bigcash");
   if(bc){const k="bc"+S.round+"-"+S.turn;if(!done.has(k)){done.add(k);countUp(bc,+bc.dataset.from,+bc.dataset.to,1500)}else bc.textContent=money(+bc.dataset.to);
     bc.style.color=+bc.dataset.to<0?"var(--loss)":"var(--cream)"}
