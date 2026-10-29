@@ -804,6 +804,15 @@ img[src^="data:image/webp"]{aspect-ratio:560/537;height:auto}
 .mp-turn-timer{display:flex;align-items:center;gap:8px;justify-content:center;margin:0 0 12px;padding:10px 14px;border-radius:12px;background:#e8b64714;border:1px solid var(--gold-lo);font-weight:700}
 .mp-turn-timer b{color:var(--gold-hi);font-size:18px}.mp-turn-timer .ic{color:var(--gold)}
 .mp-turn-timer.late{background:#ef6a581a;border-color:#ef6a5888;color:#ffb3a8;animation:btnPulse 1.2s infinite}
+/* big numbers never wrap or jiggle */
+.btn,.spin-btn,.air-cash,.wallet b,.readout b,.stack b,.tot{white-space:nowrap;font-variant-numeric:tabular-nums}
+.btn{min-width:0;overflow:hidden;text-overflow:ellipsis}
+#airBtn,#crCash,#lcBtn{min-height:56px}
+.readout div{gap:10px}.readout b{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.bb-row input{font-variant-numeric:tabular-nums}
+.wallet span{min-width:0}.wallet b{max-width:16ch;overflow:hidden;text-overflow:ellipsis}
+.tier-badge.legend{background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 30%,transparent),color-mix(in srgb,var(--tc) 8%,transparent),color-mix(in srgb,var(--tc) 30%,transparent));background-size:200% 100%;animation:shine 2.4s linear infinite;box-shadow:0 0 14px color-mix(in srgb,var(--tc) 50%,transparent)}
+@keyframes shine{to{background-position:200% 0}}
 </style>
 
 </head>
@@ -1330,6 +1339,7 @@ const SUIT={s:'<path d="M12 2C9 6.2 3 9 3 13.6 3 16.6 5.3 18 7.4 18c1.5 0 2.9-.7
  c:'<circle cx="12" cy="6.8" r="4.3"/><circle cx="6.6" cy="13.2" r="4.3"/><circle cx="17.4" cy="13.2" r="4.3"/><path d="M10.8 12h2.4l1.8 10h-6z"/>'};
 const suit=(s,cls="")=>`<svg class="suit ${cls}" viewBox="0 0 24 24" aria-hidden="true">${SUIT[s]}</svg>`;
 const fmtB=n=>Math.round(n).toLocaleString("en-AU");
+const fmtC=n=>{n=Math.round(n);const a=Math.abs(n);if(a>=1e12)return (n/1e12).toFixed(2)+"T";if(a>=1e9)return (n/1e9).toFixed(2)+"B";if(a>=1e7)return (n/1e6).toFixed(2)+"M";return n.toLocaleString("en-AU")};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ---------- Wallet & profiles (saved on this device) ---------- */
@@ -1825,8 +1835,8 @@ function mines(){
     ${betBox("mines",live)}
     <div><label class="lbl2">Mines</label><div class="seg wrap">${[1,3,5,10,15,24].map(n=>`<button class="${MN.mines===n?"on":""}" data-a="mnMines" data-v="${n}" ${live?"disabled":""}>${n}</button>`).join("")}</div></div>
     <div class="readout"><div><small>Multiplier</small><b class="num">${live||MN.state==="won"?(MN.state==="won"?mnMult(MN.mines,MN.picks):cur).toFixed(2):"1.00"}x</b></div><div><small>Next gem</small><b class="num">${nxt.toFixed(2)}x</b></div>
-     <div><small>${live?"Cash out for":"Last result"}</small><b class="num ${MN.state==="won"?"pos":MN.state==="lost"?"neg":""}">${live?fmtB(Math.floor(MN.stake*cur)):MN.state==="won"?`+${fmtB(MN.ret-MN.stake)}`:MN.state==="lost"?`-${fmtB(MN.stake)}`:"-"}</b></div></div>
-    ${live?`<button class="btn btn-gold btn-lg" data-a="mnCash" ${MN.picks?"":"disabled"}>${ic("coins")} Cash out ${MN.picks?fmtB(Math.floor(MN.stake*cur)):""}</button><button class="btn btn-ghost" data-a="mnRandom">${ic("shuffle")} Pick a random tile</button>`
+     <div><small>${live?"Cash out for":"Last result"}</small><b class="num ${MN.state==="won"?"pos":MN.state==="lost"?"neg":""}">${live?fmtC(Math.floor(MN.stake*cur)):MN.state==="won"?`+${fmtB(MN.ret-MN.stake)}`:MN.state==="lost"?`-${fmtB(MN.stake)}`:"-"}</b></div></div>
+    ${live?`<button class="btn btn-gold btn-lg" data-a="mnCash" ${MN.picks?"":"disabled"}>${ic("coins")} Cash out ${MN.picks?fmtC(Math.floor(MN.stake*cur)):""}</button><button class="btn btn-ghost" data-a="mnRandom">${ic("shuffle")} Pick a random tile</button>`
      :`<button class="btn btn-gold btn-lg" data-a="mnStart">${ic("play")} ${over?"Play again":"Start"}</button>`}
    </aside>
    <section class="table-felt mines-felt"><div class="mines-grid">${tiles}</div>
@@ -1851,7 +1861,7 @@ function crLoop(){
 }
 function crPaint(){
   const cv=document.getElementById("crCanvas");const el=document.getElementById("crMult");if(el){el.textContent=CR.m.toFixed(2)+"x";el.className="cr-mult num "+(CR.state==="crashed"?"crashed":CR.state==="cashed"?"cashed":"")}
-  const cb=document.getElementById("crCash");if(cb){cb.disabled=CR.state!=="run";cb.innerHTML=`${ic("coins")} ${CR.state==="run"?`Cash out ${fmtB(Math.floor(CR.stake*CR.m))}`:CR.state==="cashed"?`Cashed ${fmtB(CR.ret)} at ${CR.cashAt.toFixed(2)}x`:"Cash out"}`}
+  const cb=document.getElementById("crCash");if(cb){cb.disabled=CR.state!=="run";cb.innerHTML=`${ic("coins")} ${CR.state==="run"?`Cash out ${fmtC(Math.floor(CR.stake*CR.m))}`:CR.state==="cashed"?`Cashed ${fmtC(CR.ret)} at ${CR.cashAt.toFixed(2)}x`:"Cash out"}`}
   if(!cv)return;const dpr=Math.min(2,window.devicePixelRatio||1),W=cv.clientWidth,H=cv.clientHeight;if(cv.width!==W*dpr){cv.width=W*dpr;cv.height=H*dpr}
   const x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
   const t=Math.log(CR.m)/CR_K,tMax=Math.max(8,t*1.15),mMax=Math.max(2,CR.m*1.2),pl=44,pb=28,pt=16,pr=16;
@@ -1973,7 +1983,9 @@ CV.leaderboard=leadersOnline;
 /* ---------- Rewards: rakeback, VIP levels, daily, refill ---------- */
 P.gift=P.gift||'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>';
 P.percent='<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>';
-const TIERS=[{n:"Bronze",min:0,rate:1,bonus:0,c:"#c98b5a"},{n:"Silver",min:10000,rate:1.5,bonus:500,c:"#c9d1d9"},{n:"Gold",min:50000,rate:2,bonus:2000,c:"#e8b647"},{n:"Platinum",min:200000,rate:3,bonus:5000,c:"#8fe3d6"},{n:"Diamond",min:1000000,rate:5,bonus:20000,c:"#a8c6ff"}];
+const TIERS=[{n:"Bronze",min:0,rate:1,bonus:0,c:"#c98b5a"},{n:"Silver",min:10000,rate:1.5,bonus:500,c:"#c9d1d9"},{n:"Gold",min:50000,rate:2,bonus:2000,c:"#e8b647"},{n:"Platinum",min:200000,rate:3,bonus:5000,c:"#8fe3d6"},{n:"Diamond",min:1000000,rate:5,bonus:20000,c:"#a8c6ff"},
+ {n:"Ruby",min:5000000,rate:6,bonus:100000,c:"#ff5d7a"},{n:"Emerald",min:25000000,rate:7,bonus:500000,c:"#3fe08a"},{n:"Obsidian",min:100000000,rate:8,bonus:2000000,c:"#b28dff"},
+ {n:"Royal",min:500000000,rate:9,bonus:10000000,c:"#ffcf4a"},{n:"Butla Legend",min:2500000000,rate:10,bonus:50000000,c:"#ff9a3d"}];
 const tierOf=w=>{let t=0;TIERS.forEach((x,i)=>{if((w||0)>=x.min)t=i});return t};
 const rakeAvail=()=>Math.floor(me().rake||0);
 const levelAvail=()=>{const p=me(),t=tierOf(p.wagered);let s=0;for(let i=(p.claimedTier||0)+1;i<=t;i++)s+=TIERS[i].bonus;return s};
@@ -1990,7 +2002,7 @@ Object.assign(A,{
     if(!ACC){me().claimedTier=tierOf(me().wagered);bank(a);saveW();claimed(a,"Level-up bonus");return}
     try{claimed(await claimOnline("bb_claim_level"),"Level-up bonus")}catch(e){toast(e.message,"bad")}}
 });
-function tierBadge(t,big){const x=TIERS[t];return `<span class="tier-badge ${big?"big":""}" style="--tc:${x.c}">${ic("crown")}<b>${x.n}</b></span>`}
+function tierBadge(t,big){const x=TIERS[t];return `<span class="tier-badge ${big?"big":""} ${t>=8?"legend":""}" style="--tc:${x.c}">${ic("crown")}<b>${x.n}</b></span>`}
 function rewards(){
   const p=me(),w=p.wagered||0,t=tierOf(w),nx=TIERS[t+1],pct=nx?Math.min(100,(w-TIERS[t].min)/(nx.min-TIERS[t].min)*100):100,lv=levelAvail(),rk=rakeAvail();
   const dailyWait=Math.max(0,DAILY_MS-(Date.now()-(p.lastDaily||0))),hrs=Math.floor(dailyWait/3600e3),mins=Math.ceil((dailyWait%3600e3)/60e3);
@@ -2012,7 +2024,7 @@ function rewards(){
   </div>
   <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>VIP levels</h3><span class="mute">Based on total Bucks wagered</span></div>
    <div class="table-box"><table class="sheet tiers"><thead><tr><th>Level</th><th>Wagered</th><th>Rakeback</th><th>Level-up bonus</th></tr></thead><tbody>
-   ${TIERS.map((x,i)=>`<tr class="${i===t?"first":""}" style="--i:${i}"><td>${tierBadge(i)}${i===t?` <span class="chip gold">You</span>`:""}</td><td>${fmtB(x.min)}+</td><td>${x.rate}%</td><td>${x.bonus?fmtB(x.bonus):"-"}</td></tr>`).join("")}</tbody></table></div></section>
+   ${TIERS.map((x,i)=>`<tr class="${i===t?"first":""}" style="--i:${i}"><td>${tierBadge(i)}${i===t?` <span class="chip gold">You</span>`:""}</td><td>${fmtC(x.min)}+</td><td>${x.rate}%</td><td>${x.bonus?fmtC(x.bonus):"-"}</td></tr>`).join("")}</tbody></table></div></section>
   <p class="fine">Rewards are play money too. Butla Bucks have no cash value.</p></div>`;
 }
 ROUTES.push("rewards");CV.rewards=rewards;
@@ -2045,16 +2057,16 @@ function lcFrame(){
   if(st)st.textContent=P_.ph==="bet"?`Launching in ${P_.left.toFixed(1)}s`:P_.ph==="run"?"Live":P_.ph==="crashed"?`Crashed at ${(+LC.st.round.cp).toFixed(2)}x`:"Connecting...";
   if(bar)bar.style.width=P_.ph==="bet"?Math.max(0,Math.min(100,P_.left/7*100))+"%":"0%";
   const el=document.getElementById("crMult");if(el&&P_.ph==="bet"){el.textContent=P_.left.toFixed(1)+"s";el.className="cr-mult num wait"}
-  if(btn&&P_.ph==="run"&&mb&&!mb.cashedAt&&!(mb.auto&&P_.m>=+mb.auto))btn.innerHTML=`${ic("coins")} Cash out ${fmtB(Math.floor(mb.amount*P_.m))}`;
+  if(btn&&P_.ph==="run"&&mb&&!mb.cashedAt&&!(mb.auto&&P_.m>=+mb.auto))btn.innerHTML=`${ic("coins")} Cash out ${fmtC(Math.floor(mb.amount*P_.m))}`;
   if(LC.lastPh!==P_.ph){LC.lastPh=P_.ph;lcPanel()}
   LC.raf=requestAnimationFrame(lcFrame);
 }
 function lcBtnHtml(){
   const P_=lcPhase(),mb=LC.st&&LC.st.myBet;
-  if(P_.ph==="bet")return mb?`<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("check")} Bet placed: ${fmtB(mb.amount)}${mb.auto?` · auto ${(+mb.auto).toFixed(2)}x`:""}</button>`
+  if(P_.ph==="bet")return mb?`<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("check")} Bet placed: ${fmtC(mb.amount)}${mb.auto?` · auto ${(+mb.auto).toFixed(2)}x`:""}</button>`
     :`<button id="lcBtn" class="btn btn-gold btn-lg" data-a="lcBet" ${LC.busy?"disabled":""}>${ic("rocket")} Place bet</button>`;
   if(P_.ph==="run"&&mb&&!mb.cashedAt)return `<button id="lcBtn" class="btn btn-gold btn-lg cash" data-a="lcCash">${ic("coins")} Cash out</button>`;
-  if(mb&&mb.cashedAt)return `<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("check")} Cashed ${fmtB(mb.payout)} at ${(+mb.cashedAt).toFixed(2)}x</button>`;
+  if(mb&&mb.cashedAt)return `<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("check")} Cashed ${fmtC(mb.payout)} at ${(+mb.cashedAt).toFixed(2)}x</button>`;
   return `<button id="lcBtn" class="btn btn-ghost btn-lg" disabled>${ic("moon")} ${P_.ph==="run"?"Round in progress":"Next round soon"}</button>`;
 }
 function lcBetsHtml(){const s=LC.st;if(!s)return"";const P_=lcPhase();
@@ -2294,7 +2306,7 @@ function airCrash(o){AIR.state="crashed";AIR.why=o&&o.kind==="strike"?"strike":"
   record(AIR.stake,0);SFX.boom();SFX.lose();
   const t0=performance.now();(function f(n){airPaint();if(n-t0<1100&&APP.view==="air")requestAnimationFrame(f);else if(APP.view==="air")render()})(t0)}
 function airUI(){const el=document.getElementById("airMult");if(el){el.textContent=AIR.m.toFixed(2)+"x";el.className="air-hud-m num "+(AIR.state==="crashed"?"crashed":AIR.state==="cashed"?"cashed":"")}
-  const b=document.getElementById("airBtn");if(b&&AIR.state==="run")b.innerHTML=`${ic("coins")} Cash out ${fmtB(Math.floor(AIR.stake*AIR.m))}`;
+  const b=document.getElementById("airBtn");if(b&&AIR.state==="run")b.innerHTML=`${ic("coins")} Cash out ${fmtC(Math.floor(AIR.stake*AIR.m))}`;
   const d=document.getElementById("airDist");if(d)d.textContent=Math.floor(AIR.dist*100)+" m"}
 function cloudPath(x,cx,cy,r,col){x.fillStyle=col;x.beginPath();[[0,0,1],[-.9,.25,.7],[.9,.25,.75],[-.4,-.45,.75],[.45,-.35,.7]].forEach(([a,b,k])=>{x.moveTo(cx+a*r+k*r,cy+b*r);x.arc(cx+a*r,cy+b*r,k*r,0,7)});x.fill()}
 function airPaint(){
@@ -2423,7 +2435,7 @@ function hilo(){
     <div class="hl-main">${c?pcard(c):`<div class="pc ghost"></div>`}
      ${live?`<div class="hl-btns"><button class="btn btn-gold btn-lg" data-a="hlGuess" data-v="1">${ic("arrowUp")} Higher or same<small>${(ph*100).toFixed(0)}% · ${hlPay(ph).toFixed(2)}x</small></button>
       <button class="btn btn-gold btn-lg" data-a="hlGuess" data-v="0">${ic("arrowDown")} Lower or same<small>${(pl*100).toFixed(0)}% · ${hlPay(pl).toFixed(2)}x</small></button></div>`
-     :HL.state==="lost"?`<div class="over-msg lose">${ic("x")} Wrong call. The ${HL.card.r} ends it.</div>`:HL.state==="won"?`<div class="over-msg win">${ic("coins")} Cashed ${fmtB(HL.ret)} at ${HL.mult.toFixed(2)}x</div>`:`<div class="bj-msg idle">Deal a card to start</div>`}</div>
+     :HL.state==="lost"?`<div class="over-msg lose">${ic("x")} Wrong call. The ${HL.card.r} ends it.</div>`:HL.state==="won"?`<div class="over-msg win">${ic("coins")} Cashed ${fmtC(HL.ret)} at ${HL.mult.toFixed(2)}x</div>`:`<div class="bj-msg idle">Deal a card to start</div>`}</div>
     <div class="hl-trail">${HL.trail.slice(-10).map(x=>pcard(x,false,"mini")).join("")}</div>
    </section></div></div>`;
 }
@@ -2438,7 +2450,7 @@ Object.assign(GAME_NAMES,{pokies:"Butla Pokies",air:"Butla Air",dice:"Dice",hilo
 {const f=afterRender;afterRender=function(){f();if(APP.view==="air")airPaint(AIR.state==="gone"?1:0)}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793264213";
+const BUILD="1793264336";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
