@@ -695,6 +695,85 @@ img[src^="data:image/webp"]{aspect-ratio:560/537;height:auto}
 .rl-board.vertical .rl-cell.vert .stack.on-cell{top:auto;bottom:4px;transform:translateX(-50%)}
 .upd-bar{position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));z-index:90;display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;border:0;
   background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#1a1205;font-weight:800;box-shadow:0 14px 34px -10px #000,0 0 0 4px #e8b64733;animation:toastIn .5s cubic-bezier(.2,1.3,.4,1) both;max-width:calc(100% - 32px)}
+/* ===== Big win overlay ===== */
+.bigwin{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:radial-gradient(circle,#00000088,#000000dd);animation:fade .3s both;cursor:pointer;overflow:hidden;padding:16px}
+.bigwin.out{opacity:0;transition:opacity .35s}
+.bw-rays{position:absolute;width:160vmax;height:160vmax;background:repeating-conic-gradient(from 0deg,#e8b64722 0 10deg,transparent 10deg 20deg);animation:spinR 14s linear infinite;mask:radial-gradient(circle,#000 20%,transparent 60%)}
+@keyframes spinR{to{transform:rotate(360deg)}}
+.bw-card{position:relative;display:grid;justify-items:center;gap:6px;text-align:center;animation:bwIn .7s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes bwIn{from{transform:scale(.2) rotate(-8deg);opacity:0}}
+.bw-crown{font-size:72px;color:var(--gold-hi);filter:drop-shadow(0 0 24px #e8b647);animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(4deg)}}
+.bw-label{font-family:var(--f-display);font-weight:900;font-size:clamp(46px,11vw,110px);line-height:1;letter-spacing:.04em;background:linear-gradient(180deg,#fff7d6,var(--gold-hi) 40%,#c8902a 70%,#fff0b3);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 0 #6b4a10) drop-shadow(0 0 30px #e8b64799);animation:pulseTxt .9s ease-in-out infinite}
+@keyframes pulseTxt{50%{transform:scale(1.05)}}
+.bigwin.t2 .bw-label{background-image:linear-gradient(180deg,#fff,#ffb3e6 40%,#c04ad8 75%,#ffe0f5);filter:drop-shadow(0 6px 0 #4a1060) drop-shadow(0 0 34px #e077ff)}
+.bigwin.t3 .bw-label{background-image:linear-gradient(180deg,#fff,#9ff0ff 35%,#3f8cff 70%,#e0fbff);filter:drop-shadow(0 6px 0 #0d2a6b) drop-shadow(0 0 40px #6fd0ff)}
+.bw-amt{font-size:clamp(34px,8vw,64px);font-weight:700;color:var(--money);text-shadow:0 0 24px #58c98a88}
+.bw-sub{color:#f4ecd6bb;font-weight:700;font-size:14px}
+/* ===== Pokies ===== */
+.art-pz .tile-art{background:radial-gradient(circle at 50% 60%,#4a0f1d,#14050a);color:#ff6b8a}
+.art-air .tile-art{background:radial-gradient(circle at 50% 60%,#0f2f4a,#060f18);color:#ff8a6b}
+.art-dc .tile-art{background:radial-gradient(circle at 50% 60%,#203a14,#0a1405);color:#b6f06b}
+.art-hl .tile-art{background:radial-gradient(circle at 50% 60%,#3a2a0b,#140d02);color:#ffd27a}
+.pokie{--pc:clamp(58px,13vw,104px);border-radius:28px;padding:18px;background:linear-gradient(180deg,#3a0d18,#14050a 60%);border:2px solid #c8902a;box-shadow:inset 0 0 0 6px #0b0a07,inset 0 0 0 8px #8a6514,0 30px 60px -30px #000;display:grid;justify-items:center;gap:14px;transition:background .6s}
+.pokie.free{background:linear-gradient(180deg,#1a1a52,#07071c 60%)}
+.pk-top{display:grid;justify-items:center;gap:6px}
+.pk-title{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:900;font-size:clamp(22px,5vw,34px);letter-spacing:.08em;color:var(--gold-hi);text-shadow:0 0 18px #e8b64777}
+.pk-title b{color:#ff6b8a;text-shadow:0 0 18px #ff6b8a88}
+.pk-free{padding:6px 16px;border-radius:999px;background:#3f8cff;color:#fff;font-weight:900;letter-spacing:.08em;animation:btnPulse 1.4s infinite;font-size:13px}
+.pk-window{position:relative;padding:8px;border-radius:16px;background:#0b0a07;box-shadow:inset 0 0 0 2px #8a6514,inset 0 10px 30px #000;max-width:100%}
+.preels{display:grid;grid-template-columns:repeat(5,var(--pc));gap:5px}
+.preel{height:calc(var(--pc)*3);overflow:hidden;border-radius:8px;background:linear-gradient(180deg,#d9cfb5,#fbf6e9 18%,#fbf6e9 82%,#d9cfb5)}
+.preel-strip{will-change:transform}.preel-strip.go{transition:transform 1.1s cubic-bezier(.35,.05,.25,1.04)}
+.preel:nth-child(2) .preel-strip.go{transition-duration:1.36s}.preel:nth-child(3) .preel-strip.go{transition-duration:1.62s}.preel:nth-child(4) .preel-strip.go{transition-duration:1.88s}.preel:nth-child(5) .preel-strip.go{transition-duration:2.14s}
+.pcell{height:var(--pc);display:grid;place-items:center;position:relative}
+.pcell.win{background:radial-gradient(circle,#ffdd85aa,transparent 70%);animation:winPulse .8s ease-in-out 4}
+.ps{display:grid;place-items:center;font-size:calc(var(--pc)*.5);position:relative}
+.ps b{font-family:var(--f-card);font-weight:400;font-size:1em;line-height:1}
+.ps i{position:absolute;bottom:-.55em;font-style:normal;font-size:.22em;font-weight:900;letter-spacing:.08em;padding:1px 5px;border-radius:4px;color:#fff}
+.ps .ic{stroke-width:2}
+.ps-wild{color:#c8902a}.ps-wild i{background:#c8902a}.ps-scatter{color:#1f8a4c}.ps-scatter i{background:#1f8a4c}
+.ps-gem{color:#2f6fd1}.ps-seven{color:#b3261e}.ps-trophy{color:#8a6514}
+.ps-A{color:#7a3fb0}.ps-K{color:#b3261e}.ps-Q{color:#1f8a4c}.ps-J{color:#2f6fd1}.ps-T{color:#c86a1a}
+.plines{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);pointer-events:none}
+.plines polyline{fill:none;stroke:#ff6b8a;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;opacity:.85;vector-effect:non-scaling-stroke;stroke-dasharray:900;animation:draw .9s ease-out both}
+.pk-msg{font-family:var(--f-display);font-weight:800;font-size:clamp(17px,3.6vw,22px);color:#f4ecd6bb;min-height:28px;text-align:center}.pk-msg.win{color:var(--money);text-shadow:0 0 16px #58c98a66}
+.pk-ctl{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;justify-content:center}
+.pk-stat{display:grid}.pk-stat small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--mute)}.pk-stat b{font-size:22px;color:var(--gold-hi)}
+.pk-auto.on{border-color:var(--gold);color:var(--gold-hi)}
+.pk-pays{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.pp{display:grid;grid-template-columns:44px repeat(3,1fr);gap:6px;align-items:center;padding:8px 10px;border-radius:10px;background:#0e0d09;border:1px solid var(--line);--pc:40px}
+.pp .ps{width:40px;height:40px;border-radius:8px;background:#fbf6e9;font-size:22px}.pp .ps i{font-size:7px;bottom:-4px}
+.pp span{display:grid;text-align:center;font-size:13px}.pp small{color:var(--mute);font-size:10px}.pp b{font-family:var(--f-num);color:var(--gold-hi)}
+.pp.sc{grid-column:1/-1}.pp.sc span{font-size:13px;color:var(--mute)}
+/* ===== Air, Dice, Hi-Lo ===== */
+.air-felt{position:relative;padding:12px;min-height:460px}
+#airCanvas{display:block;width:100%;height:440px;border-radius:14px}
+.air-mult{font-size:clamp(48px,9vw,96px);font-weight:700;color:var(--cream);text-shadow:0 4px 30px #000}.air-mult.crashed{color:var(--loss)}.air-mult.cashed{color:var(--money)}
+.btn.cashg:not(:disabled){background:linear-gradient(180deg,#8ff0b4,#3fbf74);color:#06210f}
+.dice-felt{display:grid;justify-items:center;gap:16px;padding:28px 24px;min-height:420px;align-content:center}
+.dc-num{font-size:clamp(64px,14vw,120px);font-weight:700;color:var(--cream);line-height:1;text-shadow:0 6px 40px #000}
+.dc-num.win{color:var(--money)}.dc-num.lose{color:var(--loss)}
+.dc-res{min-height:24px;font-weight:800;color:var(--gold-hi)}
+.dc-track{--t:50%;position:relative;width:100%;max-width:640px;height:18px;border-radius:999px;margin-top:20px}
+.dc-track.over{background:linear-gradient(90deg,#ef6a58 0 var(--t),#58c98a var(--t) 100%)}
+.dc-track.under{background:linear-gradient(90deg,#58c98a 0 var(--t),#ef6a58 var(--t) 100%)}
+.dc-track input{position:absolute;inset:-12px 0;width:100%;height:42px;margin:0;background:none;-webkit-appearance:none;appearance:none;cursor:pointer}
+.dc-track input::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;border-radius:10px;background:linear-gradient(180deg,var(--gold-hi),var(--gold));border:3px solid #1a1205;box-shadow:0 6px 16px #000a}
+.dc-track input::-moz-range-thumb{width:30px;height:30px;border-radius:10px;background:var(--gold);border:3px solid #1a1205}
+.dc-mark{position:absolute;bottom:26px;transform:translateX(-50%);padding:4px 8px;border-radius:8px;font:700 13px var(--f-num);background:#000c;animation:pop .4s both}
+.dc-mark.win{color:var(--money)}.dc-mark.lose{color:var(--loss)}
+.dc-scale{width:100%;max-width:640px;display:flex;justify-content:space-between;font:12px var(--f-num);color:#f4ecd699}
+.hl-felt{display:grid;gap:18px;justify-items:center;padding:28px 18px;min-height:420px;align-content:center}
+.hl-main{display:grid;justify-items:center;gap:18px}.hl-main .pc{--w:130px}
+.hl-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(460px,100%)}
+.hl-btns .btn{flex-direction:column;gap:2px}.hl-btns small{font-size:12px;font-weight:700;opacity:.75}
+.hl-trail{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.hl-trail .pc{--w:44px}.hl-trail .pc .pc-c{font-size:10px}.hl-trail .pc .pc-big,.hl-trail .pc .pc-face,.hl-trail .pc .pc-ace{transform:scale(.8)}
+@media (max-width:640px){
+  .pokie{padding:12px 8px;border-radius:20px}.preels{gap:3px}.pk-window{padding:5px}.pk-ctl{gap:10px}.pk-ctl .spin-btn{width:80px;height:80px}
+  #airCanvas{height:300px}.air-felt{min-height:320px}.dice-felt,.hl-felt{min-height:0;padding:20px 12px}.hl-main .pc{--w:104px}
+}
+.pp .ps b{color:inherit;font-family:var(--f-card);font-size:22px;font-weight:400}.pp .ps-A{color:#7a3fb0}.pp .ps-K{color:#b3261e}.pp .ps-Q{color:#1f8a4c}.pp .ps-J{color:#2f6fd1}.pp .ps-T{color:#c86a1a}.pp .ps-seven{color:#b3261e}.pp .ps-T b{font-size:17px}
 </style>
 
 </head>
@@ -1998,8 +2077,285 @@ if(typeof window!=="undefined"&&window.setInterval)setInterval(()=>{if(NET_OK!==
 {const f=route;route=function(){const was=APP.view;f();if(APP.view==="crash"&&liveOn()){lcStart();flushAcc()}else if(was==="crash"&&APP.view!=="crash")lcStop();if(APP.view==="home")loadFeed()}}
 {const f=restoreSession;restoreSession=async function(){await f();loadFeed();if(APP.view==="crash"&&liveOn())lcStart()}}
 
+
+/* =====================================================================
+   CASINO SOUND v2 + BIG WIN CELEBRATIONS + POKIES, BUTLA AIR, DICE, HI-LO
+   ===================================================================== */
+Object.assign(P,{
+ plane:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+ dice5:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2"/><circle cx="16" cy="8" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="8" cy="16" r="1.2"/><circle cx="16" cy="16" r="1.2"/>',
+ arrowUp:'<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',arrowDown:'<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+ cherry:'<circle cx="7" cy="17" r="4"/><circle cx="17" cy="17" r="4"/><path d="M7 13c0-4 3-8 9-10M17 13c0-3-1-6-1-10"/>',
+ coinS:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1.4 1.1-2 2.5-2s2.5.6 2.5 2-1.2 1.8-2.5 2.2-2.5.8-2.5 2.3 1.1 2 2.5 2 2.5-.6 2.5-2"/>'
+});
+
+/* ---------- Sound v2: master bus with reverb, bells, coins, fanfares ---------- */
+Object.assign(SFX,{
+  bus(){if(!this.ok())return null;if(this._bus)return this._bus;const c=this.ctx,comp=c.createDynamicsCompressor(),out=c.createGain(),wet=c.createGain(),conv=c.createConvolver();
+    comp.threshold.value=-14;comp.ratio.value=4;out.gain.value=.9;wet.gain.value=.22;
+    const len=c.sampleRate*1.6,ir=c.createBuffer(2,len,c.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}conv.buffer=ir;
+    comp.connect(out);out.connect(c.destination);comp.connect(conv);conv.connect(wet);wet.connect(c.destination);this._bus=comp;return comp},
+  v(f,d,{type="sine",v=.12,at=0,to=0,det=0,lp=0}={}){if(!this.ok())return;const c=this.ctx,t=c.currentTime+at,o=c.createOscillator(),g=c.createGain();let n=o;
+    o.type=type;o.frequency.setValueAtTime(f,t);o.detune.value=det;if(to)o.frequency.exponentialRampToValueAtTime(to,t+d);
+    if(lp){const fl=c.createBiquadFilter();fl.type="lowpass";fl.frequency.value=lp;o.connect(fl);n=fl}
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);n.connect(g).connect(this.bus()||c.destination);o.start(t);o.stop(t+d+.05)},
+  bell(f=1568,at=0,v=.07){[1,2.76,5.4].forEach((m,i)=>this.v(f*m,1.1/(i+1),{type:"sine",v:v/(i+1),at}))},
+  coins(n=12,dur=1){for(let i=0;i<n;i++){const at=Math.random()*dur,f=1800+Math.random()*2600;this.v(f,.12,{type:"triangle",v:.035,at});this.v(f*1.5,.09,{type:"sine",v:.02,at:at+.02})}},
+  brass(notes,step=.12,len=.3,v=.07){notes.forEach((f,i)=>{this.v(f,len,{type:"sawtooth",v,at:i*step,lp:2400,det:-6});this.v(f,len,{type:"sawtooth",v:v*.8,at:i*step,lp:2400,det:7});this.v(f/2,len,{type:"square",v:v*.4,at:i*step,lp:900})})},
+  win(size=1){
+    if(Date.now()-(this._bwAt||0)<2500)return;
+    if(size<=1){this.bell(1319,0,.06);this.bell(1760,.09,.06);this.coins(4,.3);return}
+    if(size===2){[1047,1319,1568,2093].forEach((f,i)=>this.bell(f,i*.07,.07));this.coins(14,.9);this.brass([523,659,784],.08,.22,.05);return}
+    this.brass([523,659,784,1047,784,1047,1319],.09,.32,.07);[0,.15,.3,.45,.6,.75].forEach(a=>this.bell(2093,a,.06));this.coins(30,1.8)},
+  lose(){this.v(392,.18,{type:"triangle",v:.06,to:330});this.v(294,.32,{type:"triangle",v:.05,at:.15,to:196})},
+  siren(dur=2){if(!this.ok())return;const c=this.ctx,t=c.currentTime,o=c.createOscillator(),g=c.createGain(),l=c.createOscillator(),lg=c.createGain();
+    o.type="square";o.frequency.value=900;l.frequency.value=5;lg.gain.value=280;l.connect(lg).connect(o.frequency);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.035,t+.05);g.gain.setValueAtTime(.035,t+dur-.2);g.gain.linearRampToValueAtTime(0,t+dur);
+    const fl=c.createBiquadFilter();fl.type="lowpass";fl.frequency.value=2500;o.connect(fl).connect(g).connect(this.bus()||c.destination);o.start(t);l.start(t);o.stop(t+dur);l.stop(t+dur)},
+  reelStop(i=0){this.v(160-i*8,.12,{type:"triangle",v:.16,to:80});this.noise(.05,{f:1200,v:.08});this.v(2400+i*200,.05,{type:"sine",v:.03})},
+  rattle(ms=1500){if(!this.ok())return;const n=Math.floor(ms/55);for(let i=0;i<n;i++)this.v(1100+Math.random()*300,.025,{type:"square",v:.018,at:i*.055})},
+  engine(dur=1){this.v(90,dur,{type:"sawtooth",v:.03,to:160,lp:600})},
+  roll(){for(let i=0;i<9;i++)this.noise(.03,{f:2500+Math.random()*1500,v:.12,at:i*.05})},
+  fanfareLoop(dur){const notes=[523,659,784,1047];for(let t=0;t<dur;t+=.6)notes.forEach((f,i)=>this.v(f*(t%1.2<.6?1:1.122),.2,{type:"triangle",v:.03,at:t+i*.1}));for(let t=0;t<dur;t+=.25)this.bell(2637,t,.025)}
+});
+
+/* ---------- Big win overlay ---------- */
+let BW=null;
+function bigWin(profit,ratio){
+  if(!(profit>0))return;const tier=ratio>=50?3:ratio>=15?2:1,label=["","BIG WIN","MEGA WIN","EPIC WIN"][tier],dur=[0,2600,3600,4800][tier];
+  document.getElementById("bigWin")?.remove();const d=document.createElement("div");d.id="bigWin";d.className=`bigwin t${tier}`;
+  d.innerHTML=`<div class="bw-rays"></div><div class="bw-card"><div class="bw-crown">${ic("crown")}</div><div class="bw-label">${label}</div><div class="bw-amt num">+0</div><div class="bw-sub">${ratio.toFixed(ratio>=10?0:1)}x your bet · tap to continue</div></div>`;
+  d.onclick=()=>{d.classList.add("out");setTimeout(()=>d.remove(),350)};document.body.appendChild(d);
+  const el=d.querySelector(".bw-amt"),t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/(dur*.75)),e=1-Math.pow(1-k,3);el.textContent="+"+fmtB(profit*e);if(k<1&&d.isConnected)requestAnimationFrame(f)})(t0);
+  SFX._bwAt=0;SFX.win(3);SFX._bwAt=Date.now();if(tier>=2)SFX.siren(tier===3?2.6:1.6);SFX.fanfareLoop(dur/1000*.8);coinBurst(tier===3?220:tier===2?160:110);
+  clearTimeout(BW);BW=setTimeout(()=>{if(d.isConnected){d.classList.add("out");setTimeout(()=>d.remove(),350)}},dur+1200);
+}
+{const f=record;record=function(stake,ret){f(stake,ret);if(stake>0&&ret>=stake*5&&ret-stake>=50&&APP.view!=="plinko")bigWin(ret-stake,ret/stake)}}
+{const f=A.lcCash;A.lcCash=async function(){await f.apply(this,arguments);const mb=LC.st&&LC.st.myBet;if(mb&&mb.cashedAt&&+mb.cashedAt>=5&&mb.payout-mb.amount>=50)bigWin(mb.payout-mb.amount,+mb.cashedAt)}}
+
+/* ---------- Butla Pokies: 5 reels, 20 lines, wilds, free spins ---------- */
+const PSYM=[{id:"wild",icon:"crown",lbl:"WILD"},{id:"scatter",icon:"coinS",lbl:"BONUS"},{id:"gem",icon:"gem"},{id:"seven",txt:"7"},{id:"trophy",icon:"trophy"},{id:"A",txt:"A"},{id:"K",txt:"K"},{id:"Q",txt:"Q"},{id:"J",txt:"J"},{id:"T",txt:"10"}];
+const PPAY={0:[100,500,2500],2:[70,280,1100],3:[45,170,650],4:[28,110,450],5:[17,55,220],6:[14,45,170],7:[11,34,130],8:[9,28,110],9:[9,22,90]};
+const PW=[[2,1.6,4,5,6,8,9,10,11,12],[3,1.6,4,5,6,8,9,10,11,12],[3,1.6,4,5,6,8,9,10,11,12],[3,1.6,4,5,6,8,9,10,11,12],[3,1.6,4,5,6,8,9,10,11,12]];
+const PLINES=[[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1],[0,1,1,1,0],
+ [2,1,1,1,2],[1,0,1,2,1],[1,2,1,0,1],[0,1,0,1,0],[2,1,2,1,2],[1,1,0,1,1],[1,1,2,1,1],[0,2,0,2,0],[2,0,2,0,2],[0,2,2,2,0]];
+const PFREE_MULT=3;
+function pRand(r){const w=PW[r],t=w.reduce((a,b)=>a+b,0);let x=Math.random()*t;for(let i=0;i<w.length;i++){x-=w[i];if(x<0)return i}return w.length-1}
+const pSpinGrid=()=>[0,1,2,3,4].map(r=>[pRand(r),pRand(r),pRand(r)]);
+function pEval(g,lineBet,mult){
+  let win=0;const lines=[];
+  PLINES.forEach((ln,li)=>{let sym=-1,n=0;
+    for(let r=0;r<5;r++){const s=g[r][ln[r]];if(s===1)break;if(sym===-1){if(s!==0)sym=s;n++}else if(s===0||s===sym)n++;else break}
+    if(sym===-1)sym=0;let wn=0;for(let r=0;r<5;r++){if(g[r][ln[r]]===0)wn++;else break}
+    let best=0,bn=0,bs=sym;if(n>=3&&PPAY[sym])best=PPAY[sym][n-3];
+    if(wn>=3&&PPAY[0][wn-3]>best){best=PPAY[0][wn-3];bn=wn;bs=0}else bn=n;
+    if(best){win+=best*lineBet*mult;lines.push({li,n:bn,sym:bs,pay:best*lineBet*mult})}});
+  let sc=0;const scPos=[];g.forEach((col,r)=>col.forEach((s,k)=>{if(s===1){sc++;scPos.push(r+"-"+k)}}));
+  const scPay=sc>=3?[2,10,50][Math.min(sc,5)-3]*lineBet*20*mult:0;win+=scPay;
+  return {win,lines,sc,scPos,scPay,free:sc>=3?[8,12,20][Math.min(sc,5)-3]:0};
+}
+const PK2={grid:[[5,3,6],[7,2,8],[9,4,5],[6,8,0],[7,5,9]],lineBet:1,spinning:false,res:null,free:0,freeWon:0,inFree:false,strips:null,auto:0,stake:0};
+const POKIE_BETS=[1,2,5,10,25,50];
+const pkSym=i=>{const s=PSYM[i];return `<span class="ps ps-${s.id}">${s.txt?`<b>${s.txt}</b>`:ic(s.icon)}${s.lbl?`<i>${s.lbl}</i>`:""}</span>`};
+Object.assign(A,{
+  pkBet(v){if(PK2.spinning||PK2.free)return;PK2.lineBet=v;SFX.chip();render()},
+  pkAuto(){PK2.auto=PK2.auto?0:10;SFX.click();render();if(PK2.auto&&!PK2.spinning)A.pkSpin()},
+  async pkSpin(){
+    if(PK2.spinning)return;const freeSpin=PK2.free>0,stake=PK2.lineBet*20;
+    if(!freeSpin){if(stake>me().bucks){toast("Not enough Bucks for that spin","bad");PK2.auto=0;render();return}bank(-stake);PK2.stake=stake;PK2.freeWon=0;PK2.inFree=false}
+    else{PK2.free--;PK2.inFree=true}
+    PK2.spinning=true;PK2.res=null;const g=pSpinGrid();
+    PK2.strips=g.map((col,i)=>{const s=[...PK2.grid[i]];for(let k=0;k<10+i*4;k++)s.push(pRand(i));return s.concat(col)});
+    render();SFX.rattle(1100+4*260);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll(".preel-strip").forEach((el,i)=>{el.classList.add("go");el.style.transform=`translateY(calc(var(--pc) * -${PK2.strips[i].length-3}))`})));
+    for(let i=0;i<5;i++){setTimeout(()=>{SFX.reelStop(i);if(g.slice(0,i+1).flat().filter(x=>x===1).length>=2&&i<4)SFX.v(880+i*120,.3,{type:"triangle",v:.05})},1100+i*260)}
+    await sleep(1100+4*260+260);
+    PK2.grid=g;PK2.strips=null;const r=pEval(g,PK2.lineBet,freeSpin?PFREE_MULT:1);PK2.res=r;
+    if(r.win)bank(r.win);
+    if(freeSpin)PK2.freeWon+=r.win;else PK2.baseWin=r.win;
+    if(r.free){PK2.free+=r.free;SFX.siren(1.4);toast(`${ic("coinS")} ${r.free} FREE SPINS at ${PFREE_MULT}x!`,"good")}
+    PK2.spinning=false;render();
+    if(!freeSpin&&!r.free)record(stake,r.win);
+    if(freeSpin&&!PK2.free){record(PK2.stake,(PK2.baseWin||0)+PK2.freeWon);PK2.inFree=false;toast(`${ic("coinS")} Free spins paid ${fmtB(PK2.freeWon)}`,"good")}
+    if(r.win)SFX.win(r.win>=PK2.stake*2?2:1);else if(!freeSpin)SFX.v(220,.12,{type:"triangle",v:.03});
+    const again=PK2.free>0||(PK2.auto>0&&--PK2.auto>=0);
+    if(again&&APP.view==="pokies"){await sleep(PK2.free>0?900:r.win?1300:500);if(APP.view==="pokies"&&!PK2.spinning)A.pkSpin()}else{PK2.auto=0;render()}
+  }
+});
+function pokies(){
+  const stake=PK2.lineBet*20,r=PK2.res,winCells=new Set();
+  if(r&&!PK2.spinning){r.lines.forEach(w=>{for(let k=0;k<w.n;k++)winCells.add(k+"-"+PLINES[w.li][k])});r.scPos.forEach(x=>winCells.add(x))}
+  const reels=[0,1,2,3,4].map(i=>{const syms=PK2.strips?PK2.strips[i]:PK2.grid[i];
+    return `<div class="preel"><div class="preel-strip">${syms.map((s,k)=>`<div class="pcell ${!PK2.strips&&winCells.has(i+"-"+k)?"win":""}">${pkSym(s)}</div>`).join("")}</div></div>`}).join("");
+  const lines=r&&!PK2.spinning?r.lines.map(w=>{const ys=PLINES[w.li].map(k=>50+k*100);return `<polyline points="${ys.map((y,i)=>`${50+i*100},${y}`).join(" ")}"/>`}).join(""):"";
+  const msg=PK2.spinning?(PK2.inFree?`Free spin · ${PK2.free} left`:"Spinning..."):r?(r.win?`${r.lines.length?`${r.lines.length} line${r.lines.length>1?"s":""}`:"Bonus"}${r.scPay?" + scatter":""} · WIN ${fmtB(r.win)}`:"No win"):"20 lines · wilds · free spins";
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Butla Pokies</h2><span class="mute">5 reels · 20 lines · 3 bonus coins = free spins at ${PFREE_MULT}x</span></div>
+  ${brokeBanner()}
+  <section class="pokie ${PK2.free||PK2.inFree?"free":""}">
+   <div class="pk-top"><div class="pk-title">${ic("crown")}<span>BUTLA</span><b>POKIES</b>${ic("crown")}</div>${PK2.free||PK2.inFree?`<div class="pk-free">FREE SPINS ${PK2.free} · ${PFREE_MULT}x · WON ${fmtB(PK2.freeWon)}</div>`:""}</div>
+   <div class="pk-window"><div class="preels">${reels}</div><svg class="plines" viewBox="0 0 500 300" preserveAspectRatio="none" aria-hidden="true">${lines}</svg></div>
+   <div class="pk-msg ${r&&r.win?"win":""}">${msg}</div>
+   <div class="pk-ctl">
+    <div class="pk-stat"><small>Balance</small><b class="num">${fmtB(me().bucks)}</b></div>
+    <div><small class="lbl2">Bet per line</small><div class="seg wrap">${POKIE_BETS.map(v=>`<button class="${PK2.lineBet===v?"on":""}" data-a="pkBet" data-v="${v}" ${PK2.spinning||PK2.free?"disabled":""}>${v}</button>`).join("")}</div></div>
+    <div class="pk-stat"><small>Total bet</small><b class="num">${fmtB(stake)}</b></div>
+    <button class="btn btn-ghost pk-auto ${PK2.auto?"on":""}" data-a="pkAuto">${ic("rotate")} ${PK2.auto?`Auto ${PK2.auto}`:"Auto 10"}</button>
+    <button class="spin-btn" data-a="pkSpin" ${PK2.spinning||(!PK2.free&&stake>me().bucks)?"disabled":""} aria-label="Spin">${ic("rotate")}<span>${PK2.free?"Free":"Spin"}</span></button>
+   </div>
+  </section>
+  <section class="felt" style="margin-top:16px"><div class="sec-h"><h3>Pay table</h3><span class="mute">x line bet, left to right</span></div>
+   <div class="pk-pays">${[0,2,3,4,5,6,7,8,9].map(i=>`<div class="pp">${pkSym(i)}<span><small>5</small><b>${PPAY[i][2]}</b></span><span><small>4</small><b>${PPAY[i][1]}</b></span><span><small>3</small><b>${PPAY[i][0]}</b></span></div>`).join("")}
+    <div class="pp sc">${pkSym(1)}<span style="grid-column:2/-1;text-align:left">3, 4 or 5 anywhere pay 2x, 10x or 50x total bet and give 8, 12 or 20 free spins at ${PFREE_MULT}x</span></div></div>
+   <p class="mute" style="font-size:12.5px;margin:10px 0 0">The crown is wild and stands in for every symbol except the bonus coin.</p></section></div>`;
+}
+
+/* ---------- Butla Air (solo plane crash game) ---------- */
+const AIR={state:"idle",stake:0,cp:1,t0:0,m:1,cashAt:0,ret:0,auto:0,hist:[],raf:0,trail:[]};
+Object.assign(A,{
+  airAuto(v){AIR.auto=v;SFX.click();render()},
+  airStart(){if(AIR.state==="run")return;const s=takeBet("air");if(!s)return;AIR.stake=s;AIR.cp=crPoint();AIR.cashAt=0;AIR.m=1;AIR.state="run";AIR.t0=performance.now();AIR.trail=[];SFX.engine(1.2);SFX.whoosh();render();airLoop()},
+  airCash(){if(AIR.state!=="run")return;AIR.cashAt=Math.floor(AIR.m*100)/100;AIR.ret=Math.floor(AIR.stake*AIR.cashAt);bank(AIR.ret);AIR.state="cashed";record(AIR.stake,AIR.ret);SFX.win(AIR.cashAt>=3?2:1);airUI()}
+});
+BETS.air=10;
+function airLoop(){
+  const t=(performance.now()-AIR.t0)/1000,m=Math.exp(CR_K*t);
+  if(m>=AIR.cp){AIR.m=AIR.cp;const lost=AIR.state==="run";AIR.flewAt=performance.now();AIR.state="gone";AIR.hist.unshift({cp:AIR.cp});AIR.hist=AIR.hist.slice(0,12);
+    if(lost){record(AIR.stake,0);SFX.v(600,.9,{type:"sawtooth",v:.05,to:2400,lp:3000});SFX.lose()}else SFX.whoosh();airFly();return}
+  AIR.m=m;if(AIR.state==="run"&&AIR.auto>1&&m>=AIR.auto)A.airCash();
+  if(Math.random()<.04)SFX.engine(.4);
+  airPaint();airUI();AIR.raf=requestAnimationFrame(airLoop);
+}
+function airFly(){const k=(performance.now()-AIR.flewAt)/900;airPaint(Math.min(1,k));airUI();if(k<1)requestAnimationFrame(airFly);else render()}
+function airUI(){const el=document.getElementById("airMult");if(el){el.textContent=AIR.m.toFixed(2)+"x";el.className="air-mult num "+(AIR.state==="gone"?(AIR.cashAt?"cashed":"crashed"):AIR.state==="cashed"?"cashed":"")}
+  const b=document.getElementById("airBtn");if(b){b.disabled=AIR.state!=="run";b.innerHTML=`${ic("coins")} ${AIR.state==="run"?`Cash out ${fmtB(Math.floor(AIR.stake*AIR.m))}`:AIR.cashAt?`Cashed ${fmtB(AIR.ret)} at ${AIR.cashAt.toFixed(2)}x`:"Cash out"}`}}
+function airPaint(fly=0){
+  const cv=document.getElementById("airCanvas");if(!cv)return;const dpr=Math.min(2,window.devicePixelRatio||1),W=cv.clientWidth,H=cv.clientHeight;if(cv.width!==W*dpr){cv.width=W*dpr;cv.height=H*dpr}
+  const x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+  const now=performance.now(),sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,"#0b1a2e");sky.addColorStop(1,"#1c2d1f");x.fillStyle=sky;x.fillRect(0,0,W,H);
+  for(let i=0;i<40;i++){const sx=(i*137.5+(now/40)*(i%3+1))%(W+20)-10,sy=(i*71)%(H*.7);x.fillStyle=`rgba(255,255,255,${.15+.25*(i%3)/2})`;x.fillRect(W-sx,sy,1.5,1.5)}
+  x.strokeStyle="#ffffff10";for(let i=0;i<6;i++){const gx=((i*W/5)-(now/12))%W;x.beginPath();x.moveTo(gx<0?gx+W:gx,H-20);x.lineTo((gx<0?gx+W:gx)-40,H);x.stroke()}
+  x.fillStyle="#132018";x.fillRect(0,H-20,W,20);
+  const t=Math.log(AIR.m)/CR_K,tMax=Math.max(10,t*1.2),mMax=Math.max(2.2,AIR.m*1.25),pl=16,pb=30,pt=30,pr=70;
+  const X=s=>pl+(W-pl-pr)*s/tMax,Y=v=>H-pb-(H-pb-pt)*(v-1)/(mMax-1);
+  const g=x.createLinearGradient(0,H,0,0);g.addColorStop(0,"#ef6a5800");g.addColorStop(1,"#ef6a5866");
+  x.beginPath();x.moveTo(X(0),Y(1));const steps=60;for(let i=0;i<=steps;i++){const s=t*i/steps;x.lineTo(X(s),Y(Math.exp(CR_K*s)))}x.lineTo(X(t),Y(1));x.closePath();x.fillStyle=g;x.fill();
+  x.beginPath();x.moveTo(X(0),Y(1));for(let i=0;i<=steps;i++){const s=t*i/steps;x.lineTo(X(s),Y(Math.exp(CR_K*s)))}x.strokeStyle="#ef6a58";x.lineWidth=4;x.lineCap="round";x.stroke();
+  let px=X(t),py=Y(AIR.m),ang=-Math.atan2(Y(AIR.m)-Y(Math.exp(CR_K*Math.max(0,t-.3))),X(t)-X(Math.max(0,t-.3)))||-.2;
+  if(fly){px+=fly*W*.7;py-=fly*H*.9;ang=-.7}
+  if(AIR.state==="idle"){px=X(0)+10;py=Y(1)-6;ang=0}
+  x.save();x.translate(px,py);x.rotate(-ang);
+  x.fillStyle="#e8b647";x.strokeStyle="#7a5a10";x.lineWidth=1.5;
+  x.beginPath();x.moveTo(26,0);x.quadraticCurveTo(18,-6,-18,-4);x.lineTo(-24,-12);x.lineTo(-28,-12);x.lineTo(-24,0);x.lineTo(-28,4);x.lineTo(-18,4);x.quadraticCurveTo(18,6,26,0);x.fill();x.stroke();
+  x.fillStyle="#c8902a";x.beginPath();x.moveTo(4,-2);x.lineTo(-8,-18);x.lineTo(-14,-18);x.lineTo(-6,-2);x.fill();x.beginPath();x.moveTo(4,2);x.lineTo(-6,14);x.lineTo(-11,14);x.lineTo(-5,2);x.fill();
+  x.fillStyle="#8fd3ff";x.beginPath();x.ellipse(14,-2,4,2.2,0,0,7);x.fill();
+  const prop=(now/20)%2<1?10:3;x.fillStyle="#f4ecd6aa";x.fillRect(26,-prop/2,2,prop);
+  x.restore();
+  if(AIR.cashAt){const tc=Math.log(AIR.cashAt)/CR_K;x.beginPath();x.arc(X(tc),Y(AIR.cashAt),7,0,7);x.fillStyle="#58c98a";x.fill();x.font="700 12px Manrope, sans-serif";x.fillText(`Cashed ${AIR.cashAt.toFixed(2)}x`,X(tc)+10,Y(AIR.cashAt)-10)}
+}
+function air(){
+  const run=AIR.state==="run";
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Butla Air</h2><span class="mute">Cash out before the plane flies away</span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("air",run)}
+    <div><label class="lbl2">Auto cash out</label><div class="seg wrap">${[[0,"Off"],[1.5,"1.5x"],[2,"2x"],[3,"3x"],[5,"5x"],[10,"10x"]].map(([v,l])=>`<button class="${AIR.auto===v?"on":""}" data-a="airAuto" data-v="${v}" ${run?"disabled":""}>${l}</button>`).join("")}</div></div>
+    ${run||AIR.state==="cashed"?`<button id="airBtn" class="btn btn-gold btn-lg cashg" data-a="airCash">${ic("coins")} Cash out</button>`:`<button class="btn btn-gold btn-lg" data-a="airStart">${ic("plane")} Take off</button>`}
+    <div><label class="lbl2">Recent flights</label><div class="hist">${AIR.hist.map(h=>`<span class="h ${h.cp>=2?"hi":"lo"}">${h.cp.toFixed(2)}x</span>`).join("")||`<span class="mute" style="font-size:13px">None yet</span>`}</div></div>
+   </aside>
+   <section class="table-felt air-felt"><canvas id="airCanvas" aria-label="Butla Air flight"></canvas>
+    <div class="cr-over"><div id="airMult" class="air-mult num ${AIR.state==="gone"?(AIR.cashAt?"cashed":"crashed"):""}">${AIR.m.toFixed(2)}x</div>
+     <div class="cr-sub">${AIR.state==="gone"?(AIR.cashAt?`Landed it. +${fmtB(AIR.ret-AIR.stake)}`:`FLEW AWAY at ${AIR.cp.toFixed(2)}x`):AIR.state==="idle"?"Set a bet and take off":""}</div></div></section>
+  </div></div>`;
+}
+
+/* ---------- Dice ---------- */
+const DC={target:50,over:true,roll:null,rolling:false,win:null,hist:[]};
+BETS.dice=10;
+const dcChance=()=>DC.over?100-DC.target:DC.target;
+const dcMult=()=>Math.floor(99/dcChance()*100)/100;
+Object.assign(A,{
+  dcSide(){if(DC.rolling)return;DC.over=!DC.over;SFX.click();render()},
+  async dcRoll(){if(DC.rolling)return;const s=takeBet("dice");if(!s)return;DC.rolling=true;DC.win=null;render();SFX.roll();
+    const roll=Math.floor(Math.random()*10000)/100,el=document.getElementById("dcNum"),t0=performance.now();
+    await new Promise(res=>{(function f(t){const k=(t-t0)/700;if(el)el.textContent=(k<1?Math.random()*100:roll).toFixed(2);if(k<1)requestAnimationFrame(f);else res()})(t0)});
+    const win=DC.over?roll>DC.target:roll<DC.target,ret=win?Math.floor(s*dcMult()):0;if(ret)bank(ret);record(s,ret);
+    DC.roll=roll;DC.win=win;DC.rolling=false;DC.hist.unshift({r:roll,w:win});DC.hist=DC.hist.slice(0,14);
+    if(win){if(ret<s*5)SFX.win(dcMult()>=3?2:1)}else SFX.lose();render()}
+});
+if(typeof document!=="undefined"&&document.addEventListener)document.addEventListener("input",e=>{if(e.target&&e.target.id==="dcSlider"){DC.target=Math.max(2,Math.min(98,+e.target.value));
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};set("dcTarget",DC.target);set("dcChance",dcChance()+"%");set("dcMult",dcMult().toFixed(2)+"x");set("dcSideTxt",`Roll ${DC.over?"over":"under"} ${DC.target}`);
+  const tr=document.querySelector(".dc-track");if(tr)tr.style.setProperty("--t",DC.target+"%");if(Math.random()<.4)SFX.tick()}});
+function dice(){
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Dice</h2><span class="mute">Roll 0 to 100. Pick your odds.</span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("dice",DC.rolling)}
+    <div class="readout"><div><small>Win chance</small><b class="num" id="dcChance">${dcChance()}%</b></div><div><small>Payout</small><b class="num" id="dcMult">${dcMult().toFixed(2)}x</b></div>
+     <div><small>Win amount</small><b class="num">${fmtB(Math.floor(BETS.dice*dcMult()))}</b></div></div>
+    <button class="btn btn-gold btn-lg" data-a="dcRoll" ${DC.rolling?"disabled":""}>${ic("dice5")} Roll</button>
+   </aside>
+   <section class="table-felt dice-felt">
+    <div id="dcNum" class="dc-num num ${DC.win===true?"win":DC.win===false?"lose":""}">${DC.roll==null?"50.00":DC.roll.toFixed(2)}</div>
+    <div class="dc-res">${DC.win===true?`You win ${fmtB(Math.floor(BETS.dice*dcMult())-BETS.dice)}`:DC.win===false?"Missed":""}</div>
+    <div class="dc-track ${DC.over?"over":"under"}" style="--t:${DC.target}%">${DC.roll!=null?`<span class="dc-mark ${DC.win?"win":"lose"}" style="left:${DC.roll}%">${DC.roll.toFixed(1)}</span>`:""}
+     <input id="dcSlider" type="range" min="2" max="98" step="1" value="${DC.target}" aria-label="Target number" ${DC.rolling?"disabled":""}></div>
+    <div class="dc-scale"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+    <button class="btn btn-ghost" data-a="dcSide" ${DC.rolling?"disabled":""}>${ic(DC.over?"arrowUp":"arrowDown")} <span id="dcSideTxt">Roll ${DC.over?"over":"under"} ${DC.target}</span> · tap to switch</button>
+    <div class="hist">${DC.hist.map(h=>`<span class="h ${h.w?"hi":"lo"}">${h.r.toFixed(1)}</span>`).join("")}</div>
+   </section></div></div>`;
+}
+
+/* ---------- Hi-Lo ---------- */
+const HL={card:null,stake:0,mult:1,state:"idle",trail:[],seq:900000};
+BETS.hilo=10;
+const hlRank=c=>RANKS.indexOf(c.r)+1;
+const hlDraw=()=>({r:RANKS[Math.floor(Math.random()*13)],s:"shdc"[Math.floor(Math.random()*4)],id:++HL.seq});
+const hlP=(hi,c)=>{const v=hlRank(c);return hi?(13-v+1)/13:v/13};
+const hlPay=p=>Math.floor(.97/p*100)/100;
+Object.assign(A,{
+  hlStart(){if(HL.state==="live")return;const s=takeBet("hilo");if(!s)return;HL.stake=s;HL.mult=1;HL.state="live";HL.card=hlDraw();HL.trail=[HL.card];SFX.card();render()},
+  async hlGuess(hi){if(HL.state!=="live")return;hi=!!+hi;const p=hlP(hi,HL.card),next=hlDraw(),a=hlRank(HL.card),b=hlRank(next);
+    const ok=hi?b>=a:b<=a;HL.trail.push(next);HL.prev=HL.card;HL.card=next;SFX.card();
+    if(ok){HL.mult=Math.floor(HL.mult*hlPay(p)*100)/100;SFX.v(660+HL.trail.length*40,.15,{type:"triangle",v:.06});render()}
+    else{HL.state="lost";record(HL.stake,0);SFX.lose();render()}},
+  hlSkip(){if(HL.state!=="live")return;HL.card=hlDraw();HL.trail.push(HL.card);SFX.card();render()},
+  hlCash(){if(HL.state!=="live"||HL.mult<=1)return;HL.ret=Math.floor(HL.stake*HL.mult);bank(HL.ret);record(HL.stake,HL.ret);HL.state="won";if(HL.ret<HL.stake*5)SFX.win(HL.mult>=3?2:1);render()}
+});
+function hilo(){
+  const live=HL.state==="live",c=HL.card,ph=c?hlP(true,c):0,pl=c?hlP(false,c):0;
+  return `<div class="screen">${cHead()}
+  <div class="game-head"><button class="btn btn-ghost sm" data-a="go" data-v="home">${ic("home")} Lobby</button><h2>Hi-Lo</h2><span class="mute">Higher or lower? Ties count as a win.</span></div>
+  ${brokeBanner()}
+  <div class="side-layout">
+   <aside class="felt side">
+    ${betBox("hilo",live)}
+    <div class="readout"><div><small>Multiplier</small><b class="num">${HL.mult.toFixed(2)}x</b></div><div><small>${live?"Cash out for":"Last result"}</small><b class="num ${HL.state==="won"?"pos":HL.state==="lost"?"neg":""}">${live?fmtB(Math.floor(HL.stake*HL.mult)):HL.state==="won"?`+${fmtB(HL.ret-HL.stake)}`:HL.state==="lost"?`-${fmtB(HL.stake)}`:"-"}</b></div></div>
+    ${live?`<button class="btn btn-gold btn-lg" data-a="hlCash" ${HL.mult>1?"":"disabled"}>${ic("coins")} Cash out</button><button class="btn btn-ghost" data-a="hlSkip">${ic("shuffle")} Skip this card</button>`:`<button class="btn btn-gold btn-lg" data-a="hlStart">${ic("cards")} ${HL.state==="idle"?"Deal":"Play again"}</button>`}
+   </aside>
+   <section class="table-felt hl-felt">
+    <div class="hl-main">${c?pcard(c):`<div class="pc ghost"></div>`}
+     ${live?`<div class="hl-btns"><button class="btn btn-gold btn-lg" data-a="hlGuess" data-v="1">${ic("arrowUp")} Higher or same<small>${(ph*100).toFixed(0)}% · ${hlPay(ph).toFixed(2)}x</small></button>
+      <button class="btn btn-gold btn-lg" data-a="hlGuess" data-v="0">${ic("arrowDown")} Lower or same<small>${(pl*100).toFixed(0)}% · ${hlPay(pl).toFixed(2)}x</small></button></div>`
+     :HL.state==="lost"?`<div class="over-msg lose">${ic("x")} Wrong call. The ${HL.card.r} ends it.</div>`:HL.state==="won"?`<div class="over-msg win">${ic("coins")} Cashed ${fmtB(HL.ret)} at ${HL.mult.toFixed(2)}x</div>`:`<div class="bj-msg idle">Deal a card to start</div>`}</div>
+    <div class="hl-trail">${HL.trail.slice(-10).map(x=>pcard(x,false,"mini")).join("")}</div>
+   </section></div></div>`;
+}
+
+/* ---------- Wire up ---------- */
+ROUTES.push("pokies","air","dice","hilo");Object.assign(CV,{pokies,air,dice,hilo});
+GAMES.splice(4,0,{v:"pokies",name:"Butla Pokies",icon:"cherry",art:"pz",line:"5-reel Aussie pokie. 20 lines, wild crowns and free spins at 3x.",tag:"New · Min 20"});
+GAMES.push({v:"air",name:"Butla Air",icon:"plane",art:"air",line:"Ride the plane up. Cash out before it flies away.",tag:"New · Any bet"},
+ {v:"dice",name:"Dice",icon:"dice5",art:"dc",line:"Pick your odds, roll 0 to 100. Up to 49.5x.",tag:"New · Any bet"},
+ {v:"hilo",name:"Hi-Lo",icon:"cards",art:"hl",line:"Higher or lower? Build a multiplier, cash out any time.",tag:"New · Any bet"});
+Object.assign(GAME_NAMES,{pokies:"Butla Pokies",air:"Butla Air",dice:"Dice",hilo:"Hi-Lo"});
+{const f=afterRender;afterRender=function(){f();if(APP.view==="air")airPaint(AIR.state==="gone"?1:0)}}
+
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793261680";
+const BUILD="1793262271";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
