@@ -895,6 +895,29 @@ body{overflow-x:clip}
 .job-nag .bw-label{background-image:linear-gradient(180deg,#fff,#cfe6ff 40%,#5aa0e0 75%,#e6f2ff);filter:drop-shadow(0 6px 0 #0d2a4b) drop-shadow(0 0 24px #5aa0e099);font-size:clamp(38px,9vw,84px)}
 .job-nag .bw-crown{color:#9ad1ff;filter:drop-shadow(0 0 20px #5aa0e0)}
 .job-nag{background:#000000d9;backdrop-filter:blur(3px)}
+/* realistic monitor */
+.desk{max-width:none;padding-bottom:6px}
+.monitor{width:min(600px,100%);aspect-ratio:16/10.5;display:flex;flex-direction:column;padding:12px 12px 22px;border-radius:12px;background:linear-gradient(180deg,#1d1f24,#0f1114);box-shadow:0 0 0 1px #3a3d44,inset 0 0 0 2px #000,0 26px 50px -18px #000}
+.monitor::before{content:"";position:absolute;left:50%;bottom:7px;width:6px;height:6px;border-radius:50%;background:#58c98a;box-shadow:0 0 6px #58c98a;transform:translateX(-50%)}
+.monitor::after{display:none}
+.screen-top{flex:none}
+.screen-body{flex:1;min-height:0;padding:clamp(14px,3vw,24px);align-content:center}
+.off-line{font-size:clamp(15px,2.3vw,21px)}
+.stand{width:70px;height:44px;margin-top:-1px;background:linear-gradient(90deg,#2b2e34,#3a3e46,#2b2e34);clip-path:polygon(30% 0,70% 0,78% 100%,22% 100%)}
+.stand::after{content:"";display:block}
+.desk-row{display:flex;align-items:center;gap:18px;margin-top:-2px}
+.desk-row::before{content:"";position:absolute}
+.stand+.desk-row{position:relative}
+.stand{position:relative}
+.stand::before{content:"";position:absolute;left:50%;bottom:-8px;width:170px;height:10px;transform:translateX(-50%);border-radius:50%/40%;background:#2b2e34;box-shadow:0 6px 10px -4px #000}
+.deskkb{margin-top:18px;display:grid;gap:3px;padding:8px 10px;border-radius:8px;background:#d9dbe0;box-shadow:0 6px 12px -6px #000,inset 0 -3px 0 #b8bbc2;transform:perspective(500px) rotateX(38deg)}
+.deskkb i{display:flex;gap:3px;justify-content:center}.deskkb b{width:18px;height:12px;border-radius:2px;background:#f6f7f9;box-shadow:0 2px 0 #a9adb6}
+.deskkb i:last-child b:nth-child(4){width:90px}
+.mouse{margin-top:18px;width:26px;height:38px;border-radius:13px 13px 12px 12px;background:#d9dbe0;box-shadow:0 6px 10px -5px #000,inset 0 -3px 0 #b8bbc2;transform:perspective(400px) rotateX(30deg)}
+.desk-items{right:max(0px,calc(50% - 400px));bottom:18px}
+.papers{width:46px;height:30px;background:#f4f1e8;border-radius:2px;box-shadow:3px -3px 0 #e6e2d5,6px -6px 0 #d8d3c3;transform:rotate(-8deg)}
+@media (max-width:900px){.deskkb,.mouse{display:none}.desk-row{display:none}}
+@media (max-width:640px){.monitor{aspect-ratio:auto;padding:8px 8px 16px}.screen-body{min-height:170px}.stand{height:24px;width:54px}.stand::before{width:110px}}
 </style>
 
 </head>
@@ -2727,7 +2750,9 @@ function office(){
       <div class="off-meta"><span>Typos: <b id="offErr">${OFF.errs}</b></span><span>${OFF.line.length} letters · about ${fmtB(Math.round(OFF.line.length*r.rate*(OFF.urgent?2:1)))} Bucks</span></div>
      </div>
     </div>
-    <div class="desk-items"><span class="mug">${ic("mug")}</span><span class="plant"></span></div>
+    <div class="stand"></div>
+    <div class="desk-row"><div class="deskkb" aria-hidden="true">${Array.from({length:4},(_,r)=>`<i style="--n:${[12,11,10,7][r]}">${"<b></b>".repeat([12,11,10,7][r])}</i>`).join("")}</div><div class="mouse" aria-hidden="true"></div></div>
+    <div class="desk-items"><span class="mug">${ic("mug")}</span><span class="plant"></span><span class="papers"></span></div>
    </div>
    ${L?`<div class="payslip ${L.pay?"":"none"}"><b>${L.pay?`+${fmtB(L.pay)} Bucks`:"No pay"}</b><span>${Math.round(L.acc*100)}% accurate · ${L.wpm} WPM</span><small>${esc(L.note)}</small></div>`:`<div class="payslip hint"><span>Start typing the sentence on the screen. ${"ontouchstart" in window?"Use the keyboard below.":"Use your keyboard."}</span></div>`}
    ${OFF.msg?`<div class="off-event">${ic("mug")} ${esc(OFF.msg)}</div>`:""}
@@ -2753,7 +2778,7 @@ function jobNag(){if(APP.view==="office"||document.getElementById("jobNag")||Dat
 {const f=bank;bank=function(d){const was=me().bucks;f(d);if(d<0&&me().bucks<100&&was>=me().bucks)setTimeout(()=>{if(me().bucks<100)jobNag()},2500)}}
 
 /* ---------- Update notice (GitHub Pages caches pages for ~10 min) ---------- */
-const BUILD="1793267215";
+const BUILD="1793267310";
 async function checkBuild(){try{if(typeof location==="undefined"||!/^https?:/.test(location.protocol))return;
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
   if(j.build&&j.build!==BUILD&&!document.getElementById("updBar")){const d=document.createElement("button");d.id="updBar";d.className="upd-bar";
